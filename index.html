@@ -569,7 +569,7 @@ function sfx(k,v=1){if(!AC||muted||v<=.03)return;const t=AC.currentTime;try{swit
 function vf(o){return clamp(1-Math.hypot(o.x-cam.x,o.y-cam.y)/1700,.25,1);}
 
 /* ================= BATTLE STATE ================= */
-let mines=[],nebulae=[],state='menu',ships=[],player=null,enemy=null,projs=[],beams=[],parts=[],rings=[],deaths=[],planets=[],mission=null;
+let swarmId=0,mines=[],nebulae=[],state='menu',ships=[],player=null,enemy=null,projs=[],beams=[],parts=[],rings=[],deaths=[],planets=[],mission=null;
 let TURN=6,hudBotL=90,turnT=0,turnN=0,ffwd=1,prevState='plan',tStart={d:0,t:0},freeze=0,cam={x:0,y:0,z:.6,cy:0},camO={x:0,y:0},shake=0,timeScale=1,endTimer=0,gameTime=0,wpPulse=0,hudTop=100,hudBot=190,dragging=false;
 const PLANET={dealt:0,tgtSys:'hull'};
 
@@ -626,8 +626,8 @@ function fireMount(s,m,t,idx,amb){
  else if(m.t==='torp'){const V=tvOf(m),sp=w.speed*V.spd,tdm=dmg*V.dmg,tv=m.v||'fusion';for(let i=0;i<2*ch;i++)s.queue.push({t:del+i*.17,fn:()=>{if(!s.alive||!t.alive)return;const a=lead(s,t,sp,err)+(ch>1?((i%3)-1)*.06:0);const p=local(s,20,i%2?-5:5);
    kick(s,-Math.cos(a)*6,-Math.sin(a)*6,0);projs.push({kind:'torp',v:tv,owner:s,target:t,x:p.x,y:p.y,vx:Math.cos(a)*sp+s.vx*.3,vy:Math.sin(a)*sp+s.vy*.3,life:mRange(m)/sp*1.2,dmg:tdm,age:0});
    glowP(p.x,p.y,30,SPR[V.spr],.15);sfx('torp',vf(s));}});}
- else if(m.t==='barr'){for(let i=0;i<w.count*ch;i++)s.queue.push({t:del+i*.05,fn:()=>{if(!s.alive)return;const sd=i%2?1:-1,a=s.a+sd*(Math.PI/2+rand(-.5,.4)),p=local(s,rand(-8,8),sd*10);
-   projs.push({kind:'miss',owner:s,target:t,x:p.x,y:p.y,a,spd:160,maxSpd:rand(520,600),turn:0,life:3.4,dmg,age:0,wob:rand(0,TAU)});
+ else if(m.t==='barr'){const grp=++swarmId;for(let i=0;i<w.count*ch;i++)s.queue.push({t:del+i*.05,fn:()=>{if(!s.alive)return;const sd=i%2?1:-1,a=s.a+sd*(Math.PI/2+rand(-.5,.4)),p=local(s,rand(-8,8),sd*10);
+   projs.push({kind:'miss',owner:s,target:t,grp,x:p.x,y:p.y,a,spd:160,maxSpd:rand(520,600),turn:0,life:4.2,dmg,age:0,wob:rand(0,TAU)});
    glowP(p.x,p.y,14,SPR.white,.12);if(i%3===0)sfx('barr',vf(s));}});}
  else if(m.t==='bomb'){for(let i=0;i<ch;i++)s.queue.push({t:del+i*.5,fn:()=>{if(!s.alive||!t.alive)return;const a=lead(s,t,w.speed*1.3,err),p=local(s,18,0);
   kick(s,-Math.cos(a)*22,-Math.sin(a)*22,0);projs.push({kind:'bomb',owner:s,target:t,x:p.x,y:p.y,vx:Math.cos(a)*w.speed,vy:Math.sin(a)*w.speed,life:8,dmg,R:w.radius,hp:3,age:0,fuse:65});
@@ -662,6 +662,20 @@ function glowP(x,y,size,spr,life,vx=0,vy=0,drag=0,grow=0){P({x,y,vx,vy,life,max:
 function sparks(x,y,n,spr,spd,life,size){for(let i=0;i<n;i++){const a=rand(0,TAU),v=rand(spd*.2,spd);glowP(x,y,rand(size*.4,size),spr,rand(life*.4,life),Math.cos(a)*v,Math.sin(a)*v,2.2);}}
 function ring(x,y,maxR,life,rgb,w){rings.push({x,y,r:0,maxR,life,max:life,rgb,w});}
 function boom(x,y,sc,spr){glowP(x,y,90*sc,SPR.white,.25*sc+.1);glowP(x,y,140*sc,spr,.5*sc+.15,0,0,0,40*sc);sparks(x,y,(14*sc)|0,spr,260*sc,.7,10*sc);ring(x,y,70*sc,.45,'255,220,180',3);}
+// swarm hits on the same ship stack up: every missile that lands close behind the last one blows bigger,
+// and once the salvo is spent the whole thing blooms into one large explosion sized by how many hit
+function swarmHit(t,p){let c=t.combo;if(!c||gameTime-c.tm>.45)c=t.combo={n:0,tm:0};
+ c.n++;c.tm=gameTime;c.x=p.x;c.y=p.y;c.spr=SPR[p.owner.S.g];c.rgb=p.owner.S.rgb;c.pend=1;
+ const sc=Math.min(2.2,.35+.13*c.n);boom(p.x,p.y,sc,c.spr);if(c.n%3===0)ring(p.x,p.y,30+c.n*6,.35,c.rgb,2);
+ sfx(c.n>5?'hit':'pop',vf(p)*Math.min(1,.5+c.n*.08));}
+function bloom(x,y,n,spr,rgb){const R=Math.min(240,40+n*9);
+ glowP(x,y,R*.7,SPR.white,.22);glowP(x,y,R*1.9,spr,.95,0,0,0,R*.8);glowP(x,y,R*1.2,SPR.orange,.55,0,0,0,R*.5);glowP(x,y,R*.9,SPR.violet,.7,0,0,0,R*.6);
+ const k=10+Math.min(20,n);for(let i=0;i<k;i++){const a=i/k*TAU,v=R*3.2;for(const f of[1,.62]){glowP(x,y,10+n*.4,i%2?SPR.white:spr,1.1*f,Math.cos(a)*v*f,Math.sin(a)*v*f,2.4);}}
+ sparks(x,y,20+n*2,SPR.white,R*2.4,.9,8);
+ ring(x,y,R*.55,.35,'255,236,190',4);ring(x,y,R,.6,rgb,6);ring(x,y,R*1.45,.95,'255,255,255',2);
+ sfx('boom',Math.min(1,.35+n*.04));
+ if(player&&dist({x,y},player)<700){shake=Math.min(18,shake+n*.6);freeze=Math.max(freeze,Math.min(.09,.01*n));}}
+function updCombos(){for(const s of ships){const c=s.combo;if(c&&c.pend&&gameTime-c.tm>.2){c.pend=0;if(c.n>=4)bloom(c.x,c.y,c.n,c.spr,c.rgb);}}}
 function bigBoom(x,y,R,spr,rgb){glowP(x,y,R*1.4,SPR.white,.35);glowP(x,y,R*2.2,spr,.9,0,0,0,R*.6);sparks(x,y,70,spr,R*3.2,1.2,16);sparks(x,y,30,SPR.white,R*2,.6,8);
  ring(x,y,R,.6,rgb,6);ring(x,y,R*1.35,.95,'255,255,255',2);const d=player?dist({x,y},player):9999;shake=Math.min(22,shake+clamp(26-d/30,4,22));}
 
@@ -808,9 +822,10 @@ function shipCollide(a,b){
    boom((a.x+b.x)/2,(a.y+b.y)/2,.9,SPR.orange);sfx('crash',1);a.w+=rand(-1,1)/a.mass;b.w+=rand(-1,1)/b.mass;freeze=Math.max(freeze,.07);msg('COLLISION','#ffd166');}}
 }
 function updProjs(dt){
+ const eta={};for(const p of projs)if(p.kind==='miss'&&p.age>.35&&p.target.alive){const e=Math.max(0,dist(p,p.target)-170)/p.maxSpd;if(!(eta[p.grp]>e))eta[p.grp]=e;}
  for(let i=projs.length-1;i>=0;i--){const p=projs[i],t=p.target;p.age+=dt;p.life-=dt;
   const tv=t.alive&&p.owner.sees;
-  if(p.kind==='miss'){p.spd=Math.min(p.maxSpd,p.spd+1100*dt);if(p.age>.22&&tv){p.turn=Math.min(9,p.turn+dt*14);p.a+=clamp(wrap(angTo(p,t)-p.a),-p.turn*dt,p.turn*dt);}
+  if(p.kind==='miss'){const ge=eta[p.grp],dd=dist(p,t),want=ge&&p.age>.35&&dd>170?clamp((dd-170)/ge,200,p.maxSpd):p.maxSpd;p.spd+=clamp(want-p.spd,-900*dt,1100*dt);if(p.age>.22&&tv){p.turn=Math.min(9,p.turn+dt*14);p.a+=clamp(wrap(angTo(p,t)-p.a),-p.turn*dt,p.turn*dt);}
    p.a+=Math.sin(p.age*18+p.wob)*.6*dt;p.vx=Math.cos(p.a)*p.spd;p.vy=Math.sin(p.a)*p.spd;}
   else{const gf=p.kind==='bomb'?1:.5;for(const pl of planets){const g=gravAt(p.x,p.y,pl);p.vx+=g[0]*gf*dt;p.vy+=g[1]*gf*dt;}
    if(p.kind==='torp'&&tv&&p.age>.25){const sp=Math.hypot(p.vx,p.vy),a=Math.atan2(p.vy,p.vx),na=a+clamp(wrap(angTo(p,t)-a),-.9*dt,.9*dt);p.vx=Math.cos(na)*sp;p.vy=Math.sin(na)*sp;}
@@ -825,7 +840,7 @@ function updProjs(dt){
   if(!dead&&t.alive&&p.life>0&&!isOn(t,'phase')){const d=dist(p,t);
    if(p.kind==='bomb'){if(d<p.fuse+t.rad*.5){detonate(p,1);dead=true;}}
    else{const sx=p.x-Math.cos(p.a)*40,sy=p.y-Math.sin(p.a)*40,f=facingOf(t,sx,sy),r=t.sh[f]>1?t.rad+12:t.rad;
-    if(d<r){hit(t,p.dmg,sx,sy,p.owner,p.kind);const gv=p.v==='grav',im=p.kind==='torp'?(gv?140:34):7;kick(t,Math.cos(p.a)*im,Math.sin(p.a)*im,rand(-1,1)*(p.kind==='torp'?(gv?1.6:.5):.1));if(gv){t.gravT=2.5;ring(p.x,p.y,70,.5,'90,160,255',3);}if(p.kind==='torp'&&(t===player||p.owner===player))freeze=Math.max(freeze,.035);boom(p.x,p.y,p.kind==='torp'?(p.v==='anti'?1.3:.8):.4,p.kind==='torp'?SPR[TV[p.v].spr]:SPR[p.owner.S.miss]);sfx(p.kind==='torp'?'hit':'pop',vf(p));dead=true;}}}
+    if(d<r){hit(t,p.dmg,sx,sy,p.owner,p.kind);const gv=p.v==='grav',im=p.kind==='torp'?(gv?140:34):7;kick(t,Math.cos(p.a)*im,Math.sin(p.a)*im,rand(-1,1)*(p.kind==='torp'?(gv?1.6:.5):.1));if(gv){t.gravT=2.5;ring(p.x,p.y,70,.5,'90,160,255',3);}if(p.kind==='torp'&&(t===player||p.owner===player))freeze=Math.max(freeze,.035);if(p.kind==='miss')swarmHit(t,p);else{boom(p.x,p.y,p.v==='anti'?1.3:.8,SPR[TV[p.v].spr]);sfx('hit',vf(p));}dead=true;}}}
   if(!dead&&p.kind==='bomb'&&p.hp<=0){detonate(p,.45);dead=true;}
   if(!dead&&p.life<=0){if(p.kind==='bomb')detonate(p,1);else{sparks(p.x,p.y,6,SPR.white,90,.3,6);sfx('pop',vf(p)*.6);}dead=true;}
   if(dead)projs.splice(i,1);}
@@ -1011,7 +1026,7 @@ function step(dt){
  updSensors();
  if(state==='exec'&&player.alive&&firing(player))for(const k of WTYPES)if(player.armed[k])fireType(player,k,enemy);
  shipCollide(player,enemy);
- updProjs(dt);updBeams(dt);updMines(dt);updParts(dt);
+ updProjs(dt);updBeams(dt);updMines(dt);updCombos();updParts(dt);
  wpPulse=Math.max(0,wpPulse-dt*1.5);
 }
 function updCam(dt){
@@ -1241,7 +1256,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.7.5';
+const VERSION='0.7.6';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1300,7 +1315,7 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:11.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Economy rebalance: ships, upgrades, weapons and modules cost about 2.5 times more, and contract pay comes from the sector rather than your ship's value</li><li>The game checks for a newer version when it starts and offers to update</li><li>Battlefields are much larger, with more nebulae and planets, and folding space no longer gives away where you arrive</li><li>Contracts keep pace with your ship: core sectors always outclass you and pay accordingly, while the rim gets easier as you grow</li><li>Fixed big ships getting stuck on planets: engines can always beat a planet's pull, and a beached ship turns away and claws off on its own</li><li>Title screen, save slots, save codes, options and privacy policy</li><li>Redesigned ships: every empire has its own design language and every hull is shaped for its role, with turrets and launchers that track the enemy and light up when charged</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Missile swarms pace themselves to hit together, and their explosions build on each other into one big bloom</li><li>Economy rebalance: ships, upgrades, weapons and modules cost about 2.5 times more, and contract pay comes from the sector rather than your ship's value</li><li>The game checks for a newer version when it starts and offers to update</li><li>Battlefields are much larger, with more nebulae and planets, and folding space no longer gives away where you arrive</li><li>Contracts keep pace with your ship: core sectors always outclass you and pay accordingly, while the rim gets easier as you grow</li><li>Fixed big ships getting stuck on planets: engines can always beat a planet's pull, and a beached ship turns away and claws off on its own</li><li>Title screen, save slots, save codes, options and privacy policy</li><li>Redesigned ships: every empire has its own design language and every hull is shaped for its role, with turrets and launchers that track the enemy and light up when charged</li></ul>
  <p><b>Earlier</b></p><ul style="margin-top:0"><li>0.6 · Galaxy campaign with six empires, reputation and territory</li><li>0.5 · Torpedo warheads, fold space, mines, drone swarms</li><li>0.4 · Sensors, nebulae, action levers and capacitors</li><li>0.3 · Simultaneous turns</li></ul></div>
  <button class="btn alt" data-act="title">BACK</button>`);}
 function applyOpt(){TURN=OPT.turn;muted=!OPT.sound;if(master)master.gain.value=.65*OPT.vol;try{localStorage.setItem(OPT_KEY,JSON.stringify(OPT));}catch(e){}}
