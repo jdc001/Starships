@@ -1,5 +1,7 @@
 # Starships (working title)
 
+Version 0.7.0
+
 A one-on-one starship duel game for iPhone and iPad, played in simultaneous turns.
 
 **Play:** https://jdc001.github.io/Starships/
@@ -28,7 +30,7 @@ Six empires share a spiral galaxy, each starting with a sixth of it: the Terran 
 - **The galaxy moves without you:** border clashes happen between missions. Any empire above 40% faces a coalition.
 - **Winning:** Conquest (an allied empire holds two thirds of the galaxy) or Balance of Power (two or more allied empires each hold at least 25%, together 75%).
 
-Progress saves in the browser.
+Progress saves in the browser after every mission. The title screen adds three save slots, a save code you can copy to another device, options (sound, screen shake, turn length, watch speed, tips) and the privacy policy.
 
 ## Files
 

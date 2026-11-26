@@ -138,6 +138,7 @@ h2{margin:0 0 4px;font-size:15px;letter-spacing:.2em;color:var(--cy)}
 .hdr{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
 .cr{color:#ffe066;font-size:13px;letter-spacing:.08em;white-space:nowrap}
 .btn{font:inherit;font-size:11px;letter-spacing:.12em;color:#04060c;background:var(--cy);border:0;border-radius:8px;padding:9px 13px;margin:4px 6px 0 0}
+.btn.wide{display:block;width:min(260px,80%);margin:7px auto 0;padding:12px 0;font-size:12px}
 .btn.alt{background:transparent;color:var(--cy);border:1px solid var(--cy)}
 .btn.sm{font-size:10px;padding:6px 9px;letter-spacing:.06em}
 .btn:disabled{opacity:.3}
@@ -200,7 +201,7 @@ ul{padding-left:16px;margin:10px 0 0;font-size:11px;line-height:1.55;opacity:.85
 <div id="msg"></div>
 <div id="gal">
  <div id="gtop" class="gp"><div class="gh"><b>STARSHIPS</b><span id="gcr"></span></div><div id="greps"></div>
-  <div class="gb"><button class="btn sm" data-gact="yard">SHIPYARD</button><button class="btn alt sm" data-gact="stand">STANDINGS</button></div></div>
+  <div class="gb"><button class="btn sm" data-gact="yard">SHIPYARD</button><button class="btn alt sm" data-gact="stand">STANDINGS</button><button class="btn alt sm" data-gact="menu">MENU</button></div></div>
  <div id="gbot" class="gp"></div>
 </div>
 <div class="ov on" id="scr"><div class="box" id="scrBox"></div></div>
@@ -334,19 +335,6 @@ const AIS={
  warden:{label:'Disciplined',pref:400,sys:'shd',bomb:.6,cautious:.35},
  lancer:{label:'Evasive',pref:620,sys:'eng',bomb:.95,cautious:.5}
 };
-const PATH={
- player:{kestrel:'M18 0 L5 -5 L-8 -8 L-14 -9 L-11 -3 L-14 0 L-11 3 L-14 9 L-8 8 L5 5 Z',
-  warhound:'M20 0 L15 -7 L4 -11 L-12 -13 L-17 -8 L-14 0 L-17 8 L-12 13 L4 11 L15 7 Z',
-  halberd:'M24 0 L9 -5 L-3 -6 L-12 -14 L-21 -14 L-17 -6 L-23 -5 L-23 5 L-17 6 L-21 14 L-12 14 L-3 6 L9 5 Z',
-  leviathan:'M24 0 L18 -6 L0 -8 L-8 -14 L-22 -15 L-19 -7 L-24 -5 L-24 5 L-19 7 L-22 15 L-8 14 L0 8 L18 6 Z'},
- enemy:{kestrel:'M17 -6 L4 -7 L-12 -5 L-8 0 L-12 5 L4 7 L17 6 L8 2 L10 0 L8 -2 Z',
-  warhound:'M21 -4 L8 -12 L-12 -13 L-16 -6 L-12 0 L-16 6 L-12 13 L8 12 L21 4 L12 0 Z',
-  halberd:'M23 -10 L12 -12 L-8 -9 L-21 -13 L-16 0 L-21 13 L-8 9 L12 12 L23 10 L13 4 L17 0 L13 -4 Z',
-  leviathan:'M24 -11 L12 -14 L-8 -11 L-24 -17 L-19 -5 L-24 0 L-19 5 L-24 17 L-8 11 L12 14 L24 11 L14 5 L19 0 L14 -5 Z'}
-};
-const P2D={player:{},enemy:{}};for(const sd in PATH)for(const k in PATH[sd])P2D[sd][k]=new Path2D(PATH[sd][k]);
-const ENG={player:{kestrel:[[-13,0]],warhound:[[-15,-5],[-15,5]],halberd:[[-22,-3],[-22,3]],leviathan:[[-23,-3],[-23,3],[-20,-12],[-20,12]]},
- enemy:{kestrel:[[-10,0]],warhound:[[-14,-4],[-14,4]],halberd:[[-18,-9],[-18,9]],leviathan:[[-21,-5],[-21,5]]}};
 const PTYPES=[
  {n:'Gas giant',hi:'#f0c898',lo:'#6a3a1c',band:'130,70,35',atm:'255,200,140',bands:1},
  {n:'Ice world',hi:'#eaf8ff',lo:'#2a5a7a',spot:'255,255,255',atm:'160,220,255'},
@@ -359,12 +347,12 @@ const MDESC=['A lone Kesh scout is probing the border.','A Kesh warship is haras
 
 /* ================= EMPIRES ================= */
 const EMP={
- terran:{name:'Terran Concord',short:'Concord',col:'#4f8cff',rgb:'79,140,255',spr:'blue',shape:'player',pers:'warden',wpn:['beam','beam','torp'],mods:['tractor','nanites'],tv:'fusion',bio:'Humanity, spread out from Sol. Disciplined crews and heavy beam batteries.'},
- kesh:{name:'Kesh Dominion',short:'Kesh',col:'#ffb347',rgb:'255,179,71',spr:'amber',shape:'enemy',pers:'lancer',wpn:['beam','torp','barr'],mods:['cloak','phase'],tv:'fusion',bio:'Raiders and ambushers who perfected the cloak.'},
- orrun:{name:'Orrun Hegemony',short:'Orrun',col:'#ff5a46',rgb:'255,90,70',spr:'red',shape:'enemy',pers:'raider',wpn:['torp','bomb','beam'],mods:['tractor','nanites'],tv:'anti',bio:'Brutal and heavily armed. Antimatter torpedoes and bombs, and they come straight at you.'},
- vael:{name:'Vael Collective',short:'Vael',col:'#7dffb0',rgb:'125,255,176',spr:'green',shape:'player',pers:'warden',wpn:['beam','barr','torp'],mods:['drones','nanites'],tv:'fusion',bio:'A patient hive mind. Drone swarms and ships that repair themselves.'},
- thane:{name:'Thane Free Worlds',short:'Thane',col:'#ff8fd0',rgb:'255,143,208',spr:'pink',shape:'enemy',pers:'raider',wpn:['barr','beam','torp'],mods:['tractor','drones'],tv:'fusion',bio:'Mercenary freeholds. Missile swarms, mines and grappling beams.'},
- sylari:{name:'Sylari Choir',short:'Sylari',col:'#c9a8ff',rgb:'201,168,255',spr:'violet',shape:'player',pers:'lancer',wpn:['torp','beam','barr'],mods:['phase','drones'],tv:'grav',bio:'Mystics who bend gravity and slip between folds of space.'}
+ terran:{name:'Terran Concord',short:'Concord',col:'#4f8cff',rgb:'79,140,255',spr:'blue',style:'line',pers:'warden',wpn:['beam','beam','torp'],mods:['tractor','nanites'],tv:'fusion',bio:'Humanity, spread out from Sol. Disciplined crews and heavy beam batteries.'},
+ kesh:{name:'Kesh Dominion',short:'Kesh',col:'#ffb347',rgb:'255,179,71',spr:'amber',style:'raptor',pers:'lancer',wpn:['beam','torp','barr'],mods:['cloak','phase'],tv:'fusion',bio:'Raiders and ambushers who perfected the cloak.'},
+ orrun:{name:'Orrun Hegemony',short:'Orrun',col:'#ff5a46',rgb:'255,90,70',spr:'red',style:'block',pers:'raider',wpn:['torp','bomb','beam'],mods:['tractor','nanites'],tv:'anti',bio:'Brutal and heavily armed. Antimatter torpedoes and bombs, and they come straight at you.'},
+ vael:{name:'Vael Collective',short:'Vael',col:'#7dffb0',rgb:'125,255,176',spr:'green',style:'organic',pers:'warden',wpn:['beam','barr','torp'],mods:['drones','nanites'],tv:'fusion',bio:'A patient hive mind. Drone swarms and ships that repair themselves.'},
+ thane:{name:'Thane Free Worlds',short:'Thane',col:'#ff8fd0',rgb:'255,143,208',spr:'pink',style:'raptor',pers:'raider',wpn:['barr','beam','torp'],mods:['tractor','drones'],tv:'fusion',bio:'Mercenary freeholds. Missile swarms, mines and grappling beams.'},
+ sylari:{name:'Sylari Choir',short:'Sylari',col:'#c9a8ff',rgb:'201,168,255',spr:'violet',style:'organic',pers:'lancer',wpn:['torp','beam','barr'],mods:['phase','drones'],tv:'grav',bio:'Mystics who bend gravity and slip between folds of space.'}
 };
 const EORD=['terran','kesh','orrun','vael','thane','sylari'];
 const ename=()=>enemy&&enemy.emp?EMP[enemy.emp].short.toUpperCase():'ENEMY';
@@ -386,14 +374,97 @@ const SY1=['Vey','Or','Cal','Tesh','Mar','Il','Ash','Cor','Hol','Pel','Qui','Bra
 const SECT=[];for(let r=0;r<RINGS;r++)for(let c=0;c<CELLS;c++){const id=r*CELLS+c,q=mulb(id*977+13);SECT.push({id,r,c,val:RVAL[r],name:id===SOL?'Sol':`${pick2(SY1,q)}${pick2(SY2,q)} ${pick2(SY3,q)}`});}
 function nbrs(id){const r=Math.floor(id/CELLS),c=id%CELLS,o=[r*CELLS+(c+1)%CELLS,r*CELLS+(c+CELLS-1)%CELLS];if(r>0)o.push((r-1)*CELLS+c);if(r<RINGS-1)o.push((r+1)*CELLS+c);return o;}
 const TOTV=SECT.reduce((a,x)=>a+x.val,0);
-function newGalaxy(){const rep={};EORD.forEach(e=>rep[e]=0);rep.terran=10;return{own:SECT.map(x=>EORD[Math.floor(x.c/4)]),rep,n:0,log:[],offers:{},won:null};}
+function newGalaxy(home){const rep={};EORD.forEach(e=>rep[e]=0);rep[home||'terran']=15;return{own:SECT.map(x=>EORD[Math.floor(x.c/4)]),rep,n:0,log:[],offers:{},won:null};}
 const shareOf=e=>save.g.own.reduce((a,o,i)=>a+(o===e?SECT[i].val:0),0)/TOTV;
 const alive=e=>save.g.own.includes(e);
+
+/* ================= SHIP ART ================= */
+// Four design languages, each with a hull for every role.
+// line: Concord and the player, clean naval lines. raptor: Kesh and Thane, forward claws.
+// block: Orrun, brutal armour slabs. organic: Vael and Sylari, grown crescents.
+const DES={
+ line:{
+  kestrel:{p:'M22 0 L8 -4 L-4 -5 L-12 -12 L-16 -12 L-12 -4 L-16 -3 L-16 3 L-12 4 L-16 12 L-12 12 L-4 5 L8 4 Z',eng:[[-16,0]],br:[12,0]},
+  warhound:{p:'M24 -7 L24 -3 L15 -3 L13 0 L15 3 L24 3 L24 7 L10 11 L-8 13 L-18 10 L-20 4 L-20 -4 L-18 -10 L-8 -13 L10 -11 Z',eng:[[-20,-5],[-20,5]],br:[6,0]},
+  halberd:{p:'M26 0 L18 -3 L6 -4 L0 -11 L-14 -12 L-16 -6 L-22 -5 L-24 -2 L-24 2 L-22 5 L-16 6 L-14 12 L0 11 L6 4 L18 3 Z',eng:[[-24,0],[-15,-10],[-15,10]],br:[16,0]},
+  leviathan:{p:'M24 0 L20 -6 L8 -10 L-4 -16 L-20 -16 L-24 -10 L-24 10 L-20 16 L-4 16 L8 10 L20 6 Z',eng:[[-24,-6],[-24,6],[-22,-13],[-22,13]],br:[14,0]}},
+ raptor:{
+  kestrel:{p:'M18 -2 L10 -9 L14 -12 L2 -10 L-12 -6 L-8 0 L-12 6 L2 10 L14 12 L10 9 L18 2 Z',eng:[[-10,-4],[-10,4]],br:[10,0]},
+  warhound:{p:'M24 -8 L12 -6 L16 -14 L0 -12 L-16 -10 L-12 0 L-16 10 L0 12 L16 14 L12 6 L24 8 L14 0 Z',eng:[[-14,-8],[-14,8]],br:[2,0]},
+  halberd:{p:'M23 -10 L12 -12 L-8 -9 L-21 -13 L-16 0 L-21 13 L-8 9 L12 12 L23 10 L13 4 L17 0 L13 -4 Z',eng:[[-19,-10],[-19,10]],br:[8,0]},
+  leviathan:{p:'M24 -12 L10 -16 L-10 -12 L-24 -18 L-18 -6 L-24 0 L-18 6 L-24 18 L-10 12 L10 16 L24 12 L14 6 L20 0 L14 -6 Z',eng:[[-21,-14],[-21,14],[-20,0]],br:[10,0]}},
+ block:{
+  kestrel:{p:'M16 -5 L16 5 L4 8 L-12 8 L-14 4 L-14 -4 L-12 -8 L4 -8 Z',eng:[[-14,-4],[-14,4]],br:[8,0]},
+  warhound:{p:'M24 -5 L24 5 L18 7 L18 12 L-14 12 L-18 8 L-18 -8 L-14 -12 L18 -12 L18 -7 Z',eng:[[-18,-6],[-18,0],[-18,6]],br:[8,0]},
+  halberd:{p:'M24 -4 L24 4 L14 6 L10 12 L-16 12 L-22 6 L-22 -6 L-16 -12 L10 -12 L14 -6 Z',eng:[[-22,-4],[-22,4]],br:[16,0]},
+  leviathan:{p:'M24 -8 L24 8 L16 14 L-18 16 L-24 10 L-24 -10 L-18 -16 L16 -14 Z',eng:[[-24,-8],[-24,0],[-24,8]],br:[14,0]}},
+ organic:{
+  kestrel:{p:'M18 0 Q6 -10 -12 -9 Q-6 -3 -10 0 Q-6 3 -12 9 Q6 10 18 0 Z',eng:[[-9,0]],br:[8,0]},
+  warhound:{p:'M24 0 Q20 -8 6 -12 Q-14 -14 -18 -6 Q-12 0 -18 6 Q-14 14 6 12 Q20 8 24 0 Z',eng:[[-15,-5],[-15,5]],br:[10,0]},
+  halberd:{p:'M24 -2 Q10 -14 -10 -14 Q-22 -12 -24 -4 Q-14 -6 -10 0 Q-14 6 -24 4 Q-22 12 -10 14 Q10 14 24 2 Q14 0 24 -2 Z',eng:[[-22,-6],[-22,6]],br:[8,0]},
+  leviathan:{p:'M24 0 Q22 -14 0 -16 Q-20 -18 -24 -8 Q-18 0 -24 8 Q-20 18 0 16 Q22 14 24 0 Z',eng:[[-21,-6],[-21,6]],br:[12,0]}}
+};
+// weapon hardpoints by role, in hull units; a hull can carry its mounts plus two added hardpoints
+const HP={kestrel:[[10,0],[2,0],[-4,-5],[-4,5]],warhound:[[18,-4],[18,4],[4,0],[-6,-5],[-6,5]],
+ halberd:[[15,0],[2,-7],[2,7],[-12,-7],[-12,7]],leviathan:[[17,0],[6,-9],[6,9],[-6,-11],[-6,11],[-15,0],[2,0]]};
+const BRG={kestrel:[14,0],warhound:[10,0],halberd:[8,0],leviathan:[11,0]};
+for(const st in DES)for(const k in DES[st])DES[st][k].br=BRG[k];
+const HT=document.createElement('canvas').getContext('2d');
+for(const st in DES)for(const k in DES[st]){const D=DES[st][k];D.P=new Path2D(D.p);
+ const nums=D.p.match(/-?\d+(\.\d+)?/g).map(Number),pts=[];for(let i=0;i+1<nums.length;i+=2)pts.push([nums[i],nums[i+1]]);
+ let lo=pts[0],hi=pts[0];for(const q of pts){if(q[1]<lo[1]||(q[1]===lo[1]&&q[0]<lo[0]))lo=q;if(q[1]>hi[1]||(q[1]===hi[1]&&q[0]<hi[0]))hi=q;}D.lt=[lo,hi];
+ const q=mulb(k.length*31+st.length*7),w=[];for(let i=0;i<60&&w.length<14;i++){const x=Math.round(-16+q()*34),y=Math.round(2+q()*8);if(HT.isPointInPath(D.P,x*1.15,y*1.25)&&HT.isPointInPath(D.P,x*1.15,-y*1.25))w.push([x,y]);}D.win=w;}
+const SPRC={};
+function hullSprite(style,hk,rgb){const key=style+hk+rgb;if(SPRC[key])return SPRC[key];
+ const K=6,S=64,c=document.createElement('canvas');c.width=c.height=S*K;const x=c.getContext('2d');x.setTransform(K,0,0,K,S*K/2,S*K/2);
+ const D=DES[style][hk],P=D.P;
+ x.shadowColor=`rgba(${rgb},.55)`;x.shadowBlur=5*K;x.fillStyle='#0a0f18';x.fill(P);x.shadowBlur=0;
+ const g=x.createLinearGradient(-24,0,24,0);g.addColorStop(0,'#0b1119');g.addColorStop(.6,'#1c2735');g.addColorStop(1,'#2f3f54');x.fillStyle=g;x.fill(P);
+ x.save();x.clip(P);
+ x.fillStyle=`rgba(${rgb},.10)`;x.fillRect(-32,-24,64,48);
+ const lg=x.createLinearGradient(0,-18,0,18);lg.addColorStop(0,'rgba(255,255,255,.12)');lg.addColorStop(.48,'rgba(255,255,255,.02)');lg.addColorStop(.52,'rgba(0,0,0,.05)');lg.addColorStop(1,'rgba(0,0,0,.4)');x.fillStyle=lg;x.fillRect(-32,-24,64,48);
+ // armour plating: an inset copy of the hull
+ x.save();x.scale(.74,.62);x.fillStyle='rgba(6,10,18,.5)';x.fill(P);x.strokeStyle=`rgba(${rgb},.45)`;x.lineWidth=.55;x.stroke(P);x.restore();
+ x.save();x.scale(.42,.34);x.fillStyle=`rgba(${rgb},.08)`;x.fill(P);x.strokeStyle=`rgba(${rgb},.25)`;x.lineWidth=.6;x.stroke(P);x.restore();
+ // panel seams
+ x.strokeStyle='rgba(170,200,230,.13)';x.lineWidth=.3;
+ for(let i=-22;i<=22;i+=(style==='block'?6:4.5)){x.beginPath();if(style==='organic'){x.arc(i+30,0,30,Math.PI*.85,Math.PI*1.15);}else{x.moveTo(i,-24);x.lineTo(i+(style==='raptor'?5:0),24);}x.stroke();}
+ x.beginPath();x.moveTo(-26,0);x.lineTo(26,0);x.stroke();
+ // lit windows
+ x.fillStyle='rgba(255,224,160,.65)';for(const[wx,wy]of D.win){x.fillRect(wx-.35,wy-.28,.7,.56);x.fillRect(wx-.35,-wy-.28,.7,.56);}
+ x.restore();
+ // engine housings
+ for(const[ex,ey]of D.eng){x.fillStyle='#070b12';x.beginPath();x.ellipse(ex+1.2,ey,2.2,2.4,0,0,TAU);x.fill();x.strokeStyle=`rgba(${rgb},.7)`;x.lineWidth=.5;x.stroke();}
+ // bridge
+ {const[bx,by]=D.br;x.shadowColor=`rgba(${rgb},.9)`;x.shadowBlur=3*K;x.fillStyle=`rgba(${rgb},.95)`;x.beginPath();x.ellipse(bx,by,2.2,1.3,0,0,TAU);x.fill();x.shadowBlur=0;x.fillStyle='rgba(255,255,255,.8)';x.fillRect(bx-.2,by-.5,1.2,1);}
+ x.strokeStyle=`rgba(${rgb},.95)`;x.lineWidth=.8;x.stroke(P);
+ return SPRC[key]={c,S};}
+// turrets and launchers, drawn live so they track the target and show their charge
+function drawHardpoints(s,c,ta){const hp=HP[s.hk];c=c||ctx;
+ s.mounts.forEach((m,i)=>{const p=hp[i%hp.length],arc=(s.H.arcs[m.t]||180)*Math.PI/180,a=clamp(wrap(ta||0),-arc,arc),ready=Math.min(m.cd,1)>=1;
+  c.save();c.translate(p[0],p[1]);
+  if(m.t==='beam'){c.rotate(a);c.fillStyle='#121a26';c.beginPath();c.arc(0,0,2.3,0,TAU);c.fill();c.strokeStyle=s.S.col;c.lineWidth=.45;c.stroke();
+   c.strokeStyle='#9fb3c8';c.lineWidth=.7;c.beginPath();c.moveTo(.5,-.8);c.lineTo(4.6,-.8);c.moveTo(.5,.8);c.lineTo(4.6,.8);c.stroke();
+   if(ready){c.fillStyle=s.S.col;c.beginPath();c.arc(4.7,-.8,.45,0,TAU);c.arc(4.7,.8,.45,0,TAU);c.fill();}}
+  else if(m.t==='torp'){const tc=tvOf(m).col;c.rotate(a*.35);c.fillStyle='#121a26';c.fillRect(-2.4,-1.9,5.2,3.8);c.strokeStyle=tc;c.lineWidth=.45;c.strokeRect(-2.4,-1.9,5.2,3.8);
+   c.fillStyle=ready?tc:'#33404f';c.fillRect(2.2,-1.3,.9,1);c.fillRect(2.2,.3,.9,1);}
+  else if(m.t==='barr'){c.fillStyle='#121a26';c.fillRect(-2.2,-2.2,4.4,4.4);c.strokeStyle=s.S.col;c.lineWidth=.4;c.strokeRect(-2.2,-2.2,4.4,4.4);
+   const n=Math.floor(m.cd/CAP.barr*4+.001);for(let k=0;k<4;k++){c.fillStyle=k<n||ready&&k===0?'#eaf6ff':'#2a3442';c.beginPath();c.arc(k%2?1:-1,k<2?-1:1,.55,0,TAU);c.fill();}}
+  else if(m.t==='bomb'){c.fillStyle='#121a26';c.beginPath();c.arc(0,0,2.8,0,TAU);c.fill();c.strokeStyle='#ff8c28';c.lineWidth=.5;c.stroke();
+   c.fillStyle=ready?`rgba(255,140,40,${.6+.4*Math.sin(performance.now()/180)})`:'#3a2a20';c.beginPath();c.arc(0,0,1.3,0,TAU);c.fill();}
+  c.restore();});}
+// a still picture of a hull for the shipyard and title screen
+const PICC={};
+function shipPic(style,hk,rgb,mounts){const key=style+hk+rgb+(mounts?JSON.stringify(mounts):'');if(PICC[key])return PICC[key];
+ const sp=hullSprite(style,hk,rgb),K=4,S=64,c=document.createElement('canvas');c.width=S*K;c.height=40*K;const x=c.getContext('2d');
+ x.setTransform(K,0,0,K,S*K/2,20*K);x.drawImage(sp.c,-sp.S/2,-sp.S/2,sp.S,sp.S);
+ const H=HULLS[hk];drawHardpoints({hk,H,S:{col:`rgb(${rgb})`},mounts:(mounts||H.stock.map(t=>({t,v:'fusion'}))).map(m=>({t:m.t,v:m.v,cd:1}))},x,0);
+ return PICC[key]=c.toDataURL();}
 
 /* ================= SAVE / ECONOMY ================= */
 const KEY='starships_v1';
 function newLo(hk){return{hull:hk,upg:{shd:0,arm:0,eng:0,rct:0},extra:0,mounts:HULLS[hk].stock.map(t=>({t,tier:1,stock:1})),mods:[]};}
-function defSave(){return{credits:400,wins:0,losses:0,lo:newLo('kestrel'),g:newGalaxy()};}
+function defSave(home){return{credits:400,wins:0,losses:0,home:home||'terran',lo:newLo('kestrel'),g:newGalaxy(home)};}
 let save=(()=>{try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.lo&&HULLS[s.lo.hull]){s.lo.mods=s.lo.mods.filter(k=>MODS[k]);delete s.missions;if(!s.g)s.g=newGalaxy();return s;}}catch(e){}return defSave();})();
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(save));}catch(e){}}
 function mountVal(m){if(!m.t)return 0;let v=(m.stock?0:WD[m.t].price)+(m.t==='torp'?tvOf(m).price:0);for(let t=1;t<m.tier;t++)v+=TIERC[t-1];return v;}
@@ -459,9 +530,10 @@ function checkWin(){const g=save.g;if(g.won)return null;
  if(g.n>=15&&al.length>=2&&al.every(e=>shareOf(e)>=.25)&&al.reduce((a,e)=>a+shareOf(e),0)>=.75)return g.won={type:'balance',e:al};
  return null;}
 
+const OPT_KEY='starships_opts';let OPT={sound:true,vol:.7,shake:true,turn:6,fast:false,hints:true};try{Object.assign(OPT,JSON.parse(localStorage.getItem(OPT_KEY)||'{}'));}catch(e){}
 /* ================= AUDIO ================= */
 let AC=null,master=null,muted=false,NB=null;
-function initAudio(){try{if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.45;master.connect(AC.destination);
+function initAudio(){try{if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.65*OPT.vol;master.connect(AC.destination);
  NB=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
  if(AC.state==='suspended')AC.resume();}catch(e){AC=null;}}
 function env(g,t,a,p,d){g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,p),t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+d);}
@@ -488,7 +560,7 @@ function vf(o){return clamp(1-Math.hypot(o.x-cam.x,o.y-cam.y)/1700,.25,1);}
 
 /* ================= BATTLE STATE ================= */
 let mines=[],nebulae=[],state='menu',ships=[],player=null,enemy=null,projs=[],beams=[],parts=[],rings=[],deaths=[],planets=[],mission=null;
-const TURN=6;let hudBotL=90,turnT=0,turnN=0,ffwd=1,prevState='plan',tStart={d:0,t:0},freeze=0,cam={x:0,y:0,z:.6,cy:0},camO={x:0,y:0},shake=0,timeScale=1,endTimer=0,gameTime=0,wpPulse=0,hudTop=100,hudBot=190,dragging=false;
+let TURN=6,hudBotL=90,turnT=0,turnN=0,ffwd=1,prevState='plan',tStart={d:0,t:0},freeze=0,cam={x:0,y:0,z:.6,cy:0},camO={x:0,y:0},shake=0,timeScale=1,endTimer=0,gameTime=0,wpPulse=0,hudTop=100,hudBot=190,dragging=false;
 const PLANET={dealt:0,tgtSys:'hull'};
 
 function buildShip(side,lo,x,y,a){
@@ -504,7 +576,7 @@ function buildShip(side,lo,x,y,a){
  s.hull=s.maxHull;s.sh=[s.maxSh,s.maxSh,s.maxSh,s.maxSh];s.flash=[0,0,0,0];
  const b=Math.floor(tot/3);s.pips={eng:b,wpn:b,shd:tot-2*b};
  for(const m of s.mods)s.hasMod[m.k]=m;
- s.fwd=H.arcs.beam<120;s.ps.side=s.orbit;
+ s.fwd=H.arcs.beam<120;s.ps.side=s.orbit;s.style=side==='player'?'line':'raptor';
  return s;
 }
 const isOn=(s,k)=>!!(s&&s.hasMod[k]&&s.hasMod[k].act>0);
@@ -623,7 +695,7 @@ function updShip(s,dt){
      if(s===player){shake=Math.min(18,shake+vn*.05);msg('PLANET IMPACT','#ff6b5a');}else msg('ENEMY HIT THE PLANET','#5fe3ff');}}}}
  const R=Math.hypot(s.x,s.y);if(R>ARENA){const ux=s.x/R,uy=s.y/R;s.x=ux*ARENA;s.y=uy*ARENA;const vo=s.vx*ux+s.vy*uy;if(vo>0){s.vx-=ux*vo*1.6;s.vy-=uy*vo*1.6;}}
  // visuals
- if(!isOn(s,'cloak')&&thr>.05)for(const e of ENG[s.shape||s.side][s.hk]){if(Math.random()<.85){const m=local(s,e[0],e[1]),bs=boost?2:1;
+ if(!isOn(s,'cloak')&&thr>.05)for(const e of DES[s.style][s.hk].eng){if(Math.random()<.85){const m=local(s,e[0],e[1]),bs=boost?2:1;
   glowP(m.x+rand(-1,1),m.y+rand(-1,1),(5+thr*6)*s.scale*bs,SPR[boost?'white':s.S.g],.35,-Math.cos(s.a)*120*thr*bs+s.vx*.5,-Math.sin(s.a)*120*thr*bs+s.vy*.5,1);}}
  if(s.hull<s.maxHull*.5&&Math.random()<(1-s.hull/s.maxHull)*.5){const m=local(s,rand(-15,10),rand(-8,8));glowP(m.x,m.y,rand(6,14),SPR.orange,.5,rand(-15,15)+s.vx*.5,rand(-15,15)+s.vy*.5,1);}
  // point defense
@@ -834,7 +906,7 @@ function engage(){
  aiPlan(enemy,player);
  startAct(player);startAct(enemy);
  tStart={d:player.dealt,t:enemy.dealt};
- state='exec';turnT=0;ffwd=1;$('#hud').classList.add('exec');
+ state='exec';turnT=0;ffwd=OPT.fast?2:1;$('#hud').classList.add('exec');
 }
 function endTurn(){
  state='plan';turnN++;$('#hud').classList.remove('exec');
@@ -882,7 +954,7 @@ function start(c){
  planets=mission.pl.map(q=>{const pt=PTYPES[q.t];return{x:q.x,y:q.y,r:q.r,g:140+q.r*.6,pt,img:makePlanetImg(pt,q.r),rot:rand(0,TAU)};});
  player=buildShip('player',save.lo,-1550,rand(-300,300),0);
  enemy=buildShip('enemy',mission.lo,1550,rand(-300,300),Math.PI);
- {const E=EMP[mission.foe];enemy.emp=mission.foe;enemy.shape=E.shape;enemy.S={col:E.col,rgb:E.rgb,g:E.spr,torp:'red',miss:E.spr,bomb:'red',beam:E.spr,bc:E.rgb};ECOL=E.col;ERGB=E.rgb;
+ {const E=EMP[mission.foe];enemy.emp=mission.foe;enemy.style=E.style;enemy.S={col:E.col,rgb:E.rgb,g:E.spr,torp:'red',miss:E.spr,bomb:'red',beam:E.spr,bc:E.rgb};ECOL=E.col;ERGB=E.rgb;
   $('#eName').style.color=E.col;$('#eBar').style.background=E.col;$('#enemyCard').style.borderColor=`rgba(${E.rgb},.35)`;}
  enemy.ps={k:'manual',ph:'',tm:0,side:-1};enemy.thrAuto=true;enemy.patT=0;enemy.ai=Object.assign({},AIS[mission.pers],{key:mission.pers,skill:.3+mission.st*.16});enemy.dmgMul=.7+.12*mission.st;const hm=.75+.1*mission.st;enemy.maxHull=enemy.hull=Math.round(enemy.maxHull*hm);enemy.fwd=enemy.H.arcs.beam<120;
  player.lastPat=defPat(player);player.ps={k:player.lastPat,ph:'',tm:0,side:1};player.shAuto=true;player.thrAuto=true;player.armed={beam:1,torp:1,barr:1,bomb:0};player.act='hold';enemy.act='hold';turnN=1;
@@ -892,7 +964,7 @@ function start(c){
  $$('.tb').forEach(b=>b.classList.toggle('on',b.dataset.k==='hull'));
  buildHUD();buildOrders();buildActs();
  $('#scr').classList.remove('on');$('#hud').classList.add('on');$('#hud').classList.remove('exec');
- state='plan';measure();msg('PLOT A COURSE, CHOOSE AN ACTION, ENGAGE','#ffe066');
+ state='plan';measure();$('#muteBtn').style.opacity=muted?.4:1;if(OPT.hints)msg('PLOT A COURSE, CHOOSE AN ACTION, ENGAGE','#ffe066');
 }
 function endBattle(win,retreat){
  const m=mission,g=save.g,S=SECT[m.sid],ch=[],news=[];let earned=0,pat=0;
@@ -956,15 +1028,16 @@ function drawBG(){
 }
 function shipAlpha(s){if(isOn(s,'cloak'))return s===player?.3:player.sees?.35:(player&&dist(s,player)<220?.14:.04)*(0.6+.4*Math.sin(gameTime*20));if(isOn(s,'phase'))return .45+.2*Math.sin(gameTime*30);return 1;}
 function drawShip(s){
- const al=shipAlpha(s);ctx.save();ctx.globalAlpha=al;ctx.translate(s.x,s.y);ctx.rotate(s.a);ctx.scale(s.scale,s.scale);
- const path=P2D[s.shape||s.side][s.hk],g=ctx.createLinearGradient(-22,0,24,0);g.addColorStop(0,'#0e1622');g.addColorStop(1,'#233246');
- ctx.fillStyle=g;ctx.fill(path);ctx.lineWidth=1.1/s.scale;ctx.strokeStyle=s.hitFlash>0?`rgba(255,255,255,${.5+s.hitFlash*.5})`:s.S.col;ctx.stroke(path);
- ctx.strokeStyle=`rgba(${s.S.rgb},.35)`;ctx.lineWidth=.7/s.scale;ctx.beginPath();ctx.moveTo(15,0);ctx.lineTo(-14,0);ctx.stroke();
- ctx.fillStyle=s.S.col;ctx.fillRect(8,-1,3,2);
- if(isOn(s,'phase')){ctx.globalAlpha=al*.4;ctx.translate(rand(-3,3),rand(-3,3));ctx.strokeStyle='#d0b0ff';ctx.stroke(path);}
+ const al=shipAlpha(s),D=DES[s.style][s.hk],sp=hullSprite(s.style,s.hk,s.S.rgb),t=s===player?enemy:player;
+ ctx.save();ctx.globalAlpha=al;ctx.translate(s.x,s.y);ctx.rotate(s.a);ctx.scale(s.scale,s.scale);
+ ctx.drawImage(sp.c,-sp.S/2,-sp.S/2,sp.S,sp.S);
+ drawHardpoints(s,ctx,t&&t.alive&&(s===player?player.sees:true)?angTo(s,t)-s.a:0);
+ const bl=Math.sin(gameTime*5+(s===player?0:1.5))>.3;if(bl){ctx.fillStyle='#ff4a4a';ctx.fillRect(D.lt[0][0]-.6,D.lt[0][1]-.6,1.2,1.2);ctx.fillStyle='#4aff8a';ctx.fillRect(D.lt[1][0]-.6,D.lt[1][1]-.6,1.2,1.2);}
+ if(s.hitFlash>0){ctx.strokeStyle=`rgba(255,255,255,${.4+s.hitFlash*.6})`;ctx.lineWidth=1.4/s.scale;ctx.stroke(D.P);}
+ if(isOn(s,'phase')){ctx.globalAlpha=al*.4;ctx.translate(rand(-3,3),rand(-3,3));ctx.strokeStyle='#d0b0ff';ctx.lineWidth=1;ctx.stroke(D.P);}
  ctx.restore();
 }
-function drawShields(s){if(isOn(s,'cloak'))return;const R=27*s.scale+4;
+function drawShields(s){if(isOn(s,'cloak'))return;const R=28*s.scale+5;
  for(let f=0;f<4;f++){const v=s.sh[f]/s.maxSh;if(v<.02&&s.flash[f]<.05)continue;const c=s.a+f*Math.PI/2;
   ctx.strokeStyle=`rgba(${s.S.rgb},${Math.min(1,.06+.4*v+s.flash[f]*.7)})`;ctx.lineWidth=2+s.flash[f]*4+(f===s.reinforce?1.5:0);
   ctx.beginPath();ctx.arc(s.x,s.y,R,c-.68,c+.68);ctx.stroke();}}
@@ -973,7 +1046,7 @@ function ghost(sh,o){return{x:o.x,y:o.y,vx:o.vx,vy:o.vy,a:o.a,rad:sh.rad};}
 function drift(sh,n,dt){const o={x:sh.x,y:sh.y,vx:sh.vx,vy:sh.vy,a:sh.a,w:sh.w},MP=motionP(sh),out=[];
  for(let i=0;i<n;i++){motion(o,null,sh.thr,MP,dt);out.push({x:o.x,y:o.y,vx:o.vx,vy:o.vy,a:o.a,rad:sh.rad});}return out;}
 function drawGhost(sh,o,al){ctx.save();ctx.globalAlpha=al;ctx.translate(o.x,o.y);ctx.rotate(o.a);ctx.scale(sh.scale,sh.scale);
- ctx.strokeStyle=sh.S.col;ctx.lineWidth=1/sh.scale;ctx.setLineDash([3,3]);ctx.stroke(P2D[sh.shape||sh.side][sh.hk]);ctx.setLineDash([]);ctx.restore();}
+ ctx.strokeStyle=sh.S.col;ctx.lineWidth=1/sh.scale;ctx.setLineDash([3,3]);ctx.stroke(DES[sh.style][sh.hk].P);ctx.setLineDash([]);ctx.restore();}
 function drawPlan(z){
  const dt=.05,n=Math.round(TURN/dt),eAl=enemy.alive&&player.sees,ep=eAl?drift(enemy,n,dt):null;
  if(!eAl&&player.ct&&enemy.alive){const c=player.ct,R=ctRad(player,TURN);
@@ -1002,11 +1075,14 @@ function drawPlan(z){
  if(!crash){drawGhost(sh,o,.7);
   if(A.beam<180){ctx.globalAlpha=.12;ctx.fillStyle='rgb(95,227,255)';ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.arc(o.x,o.y,WD.beam.range,o.a-A.beam*Math.PI/180,o.a+A.beam*Math.PI/180);ctx.closePath();ctx.fill();ctx.globalAlpha=1;}}
 }
+let tImg=null,tK='';
 function render(){
  if(state==='galaxy'){galGeom();drawGalaxy();return;}
+ if(state==='title'||(state==='menu'&&!player)){ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#03050b';ctx.fillRect(0,0,W,H);const R=Math.max(W,H)*.55,k=Math.round(R)+':'+DPR;if(tK!==k){tK=k;tImg=galImg(R);}
+  ctx.save();ctx.translate(W/2,H*.42);ctx.rotate(performance.now()/60000);ctx.globalAlpha=.55;ctx.drawImage(tImg,-tImg.width/DPR/2,-tImg.height/DPR/2,tImg.width/DPR,tImg.height/DPR);ctx.restore();return;}
  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalCompositeOperation='source-over';drawBG();
  const z=cam.z;camO.x=W/2-cam.x*z;camO.y=cam.cy-cam.y*z;
- const sx=(Math.random()-.5)*shake,sy=(Math.random()-.5)*shake;
+ const sk=OPT.shake?shake:0,sx=(Math.random()-.5)*sk,sy=(Math.random()-.5)*sk;
  ctx.setTransform(DPR*z,0,0,DPR*z,DPR*(camO.x+sx),DPR*(camO.y+sy));
  if(!player)return;
  ctx.strokeStyle='rgba(95,227,255,.12)';ctx.lineWidth=2/z;ctx.setLineDash([14/z,12/z]);ctx.beginPath();ctx.arc(0,0,ARENA+20,0,TAU);ctx.stroke();ctx.setLineDash([]);
@@ -1039,7 +1115,7 @@ function render(){
    ctx.beginPath();ctx.arc(x,y,8,a+Math.PI/2+.6,a+Math.PI*1.5-.6);ctx.stroke();}}
  ctx.globalCompositeOperation='source-over';
  for(const s of ships){if(!s.alive&&!deaths.some(d=>d.s===s&&d.n<7))continue;if(s===enemy&&s.alive&&!player.sees&&!isOn(s,'cloak'))continue;
-  if(s.alive&&!isOn(s,'cloak')){ctx.globalCompositeOperation='lighter';for(const e of ENG[s.shape||s.side][s.hk]){const m=local(s,e[0]-2,e[1]),sz=(10+s.speed*.06)*s.scale;ctx.drawImage(SPR[flankOn(s)?'white':s.S.g],m.x-sz/2,m.y-sz/2,sz,sz);}ctx.globalCompositeOperation='source-over';}
+  if(s.alive&&!isOn(s,'cloak')){ctx.globalCompositeOperation='lighter';for(const e of DES[s.style][s.hk].eng){const m=local(s,e[0]-2,e[1]),sz=(10+s.speed*.06)*s.scale;ctx.drawImage(SPR[flankOn(s)?'white':s.S.g],m.x-sz/2,m.y-sz/2,sz,sz);}ctx.globalCompositeOperation='source-over';}
   drawShip(s);
   if(s.alive&&isOn(s,'drones')&&!isOn(s,'cloak')&&(s===player||player.sees))for(let i=0;i<4;i++){const d=dronePos(s,i);ctx.fillStyle=s.S.col;ctx.beginPath();ctx.arc(d.x,d.y,2.4,0,TAU);ctx.fill();}}
  ctx.globalCompositeOperation='lighter';
@@ -1095,7 +1171,7 @@ $$('.pcol').forEach(c=>c.addEventListener('pointerdown',e=>{e.preventDefault();i
 $$('#shw .q').forEach(q=>q.addEventListener('pointerdown',e=>{e.preventDefault();if(!player)return;const f=+q.dataset.f;if(player.shAuto||player.reinforce!==f){player.shAuto=false;player.reinforce=f;msg(FACE[f]+' SHIELD LOCKED','#5fe3ff');}else{player.shAuto=true;msg('SHIELDS AUTO-FACING','#5fe3ff');}}));
 $('#pauseBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(state==='plan'||state==='exec')pause();});
 $('#engBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!player)return;initAudio();if(state==='plan')engage();else if(state==='exec')ffwd=ffwd>1?1:2;});
-$('#muteBtn').addEventListener('pointerdown',e=>{e.preventDefault();initAudio();muted=!muted;$('#muteBtn').style.opacity=muted?.4:1;});
+$('#muteBtn').addEventListener('pointerdown',e=>{e.preventDefault();initAudio();muted=!muted;OPT.sound=!muted;applyOpt();$('#muteBtn').style.opacity=muted?.4:1;});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='exec')pause();});
 function pause(){prevState=state;state='pause';show(`<h2>PAUSED</h2><div class="tag">${mission.name.toUpperCase()}</div><button class="btn" data-act="resume">RESUME</button><button class="btn alt" data-act="retreat">RETREAT</button>
  <ul><li>Each turn: plot a course, choose ONE action, then ENGAGE. Both ships carry out their orders together for six seconds. The enemy chooses in secret.</li>
@@ -1149,6 +1225,67 @@ function updHUD(){
 }
 
 /* ================= SCREENS ================= */
+/* ================= TITLE, SAVES, OPTIONS ================= */
+const VERSION='0.7.0';
+const SLOTS=3,slotKey=i=>'starships_slot_'+i;
+function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
+function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
+function slotSummary(d){if(!d||!d.g)return'Empty';const top=EORD.slice().sort((a,b)=>(d.g.rep[b]||0)-(d.g.rep[a]||0))[0];
+ return`${HULLS[d.lo.hull].name} · ${d.g.n} contracts · closest to the ${EMP[top].short}`;}
+function fmtDate(t){try{return new Date(t).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}catch(e){return'';}}
+function sanitize(s){if(!s||!s.lo||!HULLS[s.lo.hull]||!s.g||!s.g.own||s.g.own.length!==SECT.length)return null;s.lo.mods=(s.lo.mods||[]).filter(k=>MODS[k]);s.g.offers={};return s;}
+let titleBack='title',lineup=null;
+function title(){state='title';player=null;enemy=null;ships=[];msgEl.innerHTML='';$('#hud').classList.remove('on');$('#gal').classList.remove('on');
+ if(!lineup)lineup=HORDER.map(k=>shipPic('line',k,'95,227,255'));
+ const g=hasGame();
+ show(`<div style="text-align:center"><h1 style="font-size:34px">STARSHIPS</h1><div class="tag">VERSION ${VERSION} · WORKING TITLE</div>
+ <div style="display:flex;justify-content:center;align-items:flex-end;gap:2px;margin:4px 0 14px">${lineup.map((u,i)=>`<img src="${u}" style="width:${[52,62,74,96][i]}px;opacity:.95">`).join('')}</div>
+ ${g?`<button class="btn wide" data-act="continue">CONTINUE</button><div style="font-size:10px;opacity:.6;margin:2px 0 6px">${slotSummary(save)}</div>`:''}
+ <button class="btn ${g?'alt':''} wide" data-act="newgame">NEW CAMPAIGN</button>
+ <button class="btn alt wide" data-act="saves">SAVE AND LOAD</button>
+ <button class="btn alt wide" data-act="options">OPTIONS</button>
+ <div style="margin-top:10px"><button class="btn alt sm" data-act="about">ABOUT</button><button class="btn alt sm" data-act="privacy">PRIVACY POLICY</button></div>
+ <div style="font-size:9px;opacity:.4;margin-top:12px;letter-spacing:.14em">v${VERSION}</div></div>`);}
+function newGame(){show(`<h2>NEW CAMPAIGN</h2><div class="tag">CHOOSE YOUR HOME PORT</div>
+ <p style="font-size:11px;opacity:.8;line-height:1.5">You're an independent captain with a Kestrel and a little money. Your home port starts out friendly; every other empire is neutral. You can work for anyone.${hasGame()?' <b style="color:#ff9a6b">Starting a new campaign replaces your current one. Save it to a slot first if you want to keep it.</b>':''}</p>
+ ${EORD.map(e=>`<button class="mis" data-act="startgame" data-arg="${e}" style="border-color:rgba(${EMP[e].rgb},.45);background:rgba(${EMP[e].rgb},.05)"><b style="color:${EMP[e].col};letter-spacing:.12em">${EMP[e].name.toUpperCase()}</b>${e==='terran'?' <span style="font-size:10px;opacity:.7">· home of Sol</span>':''}<p style="margin:3px 0 0;font-size:11px;opacity:.75">${EMP[e].bio}</p></button>`).join('')}
+ <button class="btn alt" data-act="title">BACK</button>`);}
+function savesScreen(){const g=hasGame();let h=`<h2>SAVE AND LOAD</h2><div class="tag">YOUR GAME ALSO SAVES ITSELF AFTER EVERY MISSION</div>`;
+ h+=g?`<div class="row cur"><div class="t"><b>CURRENT CAMPAIGN</b></div><p>${slotSummary(save)}</p></div>`:`<p style="font-size:11px;opacity:.7">No campaign in progress.</p>`;
+ for(let i=1;i<=SLOTS;i++){const d=readSlot(i);
+  h+=`<div class="row"><div class="t"><b>SLOT ${i}</b><span style="font-size:10px;opacity:.6">${d?fmtDate(d.t):''}</span></div><p>${d?slotSummary(d.data):'Empty'}</p>
+  ${g?`<button class="btn sm" data-act="slotsave" data-arg="${i}">${d?'OVERWRITE':'SAVE HERE'}</button>`:''}${d?`<button class="btn alt sm" data-act="slotload" data-arg="${i}">LOAD</button><button class="btn alt sm" data-act="slotdel" data-arg="${i}">DELETE</button>`:''}</div>`;}
+ h+=`<div class="row"><div class="t"><b>SAVE CODE</b></div><p>Copy your campaign as a code to keep it safe or move it to another device, or paste a code to load one.</p>
+ ${g?`<button class="btn sm" data-act="export">SHOW MY CODE</button>`:''}<textarea id="codebox" rows="3" style="width:100%;margin-top:6px;font:10px ui-monospace,monospace;background:#05090f;color:#cfe9f2;border:1px solid var(--line);border-radius:6px;padding:6px;user-select:text;-webkit-user-select:text" placeholder="Paste a save code here"></textarea>
+ <button class="btn alt sm" data-act="copycode">COPY</button><button class="btn alt sm" data-act="import">LOAD CODE</button></div>
+ <button class="btn alt" data-act="${titleBack}">BACK</button>`;show(h);}
+function optionsScreen(){const o=OPT,b=(on,a,l)=>`<button class="btn ${on?'':'alt'} sm" data-act="${a}">${l}</button>`;
+ show(`<h2>OPTIONS</h2><div class="tag">VERSION ${VERSION}</div>
+ <div class="row"><div class="t"><b>SOUND</b></div>${b(o.sound,'opt:sound',o.sound?'ON':'OFF')} <span style="font-size:11px;margin:0 6px">Volume ${Math.round(o.vol*100)}%</span>${b(0,'opt:vol-','−')}${b(0,'opt:vol+','+')}</div>
+ <div class="row"><div class="t"><b>SCREEN SHAKE</b></div><p>Shake on heavy hits and explosions.</p>${b(o.shake,'opt:shake',o.shake?'ON':'OFF')}</div>
+ <div class="row"><div class="t"><b>TURN LENGTH</b></div><p>How many seconds each turn plays out. Shorter turns give finer control.</p>${[4,6,8].map(t=>b(o.turn===t,'opt:turn'+t,t+' SEC')).join(' ')}</div>
+ <div class="row"><div class="t"><b>WATCH SPEED</b></div><p>Default speed when a turn plays out. You can still tap the bar to change it.</p>${b(!o.fast,'opt:fast0','1X')} ${b(o.fast,'opt:fast1','2X')}</div>
+ <div class="row"><div class="t"><b>BATTLE TIPS</b></div><p>Short reminders at the start of a battle.</p>${b(o.hints,'opt:hints',o.hints?'ON':'OFF')}</div>
+ <div class="row"><div class="t"><b>DELETE ALL DATA</b></div><p>Erases your campaign, save slots and options from this device.</p><button class="btn alt sm" data-act="wipe">DELETE EVERYTHING</button></div>
+ <button class="btn alt" data-act="${titleBack}">BACK</button> <button class="btn alt sm" data-act="privacy">PRIVACY POLICY</button>`);}
+function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · LAST UPDATED NOVEMBER 2026</div>
+ <div style="font-size:11.5px;line-height:1.6;opacity:.9">
+ <p><b>The short version:</b> Starships does not collect, store or share any personal information. There are no accounts, no ads, no analytics and no tracking.</p>
+ <p><b>What is stored.</b> Your campaign, save slots and options are stored only on your device, in your browser's local storage (or the app's equivalent storage). They never leave your device unless you copy a save code yourself.</p>
+ <p><b>What is not collected.</b> We do not collect your name, email address, location, contacts, device identifiers, usage data or crash reports. The game makes no network requests while you play.</p>
+ <p><b>Third parties.</b> The game contains no third-party advertising, analytics or tracking code, and we do not sell or share data with anyone.</p>
+ <p><b>Children.</b> Because we collect no personal information, we collect none from children.</p>
+ <p><b>Deleting your data.</b> Use Options › Delete All Data, delete the app, or clear this site's data in your browser settings.</p>
+ <p><b>Changes.</b> If this policy changes, the new version will appear here with a new date.</p>
+ <p><b>Contact.</b> [Publisher name] · [support email]</p></div>
+ <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
+function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
+ <div style="font-size:11.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Title screen, save slots, save codes, options and privacy policy</li><li>Redesigned ships: every empire has its own design language and every hull is shaped for its role, with turrets and launchers that track the enemy and light up when charged</li></ul>
+ <p><b>Earlier</b></p><ul style="margin-top:0"><li>0.6 · Galaxy campaign with six empires, reputation and territory</li><li>0.5 · Torpedo warheads, fold space, mines, drone swarms</li><li>0.4 · Sensors, nebulae, action levers and capacitors</li><li>0.3 · Simultaneous turns</li></ul></div>
+ <button class="btn alt" data-act="title">BACK</button>`);}
+function applyOpt(){TURN=OPT.turn;muted=!OPT.sound;if(master)master.gain.value=.65*OPT.vol;try{localStorage.setItem(OPT_KEY,JSON.stringify(OPT));}catch(e){}}
+
 function show(html){$('#gal').classList.remove('on');$('#scrBox').innerHTML=html;$('#scr').classList.add('on');$('#scrBox').scrollTop=0;}
 const cr=n=>`<span class="cr">${n.toLocaleString()} cr</span>`;
 function threat(ev,st){const r=ev*(.75+.1*st)/Math.max(1,loValue(save.lo));return r<.85?['EASY','#7dffb0']:r<1.15?['EVEN','#5fe3ff']:r<1.5?['HARD','#ffd166']:['DEADLY','#ff6b5a'];}
@@ -1216,6 +1353,7 @@ function galTap(e){const dx=e.clientX-gal.cx,dy=e.clientY-gal.cy,d=Math.hypot(dx
 $('#gal').addEventListener('click',e=>{const b=e.target.closest('[data-gact]');if(!b)return;const a=b.dataset.gact;
  if(a==='yard'){yardTab='hulls';yard();}
  else if(a==='stand')standings();
+ else if(a==='menu')title();
  else if(a==='desel'){gal.sel=-1;galPanels();}
  else if(a==='go'){const[sid,cl]=b.dataset.arg.split(':');initAudio();$('#gal').classList.remove('on');start(contract(+sid,cl));}});
 function standings(){const g=save.g,pat=patronage(),dsc=discount();
@@ -1228,7 +1366,7 @@ function standings(){const g=save.g,pat=patronage(),dsc=discount();
  <li>Every win pays patronage from each empire at +25 or better, scaled by their size. An empire at +40 or better gives you a shipyard discount based on its size.</li>
  <li>The galaxy fights on between your missions. Any empire above 40% faces a coalition: it loses ground faster, and contracts against it pay more.</li>
  <li><b>Conquest:</b> an empire you're allied with (+50) holds two thirds of the galaxy. <b>Balance of power:</b> after 15 contracts, two or more allied empires each hold at least 25%, together 75% or more.</li></ul>
- <button class="btn alt" data-act="hub">BACK</button> <button class="btn alt sm" data-act="reset">NEW CAMPAIGN</button>`);}
+ <button class="btn alt" data-act="hub">BACK</button> <button class="btn alt sm" data-act="saves">SAVE AND LOAD</button>`);}
 function arcTxt(a){return a>=180?'All round':'Forward '+a*2+'°';}
 function yard(){
  const lo=save.lo,H=HULLS[lo.hull],tabs=['hulls','systems','weapons','modules'];
@@ -1236,7 +1374,7 @@ function yard(){
  if(yardTab==='hulls'){const ti=tradeIn();
   h+=`<p style="font-size:11px;opacity:.75">Trade-in for your ${H.name}: ${cr(ti)}. That includes its upgrades, weapons and modules. New hulls come with stock weapons.</p>`;
   for(const k of HORDER){const X=HULLS[k],own=k===lo.hull,net=price(X.price)-ti,lk=!unlocked('hull',k);
-   h+=`<div class="row ${own?'cur':''}"><div class="t"><b>${X.name.toUpperCase()}</b><span style="font-size:10px;opacity:.6">${X.cls.toUpperCase()}</span></div><p>${X.desc}</p>
+   h+=`<div class="row ${own?'cur':''}"><div class="t"><b>${X.name.toUpperCase()}</b><span style="font-size:10px;opacity:.6">${X.cls.toUpperCase()}</span></div><img src="${shipPic('line',k,'95,227,255',own?lo.mounts.filter(m=>m.t):null)}" style="width:150px;display:block;margin:2px 0"><p>${X.desc}</p>
    <div class="kv"><span>Hull <b>${X.hull}</b></span><span>Shields <b>${X.sh}</b></span><span>Speed <b>${X.speed}</b></span><span>Turn <b>${X.turn}</b></span><span>Mounts <b>${X.mounts}+2</b></span><span>Modules <b>${X.mods}</b></span><span>Beams <b>${arcTxt(X.arcs.beam)}</b></span><span>Mass <b>${X.mass}</b></span><span>Stock <b>${X.stock.length}</b></span></div>
    ${own?'<p style="color:var(--cy)">Current ship</p>':lk?`<p style="color:#ff9a6b">${lockTxt('hull',k)}</p>`:`<button class="btn sm ${net<=save.credits?'gold':''}" data-act="hull" data-arg="${k}" ${net>save.credits?'disabled':''}>BUY ${price(X.price).toLocaleString()} · NET ${net<0?'+'+(-net).toLocaleString()+' BACK':net.toLocaleString()}</button>`}</div>`;}}
  if(yardTab==='systems'){for(const k in UPG){const l=lo.upg[k],c=UPC[l];
@@ -1263,6 +1401,25 @@ function act(a,arg){
  const lo=save.lo;
  switch(a){
   case'hub':hub();break;
+  case'title':title();break;
+  case'continue':titleBack='hub';hub();break;
+  case'newgame':newGame();break;
+  case'startgame':save=defSave(arg);persist();gal.sel=-1;titleBack='hub';hub();break;
+  case'saves':titleBack=state==='galaxy'?'hub':'title';savesScreen();break;
+  case'options':titleBack='title';optionsScreen();break;
+  case'privacy':privacyScreen();break;
+  case'about':aboutScreen();break;
+  case'slotsave':try{localStorage.setItem(slotKey(arg),JSON.stringify({t:Date.now(),v:VERSION,data:save}));msg('SAVED TO SLOT '+arg,'#7dffb0');}catch(e){msg('COULD NOT SAVE','#ff6b5a');}savesScreen();break;
+  case'slotload':show(`<h2>LOAD SLOT ${arg}?</h2><p style="font-size:12px;opacity:.8">This replaces your current campaign. Save it to another slot first if you want to keep it.</p><button class="btn" data-act="slotload2" data-arg="${arg}">LOAD</button><button class="btn alt" data-act="saves">CANCEL</button>`);break;
+  case'slotload2':{const d=readSlot(arg),ok=d&&sanitize(d.data);if(!ok){msg('THAT SAVE COULD NOT BE READ','#ff6b5a');savesScreen();break;}save=ok;persist();gal.sel=-1;titleBack='hub';msg('LOADED SLOT '+arg,'#7dffb0');hub();break;}
+  case'slotdel':try{localStorage.removeItem(slotKey(arg));}catch(e){}savesScreen();break;
+  case'export':{const cb=$('#codebox');cb.value=btoa(unescape(encodeURIComponent(JSON.stringify(save))));cb.select&&cb.select();break;}
+  case'copycode':{const v=$('#codebox').value;if(!v)break;try{navigator.clipboard.writeText(v).then(()=>msg('CODE COPIED','#7dffb0'),()=>msg('SELECT THE CODE AND COPY IT','#ffd166'));}catch(e){msg('SELECT THE CODE AND COPY IT','#ffd166');}break;}
+  case'import':{let d=null;try{d=sanitize(JSON.parse(decodeURIComponent(escape(atob($('#codebox').value.trim())))));}catch(e){}
+   if(!d){msg('THAT CODE ISN\'T A VALID SAVE','#ff6b5a');break;}save=d;persist();gal.sel=-1;titleBack='hub';msg('CAMPAIGN LOADED','#7dffb0');hub();break;}
+  case'wipe':show(`<h2>DELETE EVERYTHING?</h2><p style="font-size:12px;opacity:.8">This erases your campaign, all save slots and your options from this device. It cannot be undone.</p><button class="btn" data-act="wipe2">DELETE</button><button class="btn alt" data-act="options">CANCEL</button>`);break;
+  case'wipe2':try{localStorage.removeItem(KEY);for(let i=1;i<=SLOTS;i++)localStorage.removeItem(slotKey(i));localStorage.removeItem(OPT_KEY);}catch(e){}
+   OPT={sound:true,vol:.7,shake:true,turn:6,fast:false,hints:true};applyOpt();try{localStorage.removeItem(OPT_KEY);}catch(e){}save=defSave();title();break;
     case'yard':yardTab='hulls';yard();$('#scrBox').scrollTop=0;break;
   case'tab':yardTab=arg;yard();$('#scrBox').scrollTop=0;break;
     case'hull':{if(!unlocked('hull',arg))return;const net=price(HULLS[arg].price)-tradeIn();if(net>save.credits)return;save.credits-=net;save.lo=newLo(arg);persist();msg('NEW SHIP: '+HULLS[arg].name.toUpperCase(),'#ffe066');yard();break;}
@@ -1275,8 +1432,15 @@ function act(a,arg){
   case'sellmod':{save.credits+=Math.round(MODS[arg].price/2);lo.mods=lo.mods.filter(k=>k!==arg);persist();yard();break;}
   case'resume':$('#scr').classList.remove('on');state=prevState;last=performance.now();break;
   case'retreat':$('#scr').classList.remove('on');endBattle(false,true);break;
+  case'opt:sound':OPT.sound=!OPT.sound;applyOpt();optionsScreen();break;
+  case'opt:vol-':OPT.vol=Math.max(0,Math.round((OPT.vol-.1)*10)/10);applyOpt();optionsScreen();break;
+  case'opt:vol+':OPT.vol=Math.min(1,Math.round((OPT.vol+.1)*10)/10);applyOpt();optionsScreen();break;
+  case'opt:shake':OPT.shake=!OPT.shake;applyOpt();optionsScreen();break;
+  case'opt:turn4':case'opt:turn6':case'opt:turn8':OPT.turn=+a.slice(8);applyOpt();optionsScreen();break;
+  case'opt:fast0':case'opt:fast1':OPT.fast=a==='opt:fast1';applyOpt();optionsScreen();break;
+  case'opt:hints':OPT.hints=!OPT.hints;applyOpt();optionsScreen();break;
   case'reset':show(`<h2>RESET CAMPAIGN?</h2><p style="font-size:12px;opacity:.8">This wipes your credits, ship, reputation and the galaxy.</p><button class="btn" data-act="reset2">YES, RESET</button><button class="btn alt" data-act="hub">CANCEL</button>`);break;
-  case'reset2':save=defSave();persist();gal.sel=-1;hub();break;
+  case'reset2':newGame();break;
  }
 }
 $('#scrBox').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;act(b.dataset.act,b.dataset.arg);});
@@ -1304,7 +1468,7 @@ function loop(now){
  render();updHUD();
  requestAnimationFrame(loop);
 }
-hub();
+applyOpt();title();
 requestAnimationFrame(loop);
 </script>
 </body>
