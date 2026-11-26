@@ -229,37 +229,37 @@ const SPR={pink:glowSprite(255,143,208),cyan:glowSprite(95,227,255),amber:glowSp
 const HULLS={
  kestrel:{name:'Kestrel',cls:'Corvette',kesh:'Skiff',price:500,hull:240,sh:85,speed:215,accel:220,turn:2.0,keel:2.2,wmul:1,mass:1,mounts:2,mods:1,scale:.95,
   arcs:{beam:100,torp:50,barr:180,bomb:100},stock:['beam','torp'],desc:'Nimble starter ship. Light armour, cheap to run.'},
- warhound:{name:'Warhound',cls:'Escort',kesh:'Fang',price:2800,hull:500,sh:110,speed:240,accel:260,turn:1.5,keel:1.9,wmul:1.2,mass:1.7,mounts:3,mods:1,scale:1.1,
+ warhound:{name:'Warhound',cls:'Escort',kesh:'Fang',price:7000,hull:500,sh:110,speed:240,accel:260,turn:1.5,keel:1.9,wmul:1.2,mass:1.7,mounts:3,mods:1,scale:1.1,
   arcs:{beam:35,torp:30,barr:180,bomb:60},stock:['beam','beam','torp'],desc:'Fast and heavily armoured, but every gun points forward. You fight nose-in.'},
- halberd:{name:'Halberd',cls:'Cruiser',kesh:'Raider',price:3400,hull:420,sh:135,speed:185,accel:180,turn:1.05,keel:1.5,wmul:1.35,mass:2,mounts:3,mods:2,scale:1.2,
+ halberd:{name:'Halberd',cls:'Cruiser',kesh:'Raider',price:8500,hull:420,sh:135,speed:185,accel:180,turn:1.05,keel:1.5,wmul:1.35,mass:2,mounts:3,mods:2,scale:1.2,
   arcs:{beam:135,torp:45,barr:180,bomb:100},stock:['beam','torp','barr'],desc:'Balanced line ship. Beams cover everything except dead astern.'},
- leviathan:{name:'Leviathan',cls:'Heavy Cruiser',kesh:'Dreadnought',price:7200,hull:660,sh:200,speed:130,accel:110,turn:.65,keel:1.2,wmul:1.5,mass:3.6,mounts:5,mods:3,scale:1.7,
+ leviathan:{name:'Leviathan',cls:'Heavy Cruiser',kesh:'Dreadnought',price:18000,hull:660,sh:200,speed:130,accel:110,turn:.65,keel:1.2,wmul:1.5,mass:3.6,mounts:5,mods:3,scale:1.7,
   arcs:{beam:180,torp:60,barr:180,bomb:120},stock:['beam','beam','torp','barr','bomb'],desc:'Slow and enormous. Beams fire in every direction and it carries the most modules.'}
 };
 const HORDER=['kestrel','warhound','halberd','leviathan'];
 const WD={
- beam:{name:'Beam',price:400,cd:2.4,range:520,dmg:17,dur:.6},
- torp:{name:'Torpedo',price:500,cd:4.8,range:800,dmg:22,speed:430},
- barr:{name:'Swarm',price:700,cd:10,range:860,dmg:5,count:10},
- bomb:{name:'Bomb',price:900,cd:16,range:680,dmg:90,radius:170,speed:115}
+ beam:{name:'Beam',price:1000,cd:2.4,range:520,dmg:17,dur:.6},
+ torp:{name:'Torpedo',price:1200,cd:4.8,range:800,dmg:22,speed:430},
+ barr:{name:'Swarm',price:1700,cd:10,range:860,dmg:5,count:10},
+ bomb:{name:'Bomb',price:2200,cd:16,range:680,dmg:90,radius:170,speed:115}
 };
 const WTYPES=['beam','torp','barr','bomb'];
 const TV={
  fusion:{name:'Fusion',col:'#ffd84a',spr:'yellow',dmg:1,spd:1,rng:1,price:0,d:'Balanced. Good speed, range and punch.'},
- anti:{name:'Antimatter',col:'#ff5a46',spr:'red',dmg:1.65,spd:.72,rng:.8,price:450,d:'Devastating hits, but slow and short-ranged. Easier to dodge and shoot down.'},
- grav:{name:'Gravitational',col:'#5aa0ff',spr:'blue',dmg:.7,spd:1.1,rng:1.1,price:350,d:'Lighter damage, but slams the target off course and doubles the pull of nearby planets on it.'}
+ anti:{name:'Antimatter',col:'#ff5a46',spr:'red',dmg:1.65,spd:.72,rng:.8,price:1100,d:'Devastating hits, but slow and short-ranged. Easier to dodge and shoot down.'},
+ grav:{name:'Gravitational',col:'#5aa0ff',spr:'blue',dmg:.7,spd:1.1,rng:1.1,price:900,d:'Lighter damage, but slams the target off course and doubles the pull of nearby planets on it.'}
 };
 const tvOf=m=>TV[m.v]||TV.fusion;
 const mRange=m=>WD[m.t].range*(m.t==='torp'?tvOf(m).rng:1);
 const WCOL={beam:'#5fe3ff',torp:'#c08aff',barr:'#eaf6ff',bomb:'#ff8c28'},WLAB={beam:'BEAM',torp:'TORP',barr:'SWARM',bomb:'BOMB'};
-const TIERC=[500,1100],MC=[900,1600],UPC=[300,700,1400,2400],MK=['','I','II','III'];
+const TIERC=[1200,2800],MC=[2200,4000],UPC=[800,1800,3500,6000],MK=['','I','II','III'];
 const UPG={shd:{name:'Shields',d:'+20% shield strength per level'},arm:{name:'Armour',d:'+15% hull per level'},eng:{name:'Engines',d:'+8% speed, thrust and turning per level'},rct:{name:'Reactor',d:'+1 power to share between systems per level'}};
 const MODS={
- tractor:{name:'Tractor Beam',lab:'TRAC',price:900,active:1,dur:3.5,cd:11,d:'Adds the Tractor order: pull the enemy toward you for a few seconds. Drag them into your forward guns or into a planet.'},
- drones:{name:'Drone Swarm',lab:'DRONES',price:1000,active:1,dur:18,cd:18,d:'Adds the Drones order: launch four point-defence drones that orbit you for three turns and shoot down torpedoes, missiles and bombs. You cannot fire on the turn you launch them.'},
- nanites:{name:'Repair Nanites',price:700,active:0,d:'Slowly repairs hull during battle.'},
- phase:{name:'Phase Shifter',lab:'PHASE',price:1500,active:1,dur:1.6,cd:14,d:'Automatically slips out of phase when a hit is about to land, so shots and planets pass through you. Recharges in 14 seconds.'},
- cloak:{name:'Cloak',lab:'CLOAK',price:1800,active:1,dur:1e9,cd:12,d:'Adds the Cloak, Fire + Cloak and Ambush orders. Stay hidden as long as you like, but shields do not recharge and you cannot fire. Firing first from cloak earns the ambush bonus.'}
+ tractor:{name:'Tractor Beam',lab:'TRAC',price:2200,active:1,dur:3.5,cd:11,d:'Adds the Tractor order: pull the enemy toward you for a few seconds. Drag them into your forward guns or into a planet.'},
+ drones:{name:'Drone Swarm',lab:'DRONES',price:2500,active:1,dur:18,cd:18,d:'Adds the Drones order: launch four point-defence drones that orbit you for three turns and shoot down torpedoes, missiles and bombs. You cannot fire on the turn you launch them.'},
+ nanites:{name:'Repair Nanites',price:1800,active:0,d:'Slowly repairs hull during battle.'},
+ phase:{name:'Phase Shifter',lab:'PHASE',price:3600,active:1,dur:1.6,cd:14,d:'Automatically slips out of phase when a hit is about to land, so shots and planets pass through you. Recharges in 14 seconds.'},
+ cloak:{name:'Cloak',lab:'CLOAK',price:4500,active:1,dur:1e9,cd:12,d:'Adds the Cloak, Fire + Cloak and Ambush orders. Stay hidden as long as you like, but shields do not recharge and you cannot fire. Firing first from cloak earns the ambush bonus.'}
 };
 const PAT={
  strafe:{code:'ALPHA',lab:'STRAFE',name:'Strafing Run'},
@@ -470,7 +470,7 @@ function shipPic(style,hk,rgb,mounts){const key=style+hk+rgb+(mounts?JSON.string
 /* ================= SAVE / ECONOMY ================= */
 const KEY='starships_v1';
 function newLo(hk){return{hull:hk,upg:{shd:0,arm:0,eng:0,rct:0},extra:0,mounts:HULLS[hk].stock.map(t=>({t,tier:1,stock:1})),mods:[]};}
-function defSave(home){return{credits:400,wins:0,losses:0,home:home||'terran',lo:newLo('kestrel'),g:newGalaxy(home)};}
+function defSave(home){return{credits:600,wins:0,losses:0,home:home||'terran',lo:newLo('kestrel'),g:newGalaxy(home)};}
 let save=(()=>{try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.lo&&HULLS[s.lo.hull]){s.lo.mods=s.lo.mods.filter(k=>MODS[k]);delete s.missions;if(!s.g)s.g=newGalaxy();s.g.offers={};return s;}}catch(e){}return defSave();})();
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(save));}catch(e){}}
 function mountVal(m){if(!m.t)return 0;let v=(m.stock?0:WD[m.t].price)+(m.t==='torp'?tvOf(m).price:0);for(let t=1;t<m.tier;t++)v+=TIERC[t-1];return v;}
@@ -511,11 +511,11 @@ function contract(sid,client){
  const g=save.g,key=sid+':'+client;if(g.offers[key])return g.offers[key];
  const S=SECT[sid],foe=g.own[sid],sf=shareOf(foe),sc=shareOf(client);
  // the map sets a floor; each ring also keeps pace with your ship, so the core always outclasses you and the rim never does
- const mapB=300+S.val*S.val*350+sf*4000+g.n*110,pv=loValue(save.lo),relB=pv*[1.3,.95,.7,.45][S.r]*(.85+sf*.9);
+ const PS=2.5,mapB=PS*(300+S.val*S.val*350+sf*4000+g.n*60),pv=loValue(save.lo),relB=pv*[1.3,.95,.7,.45][S.r]*(.85+sf*.9);
  let B=Math.max(mapB,relB);if(repOf(foe)<=-60)B*=1.25;if(sc>.4)B*=1.2;
- const st=relB>mapB?clamp([3,2,1,1][S.r]+(sf>.3?1:0)+(repOf(foe)<=-60?1:0),1,4):clamp(Math.round(1+(B-1500)/2000),1,4);
+ const st=relB>mapB?clamp([3,2,1,1][S.r]+(sf>.3?1:0)+(repOf(foe)<=-60?1:0),1,4):clamp(Math.round(1+(B/PS-1500)/2000),1,4);
  const lo=genEnemy(B,foe),ev=loValue(lo),pl=genPlanets();
- const reward=Math.round((B*.3+130)*(1+.15*(S.val-1))*(sf>.4?1.3:1)/10)*10;
+ const reward=Math.round(((mapB/PS*.3+130)*(1+.15*(S.val-1))*(sf>.4?1.3:1)+Math.max(0,B-mapB)/PS*.08)/10)*10;
  return g.offers[key]={sid,client,foe,lo,ev,st,pl,nb:genNebulae(pl),pers:EMP[foe].pers,reward,marked:repOf(foe)<=-60,coal:sf>.4,
   name:pick(OPS)+' · '+S.name};
 }
@@ -1241,7 +1241,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.7.4';
+const VERSION='0.7.5';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1300,7 +1300,7 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:11.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>The game checks for a newer version when it starts and offers to update</li><li>Battlefields are much larger, with more nebulae and planets, and folding space no longer gives away where you arrive</li><li>Contracts keep pace with your ship: core sectors always outclass you and pay accordingly, while the rim gets easier as you grow</li><li>Fixed big ships getting stuck on planets: engines can always beat a planet's pull, and a beached ship turns away and claws off on its own</li><li>Title screen, save slots, save codes, options and privacy policy</li><li>Redesigned ships: every empire has its own design language and every hull is shaped for its role, with turrets and launchers that track the enemy and light up when charged</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Economy rebalance: ships, upgrades, weapons and modules cost about 2.5 times more, and contract pay comes from the sector rather than your ship's value</li><li>The game checks for a newer version when it starts and offers to update</li><li>Battlefields are much larger, with more nebulae and planets, and folding space no longer gives away where you arrive</li><li>Contracts keep pace with your ship: core sectors always outclass you and pay accordingly, while the rim gets easier as you grow</li><li>Fixed big ships getting stuck on planets: engines can always beat a planet's pull, and a beached ship turns away and claws off on its own</li><li>Title screen, save slots, save codes, options and privacy policy</li><li>Redesigned ships: every empire has its own design language and every hull is shaped for its role, with turrets and launchers that track the enemy and light up when charged</li></ul>
  <p><b>Earlier</b></p><ul style="margin-top:0"><li>0.6 · Galaxy campaign with six empires, reputation and territory</li><li>0.5 · Torpedo warheads, fold space, mines, drone swarms</li><li>0.4 · Sensors, nebulae, action levers and capacitors</li><li>0.3 · Simultaneous turns</li></ul></div>
  <button class="btn alt" data-act="title">BACK</button>`);}
 function applyOpt(){TURN=OPT.turn;muted=!OPT.sound;if(master)master.gain.value=.65*OPT.vol;try{localStorage.setItem(OPT_KEY,JSON.stringify(OPT));}catch(e){}}
