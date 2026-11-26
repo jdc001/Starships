@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <title>Starships</title>
 <meta name="apple-mobile-web-app-title" content="Starships">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1239,7 +1241,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.7.3';
+const VERSION='0.7.4';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1248,11 +1250,15 @@ function slotSummary(d){if(!d||!d.g)return'Empty';const top=EORD.slice().sort((a
 function fmtDate(t){try{return new Date(t).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}catch(e){return'';}}
 function sanitize(s){if(!s||!s.lo||!HULLS[s.lo.hull]||!s.g||!s.g.own||s.g.own.length!==SECT.length)return null;s.lo.mods=(s.lo.mods||[]).filter(k=>MODS[k]);s.g.offers={};return s;}
 let titleBack='title',lineup=null;
+// check for a newer build; a fresh query string bypasses the phone's cached copy
+let newer=null;const vnum=v=>v.split('.').map(Number).reduce((a,b)=>a*1000+b,0);
+function checkUpdate(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.version&&vnum(j.version)>vnum(VERSION)){newer=j.version;if(state==='title')title();}}).catch(()=>{});}catch(e){}}
 function title(){state='title';player=null;enemy=null;ships=[];msgEl.innerHTML='';$('#hud').classList.remove('on');$('#gal').classList.remove('on');
  if(!lineup)lineup=HORDER.map(k=>shipPic('line',k,'95,227,255'));
  const g=hasGame();
  show(`<div style="text-align:center"><h1 style="font-size:34px">STARSHIPS</h1><div class="tag">VERSION ${VERSION} · WORKING TITLE</div>
  <div style="display:flex;justify-content:center;align-items:flex-end;gap:2px;margin:4px 0 14px">${lineup.map((u,i)=>`<img src="${u}" style="width:${[52,62,74,96][i]}px;opacity:.95">`).join('')}</div>
+ ${newer?`<button class="btn gold wide" data-act="update">UPDATE TO VERSION ${newer}</button><div style="font-size:10px;opacity:.6;margin:2px 0 6px">Your campaign and saves are kept</div>`:''}
  ${g?`<button class="btn wide" data-act="continue">CONTINUE</button><div style="font-size:10px;opacity:.6;margin:2px 0 6px">${slotSummary(save)}</div>`:''}
  <button class="btn ${g?'alt':''} wide" data-act="newgame">NEW CAMPAIGN</button>
  <button class="btn alt wide" data-act="saves">SAVE AND LOAD</button>
@@ -1294,7 +1300,7 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:11.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Battlefields are much larger, with more nebulae and planets, and folding space no longer gives away where you arrive</li><li>Contracts keep pace with your ship: core sectors always outclass you and pay accordingly, while the rim gets easier as you grow</li><li>Fixed big ships getting stuck on planets: engines can always beat a planet's pull, and a beached ship turns away and claws off on its own</li><li>Title screen, save slots, save codes, options and privacy policy</li><li>Redesigned ships: every empire has its own design language and every hull is shaped for its role, with turrets and launchers that track the enemy and light up when charged</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>The game checks for a newer version when it starts and offers to update</li><li>Battlefields are much larger, with more nebulae and planets, and folding space no longer gives away where you arrive</li><li>Contracts keep pace with your ship: core sectors always outclass you and pay accordingly, while the rim gets easier as you grow</li><li>Fixed big ships getting stuck on planets: engines can always beat a planet's pull, and a beached ship turns away and claws off on its own</li><li>Title screen, save slots, save codes, options and privacy policy</li><li>Redesigned ships: every empire has its own design language and every hull is shaped for its role, with turrets and launchers that track the enemy and light up when charged</li></ul>
  <p><b>Earlier</b></p><ul style="margin-top:0"><li>0.6 · Galaxy campaign with six empires, reputation and territory</li><li>0.5 · Torpedo warheads, fold space, mines, drone swarms</li><li>0.4 · Sensors, nebulae, action levers and capacitors</li><li>0.3 · Simultaneous turns</li></ul></div>
  <button class="btn alt" data-act="title">BACK</button>`);}
 function applyOpt(){TURN=OPT.turn;muted=!OPT.sound;if(master)master.gain.value=.65*OPT.vol;try{localStorage.setItem(OPT_KEY,JSON.stringify(OPT));}catch(e){}}
@@ -1415,6 +1421,7 @@ function act(a,arg){
  switch(a){
   case'hub':hub();break;
   case'title':title();break;
+  case'update':location.replace(location.pathname+'?v='+newer+'.'+Date.now());break;
   case'continue':titleBack='hub';hub();break;
   case'newgame':newGame();break;
   case'startgame':save=defSave(arg);persist();gal.sel=-1;titleBack='hub';hub();break;
@@ -1481,7 +1488,8 @@ function loop(now){
  render();updHUD();
  requestAnimationFrame(loop);
 }
-applyOpt();title();
+applyOpt();title();checkUpdate();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate();});
 requestAnimationFrame(loop);
 </script>
 </body>

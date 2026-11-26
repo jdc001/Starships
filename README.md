@@ -1,6 +1,6 @@
 # Starships (working title)
 
-Version 0.7.3
+Version 0.7.4
 
 A one-on-one starship duel game for iPhone and iPad, played in simultaneous turns.
 
@@ -33,5 +33,7 @@ Six empires share a spiral galaxy, each starting with a sixth of it: the Terran 
 Progress saves in the browser after every mission. The title screen adds three save slots, a save code you can copy to another device, options (sound, screen shake, turn length, watch speed, tips) and the privacy policy.
 
 ## Files
+
+- `version.json`: the current version number. The game checks it on start and offers to update when it's newer than the copy the device has cached. Bump it together with `VERSION` in `index.html` on every release.
 
 - `index.html`: the whole game in one file (HTML, CSS and JavaScript, no build step).
