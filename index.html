@@ -465,7 +465,7 @@ function shipPic(style,hk,rgb,mounts){const key=style+hk+rgb+(mounts?JSON.string
 const KEY='starships_v1';
 function newLo(hk){return{hull:hk,upg:{shd:0,arm:0,eng:0,rct:0},extra:0,mounts:HULLS[hk].stock.map(t=>({t,tier:1,stock:1})),mods:[]};}
 function defSave(home){return{credits:400,wins:0,losses:0,home:home||'terran',lo:newLo('kestrel'),g:newGalaxy(home)};}
-let save=(()=>{try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.lo&&HULLS[s.lo.hull]){s.lo.mods=s.lo.mods.filter(k=>MODS[k]);delete s.missions;if(!s.g)s.g=newGalaxy();return s;}}catch(e){}return defSave();})();
+let save=(()=>{try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.lo&&HULLS[s.lo.hull]){s.lo.mods=s.lo.mods.filter(k=>MODS[k]);delete s.missions;if(!s.g)s.g=newGalaxy();s.g.offers={};return s;}}catch(e){}return defSave();})();
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(save));}catch(e){}}
 function mountVal(m){if(!m.t)return 0;let v=(m.stock?0:WD[m.t].price)+(m.t==='torp'?tvOf(m).price:0);for(let t=1;t<m.tier;t++)v+=TIERC[t-1];return v;}
 function loValue(lo){let v=HULLS[lo.hull].price;for(const k in lo.upg)for(let l=0;l<lo.upg[k];l++)v+=UPC[l];
