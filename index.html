@@ -213,7 +213,7 @@ let W=0,H=0,DPR=1;
 const TAU=Math.PI*2,clamp=(v,a,b)=>v<a?a:v>b?b:v,rand=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.random()*a.length|0];
 const wrap=a=>{a=(a+Math.PI)%TAU;if(a<0)a+=TAU;return a-Math.PI;};
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),angTo=(a,b)=>Math.atan2(b.y-a.y,b.x-a.x);
-const ARENA=2000,SENSOR=950,CAP={beam:3,torp:3,barr:2,bomb:2};
+const ARENA=3200,SENSOR=950,CAP={beam:3,torp:3,barr:2,bomb:2};
 const FACE=['FORE','STARBOARD','AFT','PORT'],SYSN={eng:'ENGINES',wpn:'WEAPONS',shd:'SHIELDS'};
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 
@@ -308,11 +308,15 @@ function startAct(s){
 function foldTo(s,p){
  let x=p.x,y=p.y;const r=Math.hypot(x,y);if(r>ARENA*.95){x*=ARENA*.95/r;y*=ARENA*.95/r;}
  for(const pl of planets){const d=Math.hypot(x-pl.x,y-pl.y);if(d<pl.r+60){const a=Math.atan2(y-pl.y,x-pl.x);x=pl.x+Math.cos(a)*(pl.r+70);y=pl.y+Math.sin(a)*(pl.r+70);}}
- ring(s.x,s.y,110*s.scale,.7,s.S.rgb,4);sparks(s.x,s.y,24,SPR[s.S.g],260,.7,9);
+ const o=s===player?enemy:player,ox=s.x,oy=s.y,sawGo=o&&o.sees;
+ ring(ox,oy,110*s.scale,.7,s.S.rgb,4);sparks(ox,oy,24,SPR[s.S.g],260,.7,9);
  s.x=x;s.y=y;s.vx*=.3;s.vy*=.3;s.w=0;
- ring(x,y,140*s.scale,.8,'255,255,255',4);sparks(x,y,30,SPR.white,320,.8,10);sfx('phase',vf(s));
- s.lit=1.2;s.wpnLock=2;s.foldCd=3;s.foldTo=null;
- if(s===player)msg('SPACE FOLDED · WEAPONS OFFLINE THIS TURN AND NEXT','#c9a8ff');else if(player.sees||dist(s,player)<SENSOR)msg(ename()+' SHIP FOLDED SPACE',ECOL);
+ // the departure flash is visible, the arrival is not: they only learn where you went if you land inside their sensors
+ const showArr=s===player||Math.hypot(x-player.x,y-player.y)<SENSOR;
+ if(showArr){ring(x,y,140*s.scale,.8,'255,255,255',4);sparks(x,y,30,SPR.white,320,.8,10);}sfx('phase',vf(s));
+ s.lit=0;s.seenAt=-99;s.wpnLock=2;s.foldCd=3;s.foldTo=null;
+ if(sawGo)o.ct={x:ox,y:oy,vx:0,vy:0,a:s.a,t:gameTime};
+ if(s===player)msg('SPACE FOLDED · WEAPONS OFFLINE THIS TURN AND NEXT','#c9a8ff');else if(sawGo)msg(ename()+' SHIP FOLDED OUT',ECOL);
 }
 function dropMines(s){s.mineCd=3;for(let i=-1;i<=1;i++){const p=local(s,-26,i*14),a=s.a+Math.PI+i*.45;
  mines.push({x:p.x,y:p.y,vx:s.vx*.4+Math.cos(a)*45,vy:s.vy*.4+Math.sin(a)*45,owner:s,arm:1.2,life:TURN*6,ph:rand(0,TAU)});}
@@ -487,14 +491,15 @@ function genEnemy(B,emp){const E=EMP[emp]||EMP.kesh,wp=()=>Math.random()<.7?pick
  return lo;
 }
 function genPlanets(){
- const n=Math.random()<.45?1:2,ps=[];
- for(let i=0;i<n;i++){for(let k=0;k<30;k++){const q={t:Math.random()*4|0,r:rand(95,165),x:rand(-900,900),y:rand(-900,900)};
-  if(ps.every(o=>Math.hypot(o.x-q.x,o.y-q.y)>o.r+q.r+350)&&Math.abs(q.x)<1050){ps.push(q);break;}}}
+ const n=1+(Math.random()*3|0),ps=[];
+ for(let i=0;i<n;i++){for(let k=0;k<40;k++){const q={t:Math.random()*4|0,r:rand(95,170),x:rand(-2300,2300),y:rand(-2300,2300)};
+  if(Math.hypot(q.x,q.y)+q.r>ARENA-300)continue;if(Math.hypot(Math.abs(q.x)-1550,q.y)<q.r+400)continue;
+  if(ps.every(o=>Math.hypot(o.x-q.x,o.y-q.y)>o.r+q.r+400)){ps.push(q);break;}}}
  return ps;
 }
 function genNebulae(pl){
- const n=2+(Math.random()*3|0),ns=[];
- for(let i=0;i<n;i++){for(let k=0;k<40;k++){const q={r:rand(240,400),x:rand(-1550,1550),y:rand(-1450,1450),h:Math.random()<.5?0:1};
+ const n=3+(Math.random()*4|0),ns=[];
+ for(let i=0;i<n;i++){for(let k=0;k<50;k++){const q={r:rand(260,440),x:rand(-2900,2900),y:rand(-2900,2900),h:Math.random()<.5?0:1};
   if(Math.hypot(q.x,q.y)+q.r>ARENA)continue;if(Math.hypot(Math.abs(q.x)-1550,q.y)<q.r+250)continue;
   if(pl.some(o=>Math.hypot(o.x-q.x,o.y-q.y)<o.r+q.r))continue;if(ns.some(o=>Math.hypot(o.x-q.x,o.y-q.y)<o.r+q.r))continue;ns.push(q);break;}}
  return ns;
@@ -1014,11 +1019,12 @@ function updCam(dt){
  if(state==='end'&&deaths.length)pts.push(deaths[0].s);
  else if(player.sees&&enemy.alive)pts.push(enemy,{x:enemy.x+enemy.vx*1.2,y:enemy.y+enemy.vy*1.2});
  else if(player.ct&&ctAge(player)<TURN*3)pts.push({x:player.ct.x,y:player.ct.y});
+ const foldView=state==='plan'&&player.act==='fold';if(foldView)pts.push({x:-ARENA,y:-ARENA},{x:ARENA,y:ARENA});
  if(state==='plan'){if(player.pEnd)pts.push(player.pEnd);if(player.sees&&enemy.pEnd)pts.push(enemy.pEnd);}
  else if(state==='exec')pts.push({x:player.x+player.vx*1.5,y:player.y+player.vy*1.5});
  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const q of pts){x0=Math.min(x0,q.x);x1=Math.max(x1,q.x);y0=Math.min(y0,q.y);y1=Math.max(y1,q.y);}
  const mx=(x0+x1)/2,my=(y0+y1)/2,dx=x1-x0+300,dy=y1-y0+300;
- const zt=clamp(Math.min(W*.92/dx,ph/dy),.17,1.5),zk=Math.min(1,dt*(zt<cam.z?2.2:1.1)),k=Math.min(1,dt*2.2);
+ const zt=clamp(Math.min(W*.92/dx,ph/dy),foldView?.04:.17,1.5),zk=Math.min(1,dt*(zt<cam.z?2.2:1.1)),k=Math.min(1,dt*2.2);
  cam.z+=(zt-cam.z)*zk;cam.x+=(mx-cam.x)*k;cam.y+=(my-cam.y)*k;
 }
 
@@ -1233,7 +1239,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.7.2';
+const VERSION='0.7.3';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1288,7 +1294,7 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:11.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Contracts keep pace with your ship: core sectors always outclass you and pay accordingly, while the rim gets easier as you grow</li><li>Fixed big ships getting stuck on planets: engines can always beat a planet's pull, and a beached ship turns away and claws off on its own</li><li>Title screen, save slots, save codes, options and privacy policy</li><li>Redesigned ships: every empire has its own design language and every hull is shaped for its role, with turrets and launchers that track the enemy and light up when charged</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Battlefields are much larger, with more nebulae and planets, and folding space no longer gives away where you arrive</li><li>Contracts keep pace with your ship: core sectors always outclass you and pay accordingly, while the rim gets easier as you grow</li><li>Fixed big ships getting stuck on planets: engines can always beat a planet's pull, and a beached ship turns away and claws off on its own</li><li>Title screen, save slots, save codes, options and privacy policy</li><li>Redesigned ships: every empire has its own design language and every hull is shaped for its role, with turrets and launchers that track the enemy and light up when charged</li></ul>
  <p><b>Earlier</b></p><ul style="margin-top:0"><li>0.6 · Galaxy campaign with six empires, reputation and territory</li><li>0.5 · Torpedo warheads, fold space, mines, drone swarms</li><li>0.4 · Sensors, nebulae, action levers and capacitors</li><li>0.3 · Simultaneous turns</li></ul></div>
  <button class="btn alt" data-act="title">BACK</button>`);}
 function applyOpt(){TURN=OPT.turn;muted=!OPT.sound;if(master)master.gain.value=.65*OPT.vol;try{localStorage.setItem(OPT_KEY,JSON.stringify(OPT));}catch(e){}}
