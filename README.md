@@ -17,7 +17,18 @@ Each turn you plot a course, choose one action, then tap ENGAGE. Both ships carr
 - **Capacitors:** weapons store up to three charges. A full bank fires a much bigger volley. Hitting a ship that has not spotted you is an ambush for 50% extra damage.
 - **Sensors:** you only see the enemy within sensor range, or when they fire, scan or run at flank speed. Otherwise you see their last contact and a circle of where they could be. Nebulae hide ships but blind their sensors and stop shield recharge.
 
-Between battles, take missions from the board, earn credits, upgrade your ship in the shipyard or trade it in for a bigger hull. Progress saves in the browser.
+## The galaxy
+
+Six empires share a spiral galaxy, each starting with a sixth of it: the Terran Concord (home to Sol), the Kesh Dominion, the Orrun Hegemony, the Vael Collective, the Thane Free Worlds and the Sylari Choir. The map has 96 sectors in four rings. Core sectors are worth three times a rim sector and are defended by much stronger ships.
+
+- **Contracts:** tap any border sector and choose which neighbouring empire to fight for. Win and the sector changes hands.
+- **Difficulty comes from the map:** how deep the sector is, how big the defending empire is, and how far into the campaign you are. Upgrading your ship is how you push into the core.
+- **Reputation:** working for an empire raises your standing with it and lowers it with the one you hit. Below -40 an empire refuses to hire you; below -60 it sends its best against you.
+- **What reputation buys:** each empire unlocks its own hulls, modules and torpedo warheads. Friendly empires pay patronage after every win, scaled by their size, and allies give shipyard discounts.
+- **The galaxy moves without you:** border clashes happen between missions. Any empire above 40% faces a coalition.
+- **Winning:** Conquest (an allied empire holds two thirds of the galaxy) or Balance of Power (two or more allied empires each hold at least 25%, together 75%).
+
+Progress saves in the browser.
 
 ## Files
 

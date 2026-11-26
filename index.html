@@ -114,6 +114,20 @@ canvas{position:fixed;inset:0;display:block}
 .wb.pr,.mb.pr{transform:scale(.92)}
 @media (orientation:landscape){#bot{justify-content:flex-start}#wcol{margin-left:auto}}
 @media (max-width:440px){#thr{width:36px}#thrT{height:96px}#weap{grid-template-columns:repeat(2,58px);gap:5px}.wb{width:58px;height:58px}.mb{width:38px;height:38px}.pcol,.crew{width:30px}.pcols,.crow{gap:5px}#power{padding:6px}#shw{width:84px;transform:scale(.92);transform-origin:bottom center}#bot{gap:4px}}
+/* galaxy */
+#gal{position:fixed;inset:0;display:none;flex-direction:column;justify-content:space-between;pointer-events:none;z-index:4;padding:max(8px,env(safe-area-inset-top)) 8px max(8px,env(safe-area-inset-bottom))}
+#gal.on{display:flex}
+.gp{pointer-events:auto;background:rgba(6,12,22,.82);border:1px solid var(--line);border-radius:12px;padding:8px 10px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);max-width:560px;width:100%;align-self:center}
+.gh{display:flex;justify-content:space-between;align-items:center;font-size:13px;letter-spacing:.24em;color:var(--cy)}
+#greps{display:grid;grid-template-columns:repeat(3,1fr);gap:3px 8px;margin:6px 0 4px;font-size:10px}
+#greps span{display:flex;justify-content:space-between;gap:4px}#greps i{font-style:normal;opacity:.8}
+.gb{display:flex;gap:6px}.gb .btn{margin:0}
+#gbot{max-height:46vh;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;font-size:11px}
+#gbot h3{margin:0;font-size:13px;letter-spacing:.14em}
+#gbot .ct{display:block;width:100%;text-align:left;font:inherit;color:#cfe9f2;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:8px 9px;margin:6px 0 0}
+#gbot .ct:disabled{opacity:.4}
+#gbot p{margin:3px 0;line-height:1.45;opacity:.85}
+@media (orientation:landscape){#gal{flex-direction:row;align-items:stretch;justify-content:space-between}#gal .gp{width:min(300px,34vw);align-self:auto}#gbot{max-height:none}#greps{grid-template-columns:repeat(2,1fr)}}
 /* screens */
 .ov{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:max(14px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom));background:rgba(2,4,10,.6);z-index:5}
 .ov.on{display:flex}
@@ -184,6 +198,11 @@ ul{padding-left:16px;margin:10px 0 0;font-size:11px;line-height:1.55;opacity:.85
  </div>
 </div>
 <div id="msg"></div>
+<div id="gal">
+ <div id="gtop" class="gp"><div class="gh"><b>STARSHIPS</b><span id="gcr"></span></div><div id="greps"></div>
+  <div class="gb"><button class="btn sm" data-gact="yard">SHIPYARD</button><button class="btn alt sm" data-gact="stand">STANDINGS</button></div></div>
+ <div id="gbot" class="gp"></div>
+</div>
 <div class="ov on" id="scr"><div class="box" id="scrBox"></div></div>
 
 <script>
@@ -200,7 +219,8 @@ const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 function glowSprite(r,g,b){const s=64,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');const gr=x.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
  gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.18,`rgba(${r},${g},${b},.95)`);gr.addColorStop(.45,`rgba(${r},${g},${b},.3)`);gr.addColorStop(1,`rgba(${r},${g},${b},0)`);
  x.fillStyle=gr;x.fillRect(0,0,s,s);return c;}
-const SPR={cyan:glowSprite(95,227,255),amber:glowSprite(255,179,71),violet:glowSprite(190,120,255),red:glowSprite(255,70,50),orange:glowSprite(255,140,40),white:glowSprite(225,238,255),yellow:glowSprite(255,216,74),blue:glowSprite(90,160,255),green:glowSprite(150,255,190)};
+let ECOL='#ffb347',ERGB='255,179,71';
+const SPR={pink:glowSprite(255,143,208),cyan:glowSprite(95,227,255),amber:glowSprite(255,179,71),violet:glowSprite(190,120,255),red:glowSprite(255,70,50),orange:glowSprite(255,140,40),white:glowSprite(225,238,255),yellow:glowSprite(255,216,74),blue:glowSprite(90,160,255),green:glowSprite(150,255,190)};
 
 /* ================= DATA ================= */
 const HULLS={
@@ -267,19 +287,19 @@ function actList(s){const cl=isOn(s,'cloak');
 function actOK(s,k){const A=ACT[k];if(k==='fold'&&s.foldCd>0)return false;if(k==='drones'&&isOn(s,'drones'))return false;if(A.mod&&(!s.hasMod[A.mod]||s.hasMod[A.mod].cd<1))return false;return true;}
 const firing=s=>s.wpnLock<=0&&(s.act==='fire'||s.act==='ambush'||(s.act==='firecloak'&&turnT<TURN/2));
 function cloakOn(s){const m=s.hasMod.cloak;if(!m||m.act>0)return;m.act=MODS.cloak.dur;m.cd=0;sfx('cloak',vf(s));ring(s.x,s.y,50*s.scale,.4,s.S.rgb,2);
- if(s===enemy&&player.sees)msg('THE KESH ARE CLOAKING','#ffb347');}
+ if(s===enemy&&player.sees)msg(ename()+' SHIP CLOAKING',ECOL);}
 function cloakOff(s){const m=s.hasMod.cloak;if(!m||m.act<=0)return;m.act=0;m.cd=0;sfx('cloak',vf(s));ring(s.x,s.y,60*s.scale,.5,s.S.rgb,3);}
 // carry out a ship's chosen action at the start of a turn
 function startAct(s){
  s.ambOk=false;s.ambSaid=0;s.fcDone=false;
  const k=s.act;
- if(k==='scan'){s.scanT=TURN;s.lit=TURN;ring(s.x,s.y,ARENA*1.2,1.6,s.S.rgb,4);sfx('phase',1);msg(s===player?'SENSOR SWEEP':'KESH SENSOR SWEEP DETECTED',s===player?'#7dffb0':'#ffb347');}
+ if(k==='scan'){s.scanT=TURN;s.lit=TURN;ring(s.x,s.y,ARENA*1.2,1.6,s.S.rgb,4);sfx('phase',1);msg(s===player?'SENSOR SWEEP':ename()+' SENSOR SWEEP DETECTED',s===player?'#7dffb0':'#ffb347');}
  if(k==='cloak')cloakOn(s);
  if(k==='decloak')cloakOff(s);
  if(k==='ambush'){s.ambOk=true;cloakOff(s);}
  if(k==='tractor')activate(s,'tractor');
  if(k==='flank')sfx('boost',vf(s));
- if(k==='drones'){activate(s,'drones');ring(s.x,s.y,80*s.scale,.5,s.S.rgb,2);if(s===enemy&&player.sees)msg('KESH LAUNCHING DRONES','#ffb347');}
+ if(k==='drones'){activate(s,'drones');ring(s.x,s.y,80*s.scale,.5,s.S.rgb,2);if(s===enemy&&player.sees)msg(ename()+' LAUNCHING DRONES',ECOL);}
  if(k==='fold'&&s.foldTo)foldTo(s,s.foldTo);
  if(s.mineQ&&s.mineCd<=0)dropMines(s);s.mineQ=false;
  if(k==='fire'||k==='firecloak')s.ambOk=true;
@@ -291,7 +311,7 @@ function foldTo(s,p){
  s.x=x;s.y=y;s.vx*=.3;s.vy*=.3;s.w=0;
  ring(x,y,140*s.scale,.8,'255,255,255',4);sparks(x,y,30,SPR.white,320,.8,10);sfx('phase',vf(s));
  s.lit=1.2;s.wpnLock=2;s.foldCd=3;s.foldTo=null;
- if(s===player)msg('SPACE FOLDED · WEAPONS OFFLINE THIS TURN AND NEXT','#c9a8ff');else if(player.sees||dist(s,player)<SENSOR)msg('KESH SHIP FOLDED SPACE','#ffb347');
+ if(s===player)msg('SPACE FOLDED · WEAPONS OFFLINE THIS TURN AND NEXT','#c9a8ff');else if(player.sees||dist(s,player)<SENSOR)msg(ename()+' SHIP FOLDED SPACE',ECOL);
 }
 function dropMines(s){s.mineCd=3;for(let i=-1;i<=1;i++){const p=local(s,-26,i*14),a=s.a+Math.PI+i*.45;
  mines.push({x:p.x,y:p.y,vx:s.vx*.4+Math.cos(a)*45,vy:s.vy*.4+Math.sin(a)*45,owner:s,arm:1.2,life:TURN*6,ph:rand(0,TAU)});}
@@ -337,29 +357,62 @@ const PLACES=['Veyra Reach',"Orrin's Well",'Calder Drift','the Saffron Shoals','
 const OPS=['Patrol','Escort duty','Intercept','Bounty','Hold the line','Raid response','Recon in force','Duel'];
 const MDESC=['A lone Kesh scout is probing the border.','A Kesh warship is harassing a supply convoy.','A veteran Kesh captain is hunting Concord patrols.','A Kesh ace in a heavy refit. Expect a brutal fight.'];
 
+/* ================= EMPIRES ================= */
+const EMP={
+ terran:{name:'Terran Concord',short:'Concord',col:'#4f8cff',rgb:'79,140,255',spr:'blue',shape:'player',pers:'warden',wpn:['beam','beam','torp'],mods:['tractor','nanites'],tv:'fusion',bio:'Humanity, spread out from Sol. Disciplined crews and heavy beam batteries.'},
+ kesh:{name:'Kesh Dominion',short:'Kesh',col:'#ffb347',rgb:'255,179,71',spr:'amber',shape:'enemy',pers:'lancer',wpn:['beam','torp','barr'],mods:['cloak','phase'],tv:'fusion',bio:'Raiders and ambushers who perfected the cloak.'},
+ orrun:{name:'Orrun Hegemony',short:'Orrun',col:'#ff5a46',rgb:'255,90,70',spr:'red',shape:'enemy',pers:'raider',wpn:['torp','bomb','beam'],mods:['tractor','nanites'],tv:'anti',bio:'Brutal and heavily armed. Antimatter torpedoes and bombs, and they come straight at you.'},
+ vael:{name:'Vael Collective',short:'Vael',col:'#7dffb0',rgb:'125,255,176',spr:'green',shape:'player',pers:'warden',wpn:['beam','barr','torp'],mods:['drones','nanites'],tv:'fusion',bio:'A patient hive mind. Drone swarms and ships that repair themselves.'},
+ thane:{name:'Thane Free Worlds',short:'Thane',col:'#ff8fd0',rgb:'255,143,208',spr:'pink',shape:'enemy',pers:'raider',wpn:['barr','beam','torp'],mods:['tractor','drones'],tv:'fusion',bio:'Mercenary freeholds. Missile swarms, mines and grappling beams.'},
+ sylari:{name:'Sylari Choir',short:'Sylari',col:'#c9a8ff',rgb:'201,168,255',spr:'violet',shape:'player',pers:'lancer',wpn:['torp','beam','barr'],mods:['phase','drones'],tv:'grav',bio:'Mystics who bend gravity and slip between folds of space.'}
+};
+const EORD=['terran','kesh','orrun','vael','thane','sylari'];
+const ename=()=>enemy&&enemy.emp?EMP[enemy.emp].short.toUpperCase():'ENEMY';
+// rep needed with ANY one of the listed empires to buy an item
+const UNLOCK={
+ hull:{warhound:[['thane',15],['terran',15]],halberd:[['terran',30],['kesh',30]],leviathan:[['orrun',45],['terran',55]]},
+ mod:{cloak:[['kesh',30]],drones:[['vael',25]],phase:[['sylari',35]],tractor:[['thane',15],['orrun',20]],nanites:[['vael',10],['terran',15]]},
+ tv:{anti:[['orrun',25]],grav:[['sylari',20]]},
+ wpn:{bomb:[['orrun',15]],barr:[['thane',5],['vael',10]]}
+};
+const repOf=e=>save.g?save.g.rep[e]||0:0;
+function unlocked(cat,k){const u=UNLOCK[cat][k];return !u||u.some(([e,r])=>repOf(e)>=r);}
+function lockTxt(cat,k){return 'NEEDS '+UNLOCK[cat][k].map(([e,r])=>`${EMP[e].short.toUpperCase()} REP ${r}`).join(' OR ');}
+const RINGS=4,CELLS=24,RR=[.15,.36,.56,.76,.98],RVAL=[3,2,1,1],RNAME=['Core','Inner','Mid','Rim'],GROT=1.75;
+const SOL=2*CELLS+1;
+function mulb(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick2(a,q){return a[Math.floor(q()*a.length)];}
+const SY1=['Vey','Or','Cal','Tesh','Mar','Il','Ash','Cor','Hol','Pel','Qui','Bra','Zan','Lu','Ny','Ser','Tal','Var','Eo','Kai','Rho','Dra','Mer','Sab'],SY2=['ra','rin','dor','u','an','sen','fall','van','low','na','et','mos','dar','ix','eth','ul','os','ia','ane','ok'],SY3=['Reach','Gate','Drift','Verge','Deep','Crown','Narrows','Expanse','Belt','Shoals','March','Cluster','Rift','Hold','Spur','Veil'];
+const SECT=[];for(let r=0;r<RINGS;r++)for(let c=0;c<CELLS;c++){const id=r*CELLS+c,q=mulb(id*977+13);SECT.push({id,r,c,val:RVAL[r],name:id===SOL?'Sol':`${pick2(SY1,q)}${pick2(SY2,q)} ${pick2(SY3,q)}`});}
+function nbrs(id){const r=Math.floor(id/CELLS),c=id%CELLS,o=[r*CELLS+(c+1)%CELLS,r*CELLS+(c+CELLS-1)%CELLS];if(r>0)o.push((r-1)*CELLS+c);if(r<RINGS-1)o.push((r+1)*CELLS+c);return o;}
+const TOTV=SECT.reduce((a,x)=>a+x.val,0);
+function newGalaxy(){const rep={};EORD.forEach(e=>rep[e]=0);rep.terran=10;return{own:SECT.map(x=>EORD[Math.floor(x.c/4)]),rep,n:0,log:[],offers:{},won:null};}
+const shareOf=e=>save.g.own.reduce((a,o,i)=>a+(o===e?SECT[i].val:0),0)/TOTV;
+const alive=e=>save.g.own.includes(e);
+
 /* ================= SAVE / ECONOMY ================= */
 const KEY='starships_v1';
 function newLo(hk){return{hull:hk,upg:{shd:0,arm:0,eng:0,rct:0},extra:0,mounts:HULLS[hk].stock.map(t=>({t,tier:1,stock:1})),mods:[]};}
-function defSave(){return{credits:300,wins:0,losses:0,lo:newLo('kestrel'),missions:null};}
-let save=(()=>{try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.lo&&HULLS[s.lo.hull]){s.lo.mods=s.lo.mods.filter(k=>MODS[k]);if(s.missions&&!s.missions[0].nb)s.missions=null;return s;}}catch(e){}return defSave();})();
+function defSave(){return{credits:400,wins:0,losses:0,lo:newLo('kestrel'),g:newGalaxy()};}
+let save=(()=>{try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.lo&&HULLS[s.lo.hull]){s.lo.mods=s.lo.mods.filter(k=>MODS[k]);delete s.missions;if(!s.g)s.g=newGalaxy();return s;}}catch(e){}return defSave();})();
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(save));}catch(e){}}
 function mountVal(m){if(!m.t)return 0;let v=(m.stock?0:WD[m.t].price)+(m.t==='torp'?tvOf(m).price:0);for(let t=1;t<m.tier;t++)v+=TIERC[t-1];return v;}
 function loValue(lo){let v=HULLS[lo.hull].price;for(const k in lo.upg)for(let l=0;l<lo.upg[k];l++)v+=UPC[l];
  for(let i=0;i<(lo.extra||0);i++)v+=MC[i];for(const m of lo.mounts)v+=mountVal(m);for(const k of lo.mods)v+=MODS[k].price;return v;}
 const tradeIn=()=>Math.round(loValue(save.lo)*.6/10)*10;
 
-function genEnemy(B){
+function genEnemy(B,emp){const E=EMP[emp]||EMP.kesh,wp=()=>Math.random()<.7?pick(E.wpn):pick(WTYPES);
  const elig=HORDER.filter(k=>HULLS[k].price<=B*.72);let hk=elig.length?elig[elig.length-1]:'kestrel';
  if(elig.length>1&&Math.random()<.35)hk=elig[elig.length-2];
- const lo=newLo(hk);lo.mounts.forEach(m=>{if(Math.random()<.3)m.t=pick(WTYPES);});
+ const lo=newLo(hk);lo.mounts.forEach(m=>{if(Math.random()<.35)m.t=wp();});
  let rem=B-loValue(lo);
  for(let it=0;it<80;it++){const o=[];
   for(const k in lo.upg)if(lo.upg[k]<4)o.push({c:UPC[lo.upg[k]],f:()=>lo.upg[k]++});
-  lo.mounts.forEach(m=>{if(m.t&&m.tier<3)o.push({c:TIERC[m.tier-1],f:()=>m.tier++});if(!m.t){const t=pick(WTYPES);o.push({c:WD[t].price,f:()=>{m.t=t;m.tier=1;}});}});
+  lo.mounts.forEach(m=>{if(m.t&&m.tier<3)o.push({c:TIERC[m.tier-1],f:()=>m.tier++});if(!m.t){const t=wp();o.push({c:WD[t].price,f:()=>{m.t=t;m.tier=1;}});}});
   if(lo.extra<2)o.push({c:MC[lo.extra],f:()=>{lo.extra++;lo.mounts.push({t:null,tier:1,stock:0});}});
-  if(lo.mods.length<HULLS[hk].mods){const ks=Object.keys(MODS).filter(k=>!lo.mods.includes(k));const k=pick(ks);o.push({c:MODS[k].price,f:()=>lo.mods.push(k)});}
+  if(lo.mods.length<HULLS[hk].mods){const pf=E.mods.filter(k=>!lo.mods.includes(k)),ks=Object.keys(MODS).filter(k=>!lo.mods.includes(k));const k=pf.length&&Math.random()<.75?pick(pf):pick(ks);o.push({c:MODS[k].price,f:()=>lo.mods.push(k)});}
   const af=o.filter(x=>x.c<=rem);if(!af.length)break;const x=pick(af);x.f();rem-=x.c;}
- lo.mounts.forEach(m=>{if(!m.t){m.t=pick(WTYPES);}if(m.t==='torp'&&!m.v)m.v=Math.random()<.45?'fusion':pick(['anti','grav']);});
+ lo.mounts.forEach(m=>{if(!m.t){m.t=wp();}if(m.t==='torp'&&!m.v)m.v=Math.random()<.6?E.tv:pick(['fusion','anti','grav']);});
  return lo;
 }
 function genPlanets(){
@@ -375,17 +428,36 @@ function genNebulae(pl){
   if(pl.some(o=>Math.hypot(o.x-q.x,o.y-q.y)<o.r+q.r))continue;if(ns.some(o=>Math.hypot(o.x-q.x,o.y-q.y)<o.r+q.r))continue;ns.push(q);break;}}
  return ns;
 }
-function genMissions(){
- const pv=loValue(save.lo),defs=[[1,.75],[2,1],[3,1.3],[4,1.75]];
- save.missions=defs.map(([st,mul])=>{
-  const B=pv*mul*rand(.92,1.08)+save.wins*50,lo=genEnemy(B),ev=loValue(lo);
-  let pers=pick(Object.keys(AIS));
-  const pl=genPlanets();return{st,lo,ev,pers,pl,nb:genNebulae(pl),reward:Math.round((ev*.4+200)*(.7+st*.3)/10)*10,
-   name:pick(OPS)+' · '+pick(PLACES),desc:MDESC[st-1],skill:.35+st*.15};
- });
- persist();
+// a contract: fight for `client` to take sector `sid` from its owner
+function contract(sid,client){
+ const g=save.g,key=sid+':'+client;if(g.offers[key])return g.offers[key];
+ const S=SECT[sid],foe=g.own[sid],sf=shareOf(foe),sc=shareOf(client);
+ let B=300+S.val*S.val*350+sf*4000+g.n*110;if(repOf(foe)<=-60)B*=1.25;if(sc>.4)B*=1.2;
+ const lo=genEnemy(B,foe),ev=loValue(lo),st=clamp(Math.round(1+(B-1500)/2000),1,4),pl=genPlanets();
+ const reward=Math.round((B*.26+130)*(1+.15*(S.val-1))*(sf>.4?1.3:1)/10)*10;
+ return g.offers[key]={sid,client,foe,lo,ev,st,pl,nb:genNebulae(pl),pers:EMP[foe].pers,reward,marked:repOf(foe)<=-60,coal:sf>.4,
+  name:pick(OPS)+' · '+S.name};
 }
-if(!save.missions)genMissions();
+function contractsFor(sid){const g=save.g,o=g.own[sid];const cl=[...new Set(nbrs(sid).map(n=>g.own[n]).filter(e=>e!==o))];return cl.map(c=>({client:c,refuses:repOf(c)<=-40}));}
+function repGain(e,v){const g=3+2*v;return repOf(e)>=50?Math.ceil(g/2):g;}
+function repAdd(e,d,ch){const g=save.g,b=g.rep[e]||0;g.rep[e]=clamp(Math.round(b+d),-100,100);if(ch&&g.rep[e]!==b)ch.push([e,g.rep[e]-b]);}
+function patronage(){let t=0;for(const e of EORD){const r=repOf(e);if(r>=25&&alive(e))t+=shareOf(e)*r*12;}return Math.round(t/10)*10;}
+function discount(){let b=0;for(const e of EORD)if(repOf(e)>=40)b=Math.max(b,shareOf(e)*40);return Math.min(25,Math.round(b));}
+const price=p=>Math.round(p*(1-discount()/100)/10)*10;
+// the rest of the galaxy fights while you're busy
+function galDrift(lines){const g=save.g;
+ for(let k=0;k<2;k++){const pairs=[];for(let i=0;i<SECT.length;i++)for(const n of nbrs(i))if(g.own[i]!==g.own[n])pairs.push([i,n]);if(!pairs.length)return;
+  const[a,b]=pick(pairs),att=g.own[a],def=g.own[b],sa=shareOf(att),sd=shareOf(def);
+  let p=clamp(.5+(sa-sd)*.6,.25,.7);if(sa>.4)p*=.6;if(sd>.4)p=Math.min(.8,p*1.3);
+  if(Math.random()<p){g.own[b]=att;lines.push(`<span style="color:${EMP[att].col}">${EMP[att].short}</span> took ${SECT[b].name} from the <span style="color:${EMP[def].col}">${EMP[def].short}</span>`);
+   if(!alive(def))lines.push(`<b style="color:${EMP[def].col}">The ${EMP[def].name} has fallen.</b>`);}
+  else lines.push(`<span style="color:${EMP[def].col}">${EMP[def].short}</span> held ${SECT[b].name} against the <span style="color:${EMP[att].col}">${EMP[att].short}</span>`);}
+}
+function checkWin(){const g=save.g;if(g.won)return null;
+ for(const e of EORD)if(repOf(e)>=50&&shareOf(e)>=2/3)return g.won={type:'conquest',e:[e]};
+ const al=EORD.filter(e=>repOf(e)>=50&&alive(e));
+ if(g.n>=15&&al.length>=2&&al.every(e=>shareOf(e)>=.25)&&al.reduce((a,e)=>a+shareOf(e),0)>=.75)return g.won={type:'balance',e:al};
+ return null;}
 
 /* ================= AUDIO ================= */
 let AC=null,master=null,muted=false,NB=null;
@@ -462,7 +534,7 @@ const ORD={ok:7,arc:5,range:5,los:5,nolock:4,cloaked:4,phase:4,locked:4,charging
 function typeStatus(s,type,t){let st='none',pct=0,n=0;for(const m of s.mounts){if(m.t!==type)continue;n++;pct=Math.max(pct,Math.min(1,m.cd));const x=mountStatus(s,m,t);if(ORD[x]>ORD[st])st=x;}return{st,pct,n};}
 function fireType(s,type,t){let n=0;const amb=gameTime-s.seenAt>2.5&&s.ambOk;
  for(const m of s.mounts){if(m.t!==type)continue;if(mountStatus(s,m,t)==='ok'){fireMount(s,m,t,n,amb);n++;}}
- if(n){s.lit=Math.max(s.lit,1.5);if(amb&&!s.ambSaid){s.ambSaid=1;msg(s===player?'AMBUSH · +50% DAMAGE':'AMBUSHED BY THE KESH','#ffe066');}}
+ if(n){s.lit=Math.max(s.lit,1.5);if(amb&&!s.ambSaid){s.ambSaid=1;msg(s===player?'AMBUSH · +50% DAMAGE':'AMBUSHED BY THE '+ename(),'#ffe066');}}
  return n;}
 // steady platforms shoot straighter: fast ships hit softer, stopped ships hit harder
 function gunnery(s){return 1.2-.3*clamp(Math.hypot(s.vx,s.vy)/s.H.speed,0,1.2);}
@@ -551,7 +623,7 @@ function updShip(s,dt){
      if(s===player){shake=Math.min(18,shake+vn*.05);msg('PLANET IMPACT','#ff6b5a');}else msg('ENEMY HIT THE PLANET','#5fe3ff');}}}}
  const R=Math.hypot(s.x,s.y);if(R>ARENA){const ux=s.x/R,uy=s.y/R;s.x=ux*ARENA;s.y=uy*ARENA;const vo=s.vx*ux+s.vy*uy;if(vo>0){s.vx-=ux*vo*1.6;s.vy-=uy*vo*1.6;}}
  // visuals
- if(!isOn(s,'cloak')&&thr>.05)for(const e of ENG[s.side][s.hk]){if(Math.random()<.85){const m=local(s,e[0],e[1]),bs=boost?2:1;
+ if(!isOn(s,'cloak')&&thr>.05)for(const e of ENG[s.shape||s.side][s.hk]){if(Math.random()<.85){const m=local(s,e[0],e[1]),bs=boost?2:1;
   glowP(m.x+rand(-1,1),m.y+rand(-1,1),(5+thr*6)*s.scale*bs,SPR[boost?'white':s.S.g],.35,-Math.cos(s.a)*120*thr*bs+s.vx*.5,-Math.sin(s.a)*120*thr*bs+s.vy*.5,1);}}
  if(s.hull<s.maxHull*.5&&Math.random()<(1-s.hull/s.maxHull)*.5){const m=local(s,rand(-15,10),rand(-8,8));glowP(m.x,m.y,rand(6,14),SPR.orange,.5,rand(-15,15)+s.vx*.5,rand(-15,15)+s.vy*.5,1);}
  // point defense
@@ -574,7 +646,7 @@ function sense(a,b){
 function updSensors(){
  for(const[a,b]of[[player,enemy],[enemy,player]]){const was=a.sees;a.sees=a.alive&&sense(a,b);
   if(a.sees){a.ct={x:b.x,y:b.y,vx:b.vx,vy:b.vy,a:b.a,t:gameTime};b.seenAt=gameTime;}
-  if(a===player&&was!==a.sees&&b.alive&&state!=='end'){if(a.sees)msg('CONTACT · KESH '+b.H.kesh.toUpperCase(),'#7dffb0');else msg(isOn(b,'cloak')?'CONTACT LOST · THEY CLOAKED':'CONTACT LOST','#ff9a6b');}}
+  if(a===player&&was!==a.sees&&b.alive&&state!=='end'){if(a.sees)msg('CONTACT · '+ename()+' '+b.H.cls.toUpperCase(),'#7dffb0');else msg(isOn(b,'cloak')?'CONTACT LOST · THEY CLOAKED':'CONTACT LOST','#ff9a6b');}}
 }
 const ctAge=s=>s.ct?gameTime-s.ct.t:99;
 const ctRad=(s,extra)=>{const t=s===player?enemy:player;return 40+t.H.speed*.75*(ctAge(s)+(extra||0));};
@@ -586,7 +658,7 @@ function setPat(s,k,say){
  if(k!=='manual'&&k!=='about'&&!s.ai)s.lastPat=k;
  if(s===player)updOrders();
  if(say&&PAT[k]){if(s===player)msg('HELM · '+(PAT[k].code!=='HELM'?'PATTERN '+PAT[k].code+' · ':'')+PAT[k].name.toUpperCase(),'#ffe066');
-  else msg('KESH '+s.H.kesh.toUpperCase()+' · '+PAT[k].name.toUpperCase(),'#ffb347');}
+  else msg(ename()+' '+s.H.cls.toUpperCase()+' · '+PAT[k].name.toUpperCase(),ECOL);}
 }
 // one helm step of a tactical pattern: returns where to steer and how hard
 function patStep(s,t,ps,dt){
@@ -802,34 +874,47 @@ function makePlanetImg(pt,r){
  x.restore();x.strokeStyle=`rgba(${pt.atm},.5)`;x.lineWidth=1.5;x.beginPath();x.arc(cx,cx,r,Math.PI*.9,Math.PI*1.6);x.stroke();
  return c;
 }
-function start(mi){
- mission=save.missions[mi];
+function start(c){
+ mission=c;
  projs=[];beams=[];parts=[];rings=[];deaths=[];mines=[];shake=0;timeScale=1;endTimer=0;gameTime=0;
  if(!mission.nb)mission.nb=genNebulae(mission.pl);
  nebulae=mission.nb.map(q=>({x:q.x,y:q.y,r:q.r,img:makeNebImg(q.r,q.h)}));
  planets=mission.pl.map(q=>{const pt=PTYPES[q.t];return{x:q.x,y:q.y,r:q.r,g:140+q.r*.6,pt,img:makePlanetImg(pt,q.r),rot:rand(0,TAU)};});
  player=buildShip('player',save.lo,-1550,rand(-300,300),0);
  enemy=buildShip('enemy',mission.lo,1550,rand(-300,300),Math.PI);
+ {const E=EMP[mission.foe];enemy.emp=mission.foe;enemy.shape=E.shape;enemy.S={col:E.col,rgb:E.rgb,g:E.spr,torp:'red',miss:E.spr,bomb:'red',beam:E.spr,bc:E.rgb};ECOL=E.col;ERGB=E.rgb;
+  $('#eName').style.color=E.col;$('#eBar').style.background=E.col;$('#enemyCard').style.borderColor=`rgba(${E.rgb},.35)`;}
  enemy.ps={k:'manual',ph:'',tm:0,side:-1};enemy.thrAuto=true;enemy.patT=0;enemy.ai=Object.assign({},AIS[mission.pers],{key:mission.pers,skill:.3+mission.st*.16});enemy.dmgMul=.7+.12*mission.st;const hm=.75+.1*mission.st;enemy.maxHull=enemy.hull=Math.round(enemy.maxHull*hm);enemy.fwd=enemy.H.arcs.beam<120;
  player.lastPat=defPat(player);player.ps={k:player.lastPat,ph:'',tm:0,side:1};player.shAuto=true;player.thrAuto=true;player.armed={beam:1,torp:1,barr:1,bomb:0};player.act='hold';enemy.act='hold';turnN=1;
  player.ct={x:enemy.x,y:enemy.y,vx:0,vy:0,a:enemy.a,t:-TURN};enemy.ct={x:player.x,y:player.y,vx:0,vy:0,a:player.a,t:-TURN};updSensors();ships=[player,enemy];cam.x=0;cam.y=0;cam.z=.4;
  $('#pName').textContent=HULLS[save.lo.hull].name.toUpperCase();
- $('#eName').textContent='KESH '+HULLS[mission.lo.hull].kesh.toUpperCase();
+ $('#eName').textContent=EMP[mission.foe].short.toUpperCase()+' '+HULLS[mission.lo.hull].cls.toUpperCase();
  $$('.tb').forEach(b=>b.classList.toggle('on',b.dataset.k==='hull'));
  buildHUD();buildOrders();buildActs();
  $('#scr').classList.remove('on');$('#hud').classList.add('on');$('#hud').classList.remove('exec');
  state='plan';measure();msg('PLOT A COURSE, CHOOSE AN ACTION, ENGAGE','#ffe066');
 }
 function endBattle(win,retreat){
- const m=mission;let earned=0;
- if(win){earned=m.reward;save.wins++;}else{earned=retreat?0:Math.round(m.reward*.15/10)*10;save.losses++;}
- save.credits+=earned;genMissions();persist();
+ const m=mission,g=save.g,S=SECT[m.sid],ch=[],news=[];let earned=0,pat=0;
+ if(win){earned=m.reward;save.wins++;
+  if(g.own[m.sid]===m.foe){g.own[m.sid]=m.client;news.push(`<b style="color:${EMP[m.client].col}">${EMP[m.client].short}</b> took ${S.name} from the <span style="color:${EMP[m.foe].col}">${EMP[m.foe].short}</span>`);
+   if(!alive(m.foe))news.push(`<b style="color:${EMP[m.foe].col}">The ${EMP[m.foe].name} has fallen.</b>`);}
+  repAdd(m.client,repGain(m.client,S.val),ch);repAdd(m.foe,-(6+3*S.val),ch);
+  for(const e of EORD)if(e!==m.client&&e!==m.foe&&repOf(e)>0&&Math.random()<.5)repAdd(e,-1,ch);
+  pat=patronage();earned+=pat;}
+ else{earned=retreat?0:Math.round(m.reward*.15/10)*10;save.losses++;repAdd(m.client,retreat?-4:-2,ch);}
+ g.n++;save.credits+=earned;galDrift(news);g.offers={};
+ g.log=news.concat(g.log).slice(0,12);
+ const won=checkWin();persist();
  $('#hud').classList.remove('on');state='menu';
  const t=Math.round(gameTime),row=(a,b)=>`<div><span>${a}</span><span>${b}</span></div>`;
  show(`<h1 style="color:${win?'var(--cy)':'#ff6b5a'}">${win?'VICTORY':retreat?'RETREAT':'SHIP LOST'}</h1>
- <div class="tag">${win?'THE KESH '+HULLS[m.lo.hull].kesh.toUpperCase()+' IS DESTROYED':retreat?'YOU DISENGAGED. NO PAY FOR THIS ONE.':'YOUR CREW ESCAPED. THE YARD HAS REBUILT YOUR SHIP.'}</div>
- <div class="stats">${row('Battle time',`${t/60|0}:${String(t%60).padStart(2,'0')}`)}${row('Damage dealt',Math.round(player.dealt))}${row('Damage taken',Math.round(enemy.dealt))}${row('Missiles shot down',player.pdKills)}
- ${row(win?'Mission pay':'Salvage','<span class="cr">+'+earned+' cr</span>')}${row('Balance','<span class="cr">'+save.credits+' cr</span>')}</div>
+ <div class="tag">${win?'THE '+EMP[m.foe].short.toUpperCase()+' '+HULLS[m.lo.hull].cls.toUpperCase()+' IS DESTROYED':retreat?'YOU DISENGAGED. NO PAY FOR THIS ONE.':'YOUR CREW ESCAPED. THE YARD HAS REBUILT YOUR SHIP.'}</div>
+ <div class="stats">${row('Battle time',`${t/60|0}:${String(t%60).padStart(2,'0')}`)}${row('Damage dealt',Math.round(player.dealt))}${row('Damage taken',Math.round(enemy.dealt))}
+ ${row(win?'Contract pay':'Salvage','<span class="cr">+'+(earned-pat)+' cr</span>')}${pat?row('Patronage','<span class="cr">+'+pat+' cr</span>'):''}${row('Balance','<span class="cr">'+save.credits+' cr</span>')}
+ ${ch.map(([e,d])=>row(`<span style="color:${EMP[e].col}">${EMP[e].name}</span>`,`${d>0?'+':''}${d} → ${repOf(e)}`)).join('')}</div>
+ <div style="font-size:11px;line-height:1.6;opacity:.85">${news.join('<br>')}</div>
+ ${won?`<div class="row cur" style="margin-top:10px"><b style="color:#ffe066">${won.type==='conquest'?'GALACTIC CONQUEST':'BALANCE OF POWER'}</b><p>${won.type==='conquest'?`The ${EMP[won.e[0]].name} rules two thirds of the galaxy, and you put them there.`:`You have kept ${won.e.map(e=>'the '+EMP[e].short).join(', ')} strong and in balance, and every one of them owes you.`} You can keep playing or start a new campaign from Standings.</p></div>`:''}
  <button class="btn" data-act="hub">CONTINUE</button>`);
  player=null;enemy=null;ships=[];
 }
@@ -872,7 +957,7 @@ function drawBG(){
 function shipAlpha(s){if(isOn(s,'cloak'))return s===player?.3:player.sees?.35:(player&&dist(s,player)<220?.14:.04)*(0.6+.4*Math.sin(gameTime*20));if(isOn(s,'phase'))return .45+.2*Math.sin(gameTime*30);return 1;}
 function drawShip(s){
  const al=shipAlpha(s);ctx.save();ctx.globalAlpha=al;ctx.translate(s.x,s.y);ctx.rotate(s.a);ctx.scale(s.scale,s.scale);
- const path=P2D[s.side][s.hk],g=ctx.createLinearGradient(-22,0,24,0);g.addColorStop(0,'#0e1622');g.addColorStop(1,'#233246');
+ const path=P2D[s.shape||s.side][s.hk],g=ctx.createLinearGradient(-22,0,24,0);g.addColorStop(0,'#0e1622');g.addColorStop(1,'#233246');
  ctx.fillStyle=g;ctx.fill(path);ctx.lineWidth=1.1/s.scale;ctx.strokeStyle=s.hitFlash>0?`rgba(255,255,255,${.5+s.hitFlash*.5})`:s.S.col;ctx.stroke(path);
  ctx.strokeStyle=`rgba(${s.S.rgb},.35)`;ctx.lineWidth=.7/s.scale;ctx.beginPath();ctx.moveTo(15,0);ctx.lineTo(-14,0);ctx.stroke();
  ctx.fillStyle=s.S.col;ctx.fillRect(8,-1,3,2);
@@ -888,14 +973,14 @@ function ghost(sh,o){return{x:o.x,y:o.y,vx:o.vx,vy:o.vy,a:o.a,rad:sh.rad};}
 function drift(sh,n,dt){const o={x:sh.x,y:sh.y,vx:sh.vx,vy:sh.vy,a:sh.a,w:sh.w},MP=motionP(sh),out=[];
  for(let i=0;i<n;i++){motion(o,null,sh.thr,MP,dt);out.push({x:o.x,y:o.y,vx:o.vx,vy:o.vy,a:o.a,rad:sh.rad});}return out;}
 function drawGhost(sh,o,al){ctx.save();ctx.globalAlpha=al;ctx.translate(o.x,o.y);ctx.rotate(o.a);ctx.scale(sh.scale,sh.scale);
- ctx.strokeStyle=sh.S.col;ctx.lineWidth=1/sh.scale;ctx.setLineDash([3,3]);ctx.stroke(P2D[sh.side][sh.hk]);ctx.setLineDash([]);ctx.restore();}
+ ctx.strokeStyle=sh.S.col;ctx.lineWidth=1/sh.scale;ctx.setLineDash([3,3]);ctx.stroke(P2D[sh.shape||sh.side][sh.hk]);ctx.setLineDash([]);ctx.restore();}
 function drawPlan(z){
  const dt=.05,n=Math.round(TURN/dt),eAl=enemy.alive&&player.sees,ep=eAl?drift(enemy,n,dt):null;
  if(!eAl&&player.ct&&enemy.alive){const c=player.ct,R=ctRad(player,TURN);
-  ctx.fillStyle='rgba(255,179,71,.05)';ctx.beginPath();ctx.arc(c.x,c.y,R,0,TAU);ctx.fill();
-  ctx.strokeStyle='rgba(255,179,71,.35)';ctx.lineWidth=1.2/z;ctx.setLineDash([8/z,8/z]);ctx.stroke();ctx.setLineDash([]);}
+  ctx.fillStyle=`rgba(${ERGB},.05)`;ctx.beginPath();ctx.arc(c.x,c.y,R,0,TAU);ctx.fill();
+  ctx.strokeStyle=`rgba(${ERGB},.35)`;ctx.lineWidth=1.2/z;ctx.setLineDash([8/z,8/z]);ctx.stroke();ctx.setLineDash([]);}
  // enemy: drift projection only. Their real orders are secret until you engage.
- if(ep){ctx.fillStyle='rgb(255,179,71)';for(let i=3;i<n;i+=4){ctx.globalAlpha=.35*(1-i/(n+20));ctx.beginPath();ctx.arc(ep[i].x,ep[i].y,1.3/z,0,TAU);ctx.fill();}
+ if(ep){ctx.fillStyle=`rgb(${ERGB})`;for(let i=3;i<n;i+=4){ctx.globalAlpha=.35*(1-i/(n+20));ctx.beginPath();ctx.arc(ep[i].x,ep[i].y,1.3/z,0,TAU);ctx.fill();}
   ctx.globalAlpha=1;enemy.pEnd=ep[n-1];drawGhost(enemy,ep[n-1],.4);}
  // you: the full maneuver, with markers where your guns bear on their projected position
  const sh=player,o={x:sh.x,y:sh.y,vx:sh.vx,vy:sh.vy,a:sh.a,w:sh.w,H:sh.H,rad:sh.rad,mounts:sh.mounts,ai:null,wp:{x:sh.wp.x,y:sh.wp.y},wpDone:sh.wpDone,thr:sh.thr,fwd:sh.fwd,ps:Object.assign({},sh.ps)};
@@ -918,6 +1003,7 @@ function drawPlan(z){
   if(A.beam<180){ctx.globalAlpha=.12;ctx.fillStyle='rgb(95,227,255)';ctx.beginPath();ctx.moveTo(o.x,o.y);ctx.arc(o.x,o.y,WD.beam.range,o.a-A.beam*Math.PI/180,o.a+A.beam*Math.PI/180);ctx.closePath();ctx.fill();ctx.globalAlpha=1;}}
 }
 function render(){
+ if(state==='galaxy'){galGeom();drawGalaxy();return;}
  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalCompositeOperation='source-over';drawBG();
  const z=cam.z;camO.x=W/2-cam.x*z;camO.y=cam.cy-cam.y*z;
  const sx=(Math.random()-.5)*shake,sy=(Math.random()-.5)*shake;
@@ -953,7 +1039,7 @@ function render(){
    ctx.beginPath();ctx.arc(x,y,8,a+Math.PI/2+.6,a+Math.PI*1.5-.6);ctx.stroke();}}
  ctx.globalCompositeOperation='source-over';
  for(const s of ships){if(!s.alive&&!deaths.some(d=>d.s===s&&d.n<7))continue;if(s===enemy&&s.alive&&!player.sees&&!isOn(s,'cloak'))continue;
-  if(s.alive&&!isOn(s,'cloak')){ctx.globalCompositeOperation='lighter';for(const e of ENG[s.side][s.hk]){const m=local(s,e[0]-2,e[1]),sz=(10+s.speed*.06)*s.scale;ctx.drawImage(SPR[flankOn(s)?'white':s.S.g],m.x-sz/2,m.y-sz/2,sz,sz);}ctx.globalCompositeOperation='source-over';}
+  if(s.alive&&!isOn(s,'cloak')){ctx.globalCompositeOperation='lighter';for(const e of ENG[s.shape||s.side][s.hk]){const m=local(s,e[0]-2,e[1]),sz=(10+s.speed*.06)*s.scale;ctx.drawImage(SPR[flankOn(s)?'white':s.S.g],m.x-sz/2,m.y-sz/2,sz,sz);}ctx.globalCompositeOperation='source-over';}
   drawShip(s);
   if(s.alive&&isOn(s,'drones')&&!isOn(s,'cloak')&&(s===player||player.sees))for(let i=0;i<4;i++){const d=dronePos(s,i);ctx.fillStyle=s.S.col;ctx.beginPath();ctx.arc(d.x,d.y,2.4,0,TAU);ctx.fill();}}
  ctx.globalCompositeOperation='lighter';
@@ -975,14 +1061,14 @@ function render(){
  for(const n of nebulae){ctx.globalAlpha=.9;ctx.drawImage(n.img,n.x-n.img.width/2,n.y-n.img.height/2);}ctx.globalAlpha=1;
  // markers that stay readable when zoomed far out
  if(player.alive){ctx.strokeStyle='rgba(95,227,255,.8)';ctx.lineWidth=1.5/z;ctx.beginPath();ctx.arc(player.x,player.y,Math.max(player.rad+8,14/z),0,TAU);ctx.stroke();}
- if(enemy.alive&&!player.sees&&player.ct){const c=player.ct,R=ctRad(player);ctx.strokeStyle='rgba(255,179,71,.55)';ctx.lineWidth=1.2/z;ctx.setLineDash([6/z,6/z]);ctx.beginPath();ctx.arc(c.x,c.y,R,0,TAU);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle='rgba(255,179,71,.8)';ctx.font=`${11/z}px ui-monospace,Menlo,monospace`;ctx.textAlign='center';ctx.fillText('LAST CONTACT '+Math.round(ctAge(player))+'s',c.x,c.y-R-6/z);
+ if(enemy.alive&&!player.sees&&player.ct){const c=player.ct,R=ctRad(player);ctx.strokeStyle=`rgba(${ERGB},.55)`;ctx.lineWidth=1.2/z;ctx.setLineDash([6/z,6/z]);ctx.beginPath();ctx.arc(c.x,c.y,R,0,TAU);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=`rgba(${ERGB},.8)`;ctx.font=`${11/z}px ui-monospace,Menlo,monospace`;ctx.textAlign='center';ctx.fillText('LAST CONTACT '+Math.round(ctAge(player))+'s',c.x,c.y-R-6/z);
   ctx.beginPath();ctx.moveTo(c.x-6/z,c.y);ctx.lineTo(c.x+6/z,c.y);ctx.moveTo(c.x,c.y-6/z);ctx.lineTo(c.x,c.y+6/z);ctx.stroke();}
- if(enemy.alive&&player.sees&&!isOn(enemy,'cloak')){const r=Math.max(enemy.rad+22,16/z),t=gameTime*1.5;ctx.strokeStyle='rgba(255,179,71,.8)';ctx.lineWidth=1.5/z;for(let i=0;i<4;i++){const a=t+i*Math.PI/2;ctx.beginPath();ctx.arc(enemy.x,enemy.y,r,a,a+.45);ctx.stroke();}}
+ if(enemy.alive&&player.sees&&!isOn(enemy,'cloak')){const r=Math.max(enemy.rad+22,16/z),t=gameTime*1.5;ctx.strokeStyle=`rgba(${ERGB},.8)`;ctx.lineWidth=1.5/z;for(let i=0;i<4;i++){const a=t+i*Math.PI/2;ctx.beginPath();ctx.arc(enemy.x,enemy.y,r,a,a+.45);ctx.stroke();}}
  ctx.setTransform(DPR,0,0,DPR,0,0);
  const ear=enemy.alive?(player.sees?enemy:player.ct):null;if(ear){const ex=camO.x+ear.x*z,ey=camO.y+ear.y*z,m=24,top=(cam.t||hudTop)+8,bot=(cam.b||H-hudBot)-8;
   if(ex<m||ex>W-m||ey<top||ey>bot){const cx=clamp(ex,m,W-m),cy=clamp(ey,top,bot),a=Math.atan2(ey-cam.cy,ex-W/2);
-   ctx.save();ctx.translate(cx,cy);ctx.rotate(a);ctx.fillStyle=player.sees?'#ffb347':'rgba(255,179,71,.45)';ctx.beginPath();ctx.moveTo(10,0);ctx.lineTo(-6,-7);ctx.lineTo(-6,7);ctx.closePath();ctx.fill();ctx.restore();}}
+   ctx.save();ctx.translate(cx,cy);ctx.rotate(a);ctx.fillStyle=player.sees?ECOL:`rgba(${ERGB},.45)`;ctx.beginPath();ctx.moveTo(10,0);ctx.lineTo(-6,-7);ctx.lineTo(-6,7);ctx.closePath();ctx.fill();ctx.restore();}}
 }
 
 /* ================= HUD ================= */
@@ -1012,13 +1098,13 @@ $('#engBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropaga
 $('#muteBtn').addEventListener('pointerdown',e=>{e.preventDefault();initAudio();muted=!muted;$('#muteBtn').style.opacity=muted?.4:1;});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='exec')pause();});
 function pause(){prevState=state;state='pause';show(`<h2>PAUSED</h2><div class="tag">${mission.name.toUpperCase()}</div><button class="btn" data-act="resume">RESUME</button><button class="btn alt" data-act="retreat">RETREAT</button>
- <ul><li>Each turn: plot a course, choose ONE action, then ENGAGE. Both ships carry out their orders together for six seconds. The Kesh choose in secret.</li>
+ <ul><li>Each turn: plot a course, choose ONE action, then ENGAGE. Both ships carry out their orders together for six seconds. The enemy chooses in secret.</li>
  <li>Actions: HOLD banks weapon charge. FIRE releases it whenever your guns bear. SCAN reveals the whole board, but also you. FLANK is full speed with no firing, and your engines show from far away. Ships with a cloak also get CLOAK, STRIKE (fire, then cloak halfway through the turn) and AMBUSH.</li>
  <li>Weapons store up to three charges (two for swarms and bombs). A full bank fires a much bigger volley: wider beams, torpedo spreads, double swarms.</li>
  <li>FOLD teleports you to any point you tap. Your weapons are offline that turn and the next, and it recharges in three turns.</li>
  <li>MINES drop three mines astern on top of whatever else you do. The racks reload in three turns. Enemy mines show up when you get close.</li>
  <li>Steady ships shoot straighter: firing at speed costs damage, firing from a full stop adds it. Fast or turning targets are harder to hit. Lance hardens your forward shield while you charge.</li>
- <li>The Kesh learn your habits. Fly the same pattern every turn and they will counter it.</li>
+ <li>Enemy captains learn your habits. Fly the same pattern every turn and they will counter it.</li>
  <li>Firing on a ship that has not seen you for a few seconds is an ambush: 50% extra damage.</li>
  <li>You only see the enemy within sensor range (the faint green ring), or when they fire, scan or run at flank speed. Otherwise you see their last contact and a circle showing everywhere they could be by now.</li>
  <li>Nebulae hide you almost completely, but they blind your own sensors and stop shield recharge.</li>
@@ -1039,12 +1125,12 @@ $('#thr').addEventListener('pointermove',e=>{if(thrDrag)setThr(e);});
 $('#thr').addEventListener('pointerup',()=>thrDrag=false);$('#thr').addEventListener('pointercancel',()=>thrDrag=false);
 let hf=0;
 function updHUD(){
- if(!player||++hf%3)return;
+ if(state==='galaxy')return;if(!player||++hf%3)return;
  const pc=player.hull/player.maxHull,ec=enemy.hull/enemy.maxHull;
  $('#pBar').style.width=Math.max(0,pc*100)+'%';$('#eBar').style.width=Math.max(0,ec*100)+'%';$('#pBar').style.background=pc<.3?'#ff5a4a':'var(--cy)';
  $('#pHp').textContent=Math.max(0,Math.round(pc*100))+'%';$('#eHp').textContent=player.sees?Math.max(0,Math.round(ec*100))+'%':'??';
  const sv=$('#sensV'),nb=inNeb(player);sv.textContent=player.sees?(nb?'CONTACT · IN NEBULA':'CONTACT'):(nb?'BLIND · IN NEBULA':'NO CONTACT');sv.className=player.sees?(nb?'neb':''):'lost';
- [[player,'#pPills','95,227,255'],[enemy,'#ePills','255,179,71']].forEach(([s,id,rgb])=>{$(id).querySelectorAll('span').forEach((el,i)=>{const v=s.sh[i]/s.maxSh;el.style.background=v<.02?'rgba(255,90,74,.5)':`rgba(${rgb},${.15+.85*Math.min(1,v)})`;});});
+ [[player,'#pPills','95,227,255'],[enemy,'#ePills',ERGB]].forEach(([s,id,rgb])=>{$(id).querySelectorAll('span').forEach((el,i)=>{const v=s.sh[i]/s.maxSh;el.style.background=v<.02?'rgba(255,90,74,.5)':`rgba(${rgb},${.15+.85*Math.min(1,v)})`;});});
  {const mb=$('#weap .mn');if(mb){mb.classList.toggle('armed',player.mineQ);mb.classList.toggle('hold',!player.mineQ);mb.style.background=`conic-gradient(#a8ffcf ${(3-player.mineCd)/3*100}%, rgba(255,255,255,.08) 0)`;
   mb.querySelector('span').textContent=player.mineCd>0?player.mineCd+(player.mineCd>1?' TURNS':' TURN'):player.mineQ?'DROP':'READY';}}
  $$('#weap .wb:not(.mn)').forEach(b=>{const k=b.dataset.k,ts=typeStatus(player,k,enemy),pct=ts.pct*100;
@@ -1063,42 +1149,96 @@ function updHUD(){
 }
 
 /* ================= SCREENS ================= */
-function show(html){$('#scrBox').innerHTML=html;$('#scr').classList.add('on');$('#scrBox').scrollTop=0;}
+function show(html){$('#gal').classList.remove('on');$('#scrBox').innerHTML=html;$('#scr').classList.add('on');$('#scrBox').scrollTop=0;}
 const cr=n=>`<span class="cr">${n.toLocaleString()} cr</span>`;
 function threat(ev,st){const r=ev*(.75+.1*st)/Math.max(1,loValue(save.lo));return r<.85?['EASY','#7dffb0']:r<1.15?['EVEN','#5fe3ff']:r<1.5?['HARD','#ffd166']:['DEADLY','#ff6b5a'];}
 function loSummary(lo){const ws={};lo.mounts.forEach(m=>{if(m.t){const k=m.t==='torp'?'torp:'+(m.v||'fusion'):m.t;ws[k]=(ws[k]||[]).concat('Mk '+MK[m.tier]);}});
  const best=a=>a.reduce((x,y)=>y.length>x.length?y:x,'Mk I');const up=Object.entries(lo.upg).filter(([k,v])=>v).map(([k,v])=>UPG[k].name+' '+v);
  return Object.entries(ws).map(([t,a])=>`${a.length>1?a.length+'x ':''}${t.startsWith('torp:')?TV[t.slice(5)].name+' '+WD.torp.name:WD[t].name}${best(a)!=='Mk I'?' '+best(a):''}`).join(', ')+(lo.mods.length?' · '+lo.mods.map(k=>MODS[k].name).join(', '):'')+(up.length?' · '+up.join(', '):'');}
 let yardTab='hulls';
-function hub(){
- const lo=save.lo,H=HULLS[lo.hull];
- show(`<h1>STARSHIPS</h1><div class="tag">CONCORD FLEET COMMAND · WORKING TITLE</div>
- <div class="hdr"><span>Captain's record ${save.wins}W ${save.losses}L</span>${cr(save.credits)}</div>
- <div class="row cur"><div class="t"><b>${H.name.toUpperCase()}</b><span style="font-size:10px;opacity:.6">${H.cls.toUpperCase()} · RATING ${loValue(lo).toLocaleString()}</span></div>
- <p>${loSummary(lo)}</p></div>
- <button class="btn" data-act="board">MISSION BOARD</button><button class="btn alt" data-act="yard">SHIPYARD</button>
- <ul><li>Each mission is a one-on-one duel fought in turns on a large, fogged board. Hunt them, hide in nebulae, bank your weapons and strike first. Harder missions pay more.</li><li>Spend credits on upgrades, weapons and modules, or trade your ship in for a bigger hull.</li><li>Ships are heavy. They carry momentum and swing through wide turns, so line up your firing arcs early. Slow down to turn tighter.</li><li>Planets pull everything toward them. Slingshot around them, hide behind them, or drag the enemy into one.</li></ul>
- <div style="margin-top:14px"><button class="btn alt sm" data-act="reset">RESET CAMPAIGN</button></div>`);
+let gal={sel:-1,img:null,R:0,cx:0,cy:0,k:''};
+function hub(){galaxy();}
+function galaxy(){msgEl.innerHTML='';$('#scr').classList.remove('on');$('#hud').classList.remove('on');$('#gal').classList.add('on');state='galaxy';player=null;enemy=null;ships=[];galPanels();}
+function galPanels(){const g=save.g;
+ $('#gcr').innerHTML=cr(save.credits);
+ $('#greps').innerHTML=EORD.map(e=>{const r=repOf(e),a=alive(e);return`<span style="color:${EMP[e].col};opacity:${a?1:.35}"><b>${EMP[e].short}</b><i>${Math.round(shareOf(e)*100)}% · ${r>0?'+':''}${r}</i></span>`;}).join('');
+ let h='';
+ if(gal.sel<0){h=`<h3>${HULLS[save.lo.hull].name.toUpperCase()} · RATING ${loValue(save.lo).toLocaleString()}</h3><p>Tap a sector on a border to see who will pay you to take it. Core sectors are worth more and fight harder.</p>${g.log.slice(0,4).map(l=>`<p>${l}</p>`).join('')}`;}
+ else{const S=SECT[gal.sel],o=g.own[gal.sel],cs=contractsFor(gal.sel);
+  h=`<h3 style="color:${EMP[o].col}">${S.name.toUpperCase()}</h3><p>${RNAME[S.r]} sector · worth ${'★'.repeat(S.val)} · held by the <span style="color:${EMP[o].col}">${EMP[o].name}</span></p>`;
+  if(!cs.length)h+=`<p>Deep inside ${EMP[o].short} space. No other empire can reach it yet.</p>`;
+  for(const c of cs){const E=EMP[c.client];
+   if(c.refuses){h+=`<button class="ct" disabled><b style="color:${E.col}">${E.short.toUpperCase()}</b> refuses to hire you (rep ${repOf(c.client)})</button>`;continue;}
+   const k=contract(gal.sel,c.client),[tl,tc]=threat(k.ev,k.st);
+   h+=`<button class="ct" data-gact="go" data-arg="${gal.sel}:${c.client}"><div style="display:flex;justify-content:space-between;gap:6px"><b style="color:${E.col}">FIGHT FOR THE ${E.short.toUpperCase()}</b>${cr(k.reward)}</div>
+    <p>Take ${S.name} from a <b style="color:${EMP[o].col}">${EMP[o].short} ${HULLS[k.lo.hull].cls}</b> (${AIS[k.pers].label.toLowerCase()} captain) · ${loSummary(k.lo)}</p>
+    <p><span class="thr" style="color:${tc};border:1px solid ${tc}">${tl}</span> <span class="stars">${'★'.repeat(k.st)}${'☆'.repeat(4-k.st)}</span> · rep ${E.short} +${repGain(c.client,S.val)}, ${EMP[o].short} −${6+3*S.val}${k.coal?' · COALITION BOUNTY':''}${k.marked?' · THEY ARE HUNTING YOU':''}</p></button>`;}
+  h+=`<button class="btn alt sm" data-gact="desel" style="margin-top:8px">CLOSE</button>`;}
+ $('#gbot').innerHTML=h;gal.k='';galGeom();
 }
-function board(){
- show(`<div class="hdr"><h2>MISSION BOARD</h2>${cr(save.credits)}</div><div class="tag">YOUR RATING ${loValue(save.lo).toLocaleString()}</div>
- ${save.missions.map((m,i)=>{const[tl,tc]=threat(m.ev,m.st);return`<button class="mis" data-act="go" data-arg="${i}">
-  <div class="row" style="border:0;padding:0;margin:0;background:none"><div class="t"><b style="font-size:12px">${m.name.toUpperCase()}</b><span class="stars">${'★'.repeat(m.st)}${'☆'.repeat(4-m.st)}</span></div>
-  <p>${m.desc}</p><p>Enemy: <b style="color:var(--am)">Kesh ${HULLS[m.lo.hull].kesh}</b> (${AIS[m.pers].label.toLowerCase()} captain) · ${loSummary(m.lo)}</p>
-  <p>Battlefield: ${m.pl.map(q=>PTYPES[q.t].n.toLowerCase()).join(' and ')}</p>
-  <div class="t" style="margin-top:6px"><span class="thr" style="color:${tc};border:1px solid ${tc}">${tl}</span>${cr(m.reward)}</div></div></button>`;}).join('')}
- <button class="btn alt" data-act="hub">BACK</button>`);
+function galGeom(){const land=W>H,t=$('#gtop').getBoundingClientRect(),b=$('#gbot').getBoundingClientRect();
+ if(land){const l=t.right,r=W-b.left;gal.cx=l+(W-l-r)/2;gal.cy=H/2;gal.R=Math.max(80,Math.min(W-l-r-12,H-16)/2);}
+ else{gal.cx=W/2;gal.cy=t.bottom+(b.top-t.bottom)/2;gal.R=Math.max(80,Math.min(W-12,b.top-t.bottom-12)/2);}
+ const k=Math.round(gal.R)+':'+DPR;if(gal.k!==k){gal.k=k;gal.img=galImg(gal.R);}}
+function galImg(R){const s=Math.ceil(R*2.2*DPR),c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d'),cx=s/2,RR0=R*DPR,q=mulb(7);
+ const cg=x.createRadialGradient(cx,cx,0,cx,cx,RR0);cg.addColorStop(0,'rgba(255,236,200,.55)');cg.addColorStop(.12,'rgba(255,210,160,.22)');cg.addColorStop(.5,'rgba(120,110,200,.08)');cg.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=cg;x.fillRect(0,0,s,s);
+ for(let i=0;i<5200;i++){const arm=i%2,t=Math.pow(q(),.8),th=t*3.6*Math.PI+arm*Math.PI+GROT,r=RR0*(.06+.92*t),j=(q()-.5)*RR0*.14*(1-t*.4),a=th+(q()-.5)*.5;
+  const px=cx+Math.cos(a)*r+Math.cos(a+1.57)*j,py=cx+Math.sin(a)*r+Math.sin(a+1.57)*j,b=q();x.fillStyle=b<.1?'rgba(255,200,170,.9)':b<.3?'rgba(170,200,255,.8)':'rgba(230,235,255,.55)';const z=(q()*1.4+.4)*DPR;x.fillRect(px,py,z,z);}
+ for(let i=0;i<900;i++){const a=q()*TAU,r=RR0*Math.sqrt(q());x.fillStyle='rgba(220,225,255,.35)';x.fillRect(cx+Math.cos(a)*r,cx+Math.sin(a)*r,DPR*.8,DPR*.8);}
+ return c;}
+function cellAng(c){return c*TAU/CELLS+GROT;}
+function secPath(id,R,cx,cy){const S=SECT[id],a0=cellAng(S.c),a1=cellAng(S.c+1),r0=RR[S.r]*R,r1=RR[S.r+1]*R;ctx.beginPath();ctx.arc(cx,cy,r1,a0,a1);ctx.arc(cx,cy,r0,a1,a0,true);ctx.closePath();}
+function drawGalaxy(){
+ ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#03050b';ctx.fillRect(0,0,W,H);
+ const{R,cx,cy}=gal,g=save.g;if(!gal.img)return;
+ ctx.drawImage(gal.img,cx-gal.img.width/DPR/2,cy-gal.img.height/DPR/2,gal.img.width/DPR,gal.img.height/DPR);
+ const cand=gal.sel>=0?contractsFor(gal.sel).map(c=>c.client):[];
+ for(const S of SECT){const o=g.own[S.id],E=EMP[o];secPath(S.id,R,cx,cy);
+  ctx.fillStyle=`rgba(${E.rgb},${S.id===gal.sel?.45:.14+.05*S.val})`;ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=.6;ctx.stroke();}
+ ctx.lineWidth=1.6;ctx.strokeStyle='rgba(255,255,255,.55)';
+ for(const S of SECT){const o=g.own[S.id],r0=RR[S.r]*R,r1=RR[S.r+1]*R,a1=cellAng(S.c+1);
+  const nc=S.r*CELLS+(S.c+1)%CELLS;if(g.own[nc]!==o){ctx.beginPath();ctx.moveTo(cx+Math.cos(a1)*r0,cy+Math.sin(a1)*r0);ctx.lineTo(cx+Math.cos(a1)*r1,cy+Math.sin(a1)*r1);ctx.stroke();}
+  if(S.r<RINGS-1&&g.own[S.id+CELLS]!==o){ctx.beginPath();ctx.arc(cx,cy,r1,cellAng(S.c),a1);ctx.stroke();}}
+ ctx.strokeStyle='rgba(255,255,255,.25)';ctx.beginPath();ctx.arc(cx,cy,RR[RINGS]*R,0,TAU);ctx.stroke();
+ if(gal.sel>=0){const pl=.5+.5*Math.sin(performance.now()/250);
+  for(const n of nbrs(gal.sel))if(cand.includes(g.own[n])){secPath(n,R,cx,cy);ctx.setLineDash([4,4]);ctx.strokeStyle=`rgba(${EMP[g.own[n]].rgb},.9)`;ctx.lineWidth=1.4;ctx.stroke();ctx.setLineDash([]);}
+  secPath(gal.sel,R,cx,cy);ctx.strokeStyle=`rgba(255,255,255,${.6+.4*pl})`;ctx.lineWidth=2.4;ctx.stroke();}
+ {const S=SECT[SOL],a=cellAng(S.c+.5),r=(RR[S.r]+RR[S.r+1])/2*R,x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;ctx.fillStyle='#ffe066';ctx.beginPath();ctx.arc(x,y,3.2,0,TAU);ctx.fill();
+  ctx.font='9px ui-monospace,Menlo,monospace';ctx.textAlign='left';ctx.fillText('SOL',x+6,y+3);}
+ ctx.font='bold 10px ui-monospace,Menlo,monospace';ctx.textAlign='center';
+ for(const e of EORD){let sx=0,sy=0,n=0;g.own.forEach((o,i)=>{if(o!==e)return;const S=SECT[i],a=cellAng(S.c+.5),r=(RR[S.r]+RR[S.r+1])/2*R;sx+=Math.cos(a)*r;sy+=Math.sin(a)*r;n++;});
+  if(!n)continue;ctx.fillStyle=EMP[e].col;ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(EMP[e].short.toUpperCase(),cx+sx/n,cy+sy/n+14);ctx.shadowBlur=0;}
 }
+function galTap(e){const dx=e.clientX-gal.cx,dy=e.clientY-gal.cy,d=Math.hypot(dx,dy)/gal.R;
+ let r=-1;for(let i=0;i<RINGS;i++)if(d>=RR[i]&&d<RR[i+1])r=i;if(r<0){gal.sel=-1;galPanels();return;}
+ let a=Math.atan2(dy,dx)-GROT;a=((a%TAU)+TAU)%TAU;gal.sel=r*CELLS+Math.floor(a/(TAU/CELLS));galPanels();}
+$('#gal').addEventListener('click',e=>{const b=e.target.closest('[data-gact]');if(!b)return;const a=b.dataset.gact;
+ if(a==='yard'){yardTab='hulls';yard();}
+ else if(a==='stand')standings();
+ else if(a==='desel'){gal.sel=-1;galPanels();}
+ else if(a==='go'){const[sid,cl]=b.dataset.arg.split(':');initAudio();$('#gal').classList.remove('on');start(contract(+sid,cl));}});
+function standings(){const g=save.g,pat=patronage(),dsc=discount();
+ const st=r=>r>=50?['ALLIED','#7dffb0']:r>=25?['FRIENDLY','#5fe3ff']:r>-40?['NEUTRAL','#cfe9f2']:r>-60?['HOSTILE · REFUSES WORK','#ff9a6b']:['HUNTING YOU','#ff5a4a'];
+ const ul=e=>{const o=[];for(const cat in UNLOCK)for(const k in UNLOCK[cat])for(const[x,r]of UNLOCK[cat][k])if(x===e){const nm=cat==='hull'?HULLS[k].name:cat==='mod'?MODS[k].name:cat==='tv'?TV[k].name+' torpedoes':WD[k].name+'s';o.push(`<span style="opacity:${repOf(e)>=r?1:.45}">${nm} (${r})</span>`);}return o.join(', ');};
+ show(`<div class="hdr"><h2>STANDINGS</h2>${cr(save.credits)}</div><div class="tag">${g.n} CONTRACTS · ${save.wins}W ${save.losses}L · PATRONAGE ${pat} CR PER WIN · SHIPYARD DISCOUNT ${dsc}%</div>
+ ${EORD.map(e=>{const E=EMP[e],r=repOf(e),[sl,sc]=st(r);return`<div class="row"><div class="t"><b style="color:${E.col}">${E.name.toUpperCase()}</b><span style="color:${sc};font-size:10px">${sl}</span></div>
+  <p>${alive(e)?Math.round(shareOf(e)*100)+'% of the galaxy':'<b>Destroyed</b>'} · reputation ${r>0?'+':''}${r}</p><p>${E.bio}</p><p style="font-size:10px">Unlocks: ${ul(e)}</p></div>`;}).join('')}
+ <ul><li>Working for an empire raises your standing with them and lowers it with the empire you hit. Below −40 they refuse to hire you. Below −60 they send their best after you.</li>
+ <li>Every win pays patronage from each empire at +25 or better, scaled by their size. An empire at +40 or better gives you a shipyard discount based on its size.</li>
+ <li>The galaxy fights on between your missions. Any empire above 40% faces a coalition: it loses ground faster, and contracts against it pay more.</li>
+ <li><b>Conquest:</b> an empire you're allied with (+50) holds two thirds of the galaxy. <b>Balance of power:</b> after 15 contracts, two or more allied empires each hold at least 25%, together 75% or more.</li></ul>
+ <button class="btn alt" data-act="hub">BACK</button> <button class="btn alt sm" data-act="reset">NEW CAMPAIGN</button>`);}
 function arcTxt(a){return a>=180?'All round':'Forward '+a*2+'°';}
 function yard(){
  const lo=save.lo,H=HULLS[lo.hull],tabs=['hulls','systems','weapons','modules'];
- let h=`<div class="hdr"><h2>SHIPYARD</h2>${cr(save.credits)}</div><div class="tabs">${tabs.map(t=>`<button class="${t===yardTab?'on':''}" data-act="tab" data-arg="${t}">${t.toUpperCase()}</button>`).join('')}</div>`;
+ let h=`<div class="hdr"><h2>SHIPYARD</h2>${cr(save.credits)}</div>${discount()?`<div class="tag">PATRON DISCOUNT ${discount()}% ON HULLS</div>`:''}<div class="tabs">${tabs.map(t=>`<button class="${t===yardTab?'on':''}" data-act="tab" data-arg="${t}">${t.toUpperCase()}</button>`).join('')}</div>`;
  if(yardTab==='hulls'){const ti=tradeIn();
   h+=`<p style="font-size:11px;opacity:.75">Trade-in for your ${H.name}: ${cr(ti)}. That includes its upgrades, weapons and modules. New hulls come with stock weapons.</p>`;
-  for(const k of HORDER){const X=HULLS[k],own=k===lo.hull,net=X.price-ti;
+  for(const k of HORDER){const X=HULLS[k],own=k===lo.hull,net=price(X.price)-ti,lk=!unlocked('hull',k);
    h+=`<div class="row ${own?'cur':''}"><div class="t"><b>${X.name.toUpperCase()}</b><span style="font-size:10px;opacity:.6">${X.cls.toUpperCase()}</span></div><p>${X.desc}</p>
    <div class="kv"><span>Hull <b>${X.hull}</b></span><span>Shields <b>${X.sh}</b></span><span>Speed <b>${X.speed}</b></span><span>Turn <b>${X.turn}</b></span><span>Mounts <b>${X.mounts}+2</b></span><span>Modules <b>${X.mods}</b></span><span>Beams <b>${arcTxt(X.arcs.beam)}</b></span><span>Mass <b>${X.mass}</b></span><span>Stock <b>${X.stock.length}</b></span></div>
-   ${own?'<p style="color:var(--cy)">Current ship</p>':`<button class="btn sm ${net<=save.credits?'gold':''}" data-act="hull" data-arg="${k}" ${net>save.credits?'disabled':''}>BUY ${X.price.toLocaleString()} · NET ${net<0?'+'+(-net).toLocaleString()+' BACK':net.toLocaleString()}</button>`}</div>`;}}
+   ${own?'<p style="color:var(--cy)">Current ship</p>':lk?`<p style="color:#ff9a6b">${lockTxt('hull',k)}</p>`:`<button class="btn sm ${net<=save.credits?'gold':''}" data-act="hull" data-arg="${k}" ${net>save.credits?'disabled':''}>BUY ${price(X.price).toLocaleString()} · NET ${net<0?'+'+(-net).toLocaleString()+' BACK':net.toLocaleString()}</button>`}</div>`;}}
  if(yardTab==='systems'){for(const k in UPG){const l=lo.upg[k],c=UPC[l];
   h+=`<div class="row"><div class="t"><b>${UPG[k].name.toUpperCase()}</b><span class="lv">${'●'.repeat(l)}${'○'.repeat(4-l)}</span></div><p>${UPG[k].d}</p>
   ${l<4?`<button class="btn sm" data-act="upg" data-arg="${k}" ${c>save.credits?'disabled':''}>UPGRADE · ${c.toLocaleString()} cr</button>`:'<p style="color:var(--cy)">Maxed</p>'}</div>`;}}
@@ -1107,38 +1247,36 @@ function yard(){
   lo.mounts.forEach((m,i)=>{
    h+=`<div class="row"><div class="t"><b>MOUNT ${i+1}</b><span style="color:${m.t==='torp'?tvOf(m).col:m.t?WCOL[m.t]:'#888'}">${m.t?(m.t==='torp'?tvOf(m).name.toUpperCase()+' ':'')+WD[m.t].name.toUpperCase()+' MK '+MK[m.tier]:'EMPTY'}</span></div>
    ${m.t&&m.tier<3?`<button class="btn sm" data-act="tier" data-arg="${i}" ${TIERC[m.tier-1]>save.credits?'disabled':''}>UPGRADE TO MK ${MK[m.tier+1]} · ${TIERC[m.tier-1]} cr</button>`:''}
-   ${m.t==='torp'?`<p style="color:${tvOf(m).col}">${tvOf(m).name} warheads: ${tvOf(m).d}</p><div class="chips">${Object.keys(TV).filter(v=>v!==(m.v||'fusion')).map(v=>{const c=TV[v].price-Math.round(tvOf(m).price*.5);return`<button class="btn alt sm" style="border-color:${TV[v].col};color:${TV[v].col}" data-act="setv" data-arg="${i}:${v}" ${c>save.credits?'disabled':''}>${TV[v].name.toUpperCase()} ${c>0?c+' cr':c<0?'+'+(-c)+' cr':'FREE'}</button>`;}).join('')}</div>`:''}
-   <div class="chips">${WTYPES.filter(t=>t!==m.t).map(t=>`<button class="btn alt sm" data-act="setw" data-arg="${i}:${t}" ${WD[t].price>save.credits+Math.round(mountVal(m)*.5)?'disabled':''}>${m.t?'SWAP TO ':''}${WD[t].name.toUpperCase()} ${WD[t].price}</button>`).join('')}</div></div>`;});
+   ${m.t==='torp'?`<p style="color:${tvOf(m).col}">${tvOf(m).name} warheads: ${tvOf(m).d}</p><div class="chips">${Object.keys(TV).filter(v=>v!==(m.v||'fusion')).map(v=>{const c=TV[v].price-Math.round(tvOf(m).price*.5);if(!unlocked('tv',v))return`<span class="btn alt sm" style="opacity:.45;border-color:${TV[v].col};color:${TV[v].col}">${TV[v].name.toUpperCase()} · ${lockTxt('tv',v)}</span>`;return`<button class="btn alt sm" style="border-color:${TV[v].col};color:${TV[v].col}" data-act="setv" data-arg="${i}:${v}" ${c>save.credits?'disabled':''}>${TV[v].name.toUpperCase()} ${c>0?c+' cr':c<0?'+'+(-c)+' cr':'FREE'}</button>`;}).join('')}</div>`:''}
+   <div class="chips">${WTYPES.filter(t=>t!==m.t).map(t=>!unlocked('wpn',t)?`<span class="btn alt sm" style="opacity:.45">${WD[t].name.toUpperCase()} · ${lockTxt('wpn',t)}</span>`:`<button class="btn alt sm" data-act="setw" data-arg="${i}:${t}" ${WD[t].price>save.credits+Math.round(mountVal(m)*.5)?'disabled':''}>${m.t?'SWAP TO ':''}${WD[t].name.toUpperCase()} ${WD[t].price}</button>`).join('')}</div></div>`;});
   if(lo.extra<2)h+=`<div class="row"><div class="t"><b>ADD HARDPOINT</b><span>${lo.extra}/2 added</span></div><p>Fit an extra weapon mount to this hull.</p><button class="btn sm" data-act="mount" ${MC[lo.extra]>save.credits?'disabled':''}>ADD MOUNT · ${MC[lo.extra]} cr</button></div>`;
  }
  if(yardTab==='modules'){
   h+=`<p style="font-size:11px;opacity:.75">Module slots used: ${lo.mods.length}/${H.mods}. Removing a module refunds half its price.</p>`;
   for(const k in MODS){const M=MODS[k],has=lo.mods.includes(k);
    h+=`<div class="row ${has?'cur':''}"><div class="t"><b>${M.name.toUpperCase()}</b><span style="font-size:10px;opacity:.6">${M.active?'ACTIVE · '+M.dur+'S · '+M.cd+'S RECHARGE':'PASSIVE'}</span></div><p>${M.d}</p>
-   ${has?`<button class="btn alt sm" data-act="sellmod" data-arg="${k}">REMOVE · +${Math.round(M.price/2)} cr</button>`:`<button class="btn sm" data-act="buymod" data-arg="${k}" ${M.price>save.credits||lo.mods.length>=H.mods?'disabled':''}>${lo.mods.length>=H.mods?'NO FREE SLOT':'INSTALL · '+M.price+' cr'}</button>`}</div>`;}}
- h+=`<button class="btn alt" data-act="hub">BACK</button>`;
+   ${has?`<button class="btn alt sm" data-act="sellmod" data-arg="${k}">REMOVE · +${Math.round(M.price/2)} cr</button>`:!unlocked('mod',k)?`<p style="color:#ff9a6b">${lockTxt('mod',k)}</p>`:`<button class="btn sm" data-act="buymod" data-arg="${k}" ${M.price>save.credits||lo.mods.length>=H.mods?'disabled':''}>${lo.mods.length>=H.mods?'NO FREE SLOT':'INSTALL · '+M.price+' cr'}</button>`}</div>`;}}
+ h+=`<button class="btn alt" data-act="hub">BACK TO GALAXY</button>`;
  const st=$('#scrBox').scrollTop;show(h);$('#scrBox').scrollTop=st;
 }
 function act(a,arg){
  const lo=save.lo;
  switch(a){
   case'hub':hub();break;
-  case'board':board();break;
-  case'yard':yardTab='hulls';yard();$('#scrBox').scrollTop=0;break;
+    case'yard':yardTab='hulls';yard();$('#scrBox').scrollTop=0;break;
   case'tab':yardTab=arg;yard();$('#scrBox').scrollTop=0;break;
-  case'go':initAudio();start(+arg);break;
-  case'hull':{const net=HULLS[arg].price-tradeIn();if(net>save.credits)return;save.credits-=net;save.lo=newLo(arg);persist();msg('NEW SHIP: '+HULLS[arg].name.toUpperCase(),'#ffe066');yard();break;}
+    case'hull':{if(!unlocked('hull',arg))return;const net=price(HULLS[arg].price)-tradeIn();if(net>save.credits)return;save.credits-=net;save.lo=newLo(arg);persist();msg('NEW SHIP: '+HULLS[arg].name.toUpperCase(),'#ffe066');yard();break;}
   case'upg':{const c=UPC[lo.upg[arg]];if(c>save.credits)return;save.credits-=c;lo.upg[arg]++;persist();yard();break;}
   case'tier':{const m=lo.mounts[+arg],c=TIERC[m.tier-1];if(c>save.credits)return;save.credits-=c;m.tier++;persist();yard();break;}
-  case'setw':{const[i,t]=arg.split(':'),m=lo.mounts[+i],ref=Math.round(mountVal(m)*.5),c=WD[t].price;if(c>save.credits+ref)return;save.credits+=ref-c;lo.mounts[+i]={t,tier:1,stock:0};if(t==='torp')lo.mounts[+i].v='fusion';persist();yard();break;}
-  case'setv':{const[i,v]=arg.split(':'),m=lo.mounts[+i],c=TV[v].price-Math.round(tvOf(m).price*.5);if(c>save.credits)return;save.credits-=c;m.v=v;persist();yard();break;}
+  case'setw':{const[i,t]=arg.split(':');if(!unlocked('wpn',t))return;const m=lo.mounts[+i],ref=Math.round(mountVal(m)*.5),c=WD[t].price;if(c>save.credits+ref)return;save.credits+=ref-c;lo.mounts[+i]={t,tier:1,stock:0};if(t==='torp')lo.mounts[+i].v='fusion';persist();yard();break;}
+  case'setv':{const[i,v]=arg.split(':');if(!unlocked('tv',v))return;const m=lo.mounts[+i],c=TV[v].price-Math.round(tvOf(m).price*.5);if(c>save.credits)return;save.credits-=c;m.v=v;persist();yard();break;}
   case'mount':{const c=MC[lo.extra];if(c>save.credits)return;save.credits-=c;lo.extra++;lo.mounts.push({t:null,tier:1,stock:0});persist();yard();break;}
-  case'buymod':{const M=MODS[arg];if(M.price>save.credits||lo.mods.length>=HULLS[lo.hull].mods)return;save.credits-=M.price;lo.mods.push(arg);persist();yard();break;}
+  case'buymod':{const M=MODS[arg];if(!unlocked('mod',arg))return;if(M.price>save.credits||lo.mods.length>=HULLS[lo.hull].mods)return;save.credits-=M.price;lo.mods.push(arg);persist();yard();break;}
   case'sellmod':{save.credits+=Math.round(MODS[arg].price/2);lo.mods=lo.mods.filter(k=>k!==arg);persist();yard();break;}
   case'resume':$('#scr').classList.remove('on');state=prevState;last=performance.now();break;
   case'retreat':$('#scr').classList.remove('on');endBattle(false,true);break;
-  case'reset':show(`<h2>RESET CAMPAIGN?</h2><p style="font-size:12px;opacity:.8">This wipes your credits, ship and record.</p><button class="btn" data-act="reset2">YES, RESET</button><button class="btn alt" data-act="hub">CANCEL</button>`);break;
-  case'reset2':save=defSave();genMissions();hub();break;
+  case'reset':show(`<h2>RESET CAMPAIGN?</h2><p style="font-size:12px;opacity:.8">This wipes your credits, ship, reputation and the galaxy.</p><button class="btn" data-act="reset2">YES, RESET</button><button class="btn alt" data-act="hub">CANCEL</button>`);break;
+  case'reset2':save=defSave();persist();gal.sel=-1;hub();break;
  }
 }
 $('#scrBox').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;act(b.dataset.act,b.dataset.arg);});
@@ -1148,10 +1286,10 @@ function setWP(e){if(state!=='plan'||!player||!player.alive)return;
  if(player.act==='fold'){let x=(e.clientX-camO.x)/cam.z,y=(e.clientY-camO.y)/cam.z;const r=Math.hypot(x,y);if(r>ARENA*.95){x*=ARENA*.95/r;y*=ARENA*.95/r;}player.foldTo={x,y};wpPulse=1;return;}
  if(enemy.alive&&!isOn(enemy,'cloak')){const ex=camO.x+enemy.x*cam.z,ey=camO.y+enemy.y*cam.z;if(Math.hypot(e.clientX-ex,e.clientY-ey)<Math.max(60,enemy.rad*cam.z+30)){if(player.ps.k==='manual')setPat(player,player.lastPat||defPat(player),true);player.thrAuto=true;wpPulse=1;return;}}
  let x=(e.clientX-camO.x)/cam.z,y=(e.clientY-camO.y)/cam.z;const r=Math.hypot(x,y);if(r>ARENA){x*=ARENA/r;y*=ARENA/r;}if(player.ps.k!=='manual'){setPat(player,'manual');msg('HELM · MANUAL COURSE','#5fe3ff');}player.wp.x=x;player.wp.y=y;player.wpDone=false;wpPulse=1;}
-cvs.addEventListener('pointerdown',e=>{dragging=true;setWP(e);});
+cvs.addEventListener('pointerdown',e=>{if(state==='galaxy'){galTap(e);return;}dragging=true;setWP(e);});
 addEventListener('pointermove',e=>{if(dragging&&player&&player.ps.k==='manual')setWP(e);});
 addEventListener('pointerup',()=>dragging=false);addEventListener('pointercancel',()=>dragging=false);
-function measure(){const t=$('#top').getBoundingClientRect(),b=$('#bot').getBoundingClientRect();if(!t.height)return;
+function measure(){if(state==='galaxy'){galGeom();return;}const t=$('#top').getBoundingClientRect(),b=$('#bot').getBoundingClientRect();if(!t.height)return;
  const ob=$('#orders');ob.style.setProperty('--ob',(H-b.top+6)+'px');const o=ob.getBoundingClientRect(),port=H>=W;
  hudTop=port?$('#trow').getBoundingClientRect().bottom:t.bottom;hudBot=port&&o.height?H-o.top:H-b.top;
  const ac=$('#acts').getBoundingClientRect();hudBotL=ac.height?H-ac.top+8:H*.22;}
