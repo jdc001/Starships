@@ -1,6 +1,6 @@
 # Starships (working title)
 
-Version 0.7.0
+Version 0.7.1
 
 A one-on-one starship duel game for iPhone and iPad, played in simultaneous turns.
 

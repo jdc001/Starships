@@ -678,8 +678,11 @@ function updShip(s,dt){
  // steering and motion
  const pr=patStep(s,tgtOf(s),s.ps,dt),stg=(s.ps.k==='manual'&&!s.ai)?pr.tg:avoid(s,pr.tg);
  if(s.thrAuto&&s.ps.k!=='manual')s.thr=pr.thr;
- const boost=flankOn(s),thr=boost?1:s.thr;
- motion(s,stg,thr,motionP(s),dt);
+ const boost=flankOn(s);let thr=boost?1:s.thr,tg2=stg;
+ const beach=isOn(s,'phase')?null:planets.find(pl=>dist(s,pl)<pl.r+s.rad+35);
+ if(beach){const a=angTo(beach,s);tg2={x:s.x+Math.cos(a)*400,y:s.y+Math.sin(a)*400};thr=Math.cos(wrap(a-s.a))>.2?1:0;
+  if(s===player&&!s.beachSaid){s.beachSaid=1;msg('HELM: CLAWING AWAY FROM THE PLANET','#ffd166');}}else s.beachSaid=0;
+ motion(s,tg2,thr,motionP(s),dt);
  // tractor
  s.tlock=null;
  if(isOn(s,'tractor')){const t=s===player?enemy:player;
@@ -779,7 +782,8 @@ function motion(o,tg,thr,P,dt){
  const fx=Math.cos(o.a),fy=Math.sin(o.a);let fwd=o.vx*fx+o.vy*fy,lat=-o.vx*fy+o.vy*fx;const T=P.ms*thr;
  if(fwd<T)fwd=Math.min(T,fwd+P.acc*dt);else{const ex=fwd-T;fwd-=Math.min(ex,(T<1?P.acc*.45:ex*.6+12)*dt);}
  lat*=Math.max(0,1-P.keel*dt);o.vx=fx*fwd-fy*lat;o.vy=fy*fwd+fx*lat;
- {const gm=o.gravT>0?2:1;for(const p of planets){const g=gravAt(o.x,o.y,p);o.vx+=g[0]*dt*gm;o.vy+=g[1]*dt*gm;}}
+ {const gm=o.gravT>0?2:1;let gx=0,gy=0;for(const p of planets){const g=gravAt(o.x,o.y,p);gx+=g[0]*gm;gy+=g[1]*gm;}
+ if(o.H){const gl=Math.hypot(gx,gy),cap=P.acc*(o.gravT>0?.8:.5);if(gl>cap){gx*=cap/gl;gy*=cap/gl;}}o.vx+=gx*dt;o.vy+=gy*dt;}
  o.x+=o.vx*dt;o.y+=o.vy*dt;
 }
 function kick(s,ax,ay,spin){if(!s.alive||isOn(s,'phase'))return;s.vx+=ax/s.mass;s.vy+=ay/s.mass;s.w+=spin/s.mass;}
@@ -1043,7 +1047,7 @@ function drawShields(s){if(isOn(s,'cloak'))return;const R=28*s.scale+5;
   ctx.beginPath();ctx.arc(s.x,s.y,R,c-.68,c+.68);ctx.stroke();}}
 function ghost(sh,o){return{x:o.x,y:o.y,vx:o.vx,vy:o.vy,a:o.a,rad:sh.rad};}
 // where a ship ends up if it holds its current heading and throttle: known to both captains
-function drift(sh,n,dt){const o={x:sh.x,y:sh.y,vx:sh.vx,vy:sh.vy,a:sh.a,w:sh.w},MP=motionP(sh),out=[];
+function drift(sh,n,dt){const o={x:sh.x,y:sh.y,vx:sh.vx,vy:sh.vy,a:sh.a,w:sh.w,H:sh.H},MP=motionP(sh),out=[];
  for(let i=0;i<n;i++){motion(o,null,sh.thr,MP,dt);out.push({x:o.x,y:o.y,vx:o.vx,vy:o.vy,a:o.a,rad:sh.rad});}return out;}
 function drawGhost(sh,o,al){ctx.save();ctx.globalAlpha=al;ctx.translate(o.x,o.y);ctx.rotate(o.a);ctx.scale(sh.scale,sh.scale);
  ctx.strokeStyle=sh.S.col;ctx.lineWidth=1/sh.scale;ctx.setLineDash([3,3]);ctx.stroke(DES[sh.style][sh.hk].P);ctx.setLineDash([]);ctx.restore();}
@@ -1226,7 +1230,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.7.0';
+const VERSION='0.7.1';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1281,7 +1285,7 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:11.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Title screen, save slots, save codes, options and privacy policy</li><li>Redesigned ships: every empire has its own design language and every hull is shaped for its role, with turrets and launchers that track the enemy and light up when charged</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Fixed big ships getting stuck on planets: engines can always beat a planet's pull, and a beached ship turns away and claws off on its own</li><li>Title screen, save slots, save codes, options and privacy policy</li><li>Redesigned ships: every empire has its own design language and every hull is shaped for its role, with turrets and launchers that track the enemy and light up when charged</li></ul>
  <p><b>Earlier</b></p><ul style="margin-top:0"><li>0.6 · Galaxy campaign with six empires, reputation and territory</li><li>0.5 · Torpedo warheads, fold space, mines, drone swarms</li><li>0.4 · Sensors, nebulae, action levers and capacitors</li><li>0.3 · Simultaneous turns</li></ul></div>
  <button class="btn alt" data-act="title">BACK</button>`);}
 function applyOpt(){TURN=OPT.turn;muted=!OPT.sound;if(master)master.gain.value=.65*OPT.vol;try{localStorage.setItem(OPT_KEY,JSON.stringify(OPT));}catch(e){}}
