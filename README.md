@@ -1,6 +1,6 @@
 # Starships (working title)
 
-Version 0.8.2
+Version 0.8.3
 
 A squadron-scale starship combat game for iPhone and iPad, played in simultaneous turns.
 
@@ -39,7 +39,7 @@ Damage stays with a ship after a mission and costs credits to repair. A destroye
 ## Missions
 
 - **Territory:** Strike (destroy the squadron), Capture Planet (destroy three defence batteries, then hold a Lander in low orbit through the end of two turns), Capture Starbase (disable it, then hold a Lander alongside).
-- **Pay only:** Raid Planet (destroy the batteries), Intercept Convoy (destroy escorted freighters before they cross the map, paid per kill), Assault Starbase (destroy it outright).
+- **Pay only:** Raid Planet (destroy the batteries), Escort Convoy (get at least two of your client's three freighters across the map), Intercept Convoy (destroy escorted freighters before they cross the map, paid per kill), Assault Starbase (destroy it outright).
 - **Defence:** Defend Planet and Defend Starbase are offered by a sector's owner when a neighbour threatens it. Lose and the sector falls.
 
 ## The galaxy

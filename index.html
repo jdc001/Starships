@@ -575,7 +575,7 @@ function genEnemy(B,emp){const E=EMP[emp]||EMP.kesh,wp=()=>Math.random()<.7?pick
  return lo;
 }
 // where each mission puts its objective: a planet, a starbase, or the convoy lane
-const OBJAT={capplanet:{x:950,y:0,pl:1},raid:{x:950,y:0,pl:1},defplanet:{x:-850,y:0,pl:1},capbase:{x:1000,y:0},assault:{x:1000,y:0},defbase:{x:-1000,y:0},convoy:{x:650,y:0,lane:1}};
+const OBJAT={escort:{x:-250,y:0,lane:1},capplanet:{x:950,y:0,pl:1},raid:{x:950,y:0,pl:1},defplanet:{x:-850,y:0,pl:1},capbase:{x:1000,y:0},assault:{x:1000,y:0},defbase:{x:-1000,y:0},convoy:{x:650,y:0,lane:1}};
 function genPlanets(type){
  const ps=[],o=OBJAT[type];
  if(o&&o.pl)ps.push({t:Math.random()*4|0,r:rand(130,165),x:o.x,y:o.y+rand(-150,150),obj:1});
@@ -600,12 +600,13 @@ const MT={
  capplanet:{name:'Capture Planet',terr:1,pay:1.15,lander:1,st:'planet',d:'Knock out the planet\'s defence batteries, then hold a Lander in low orbit through the end of two turns.'},
  capbase:{name:'Capture Starbase',terr:1,pay:1.3,lander:1,st:'base',d:'Shoot the starbase until it is disabled, then hold a Lander alongside it through the end of two turns.'},
  raid:{name:'Raid Planet',terr:0,pay:1.9,st:'planet',d:'Destroy the planet\'s defence batteries and get out. No territory, much better pay.'},
+ escort:{name:'Escort Convoy',terr:0,pay:1.6,st:'escort',d:'Three of your client\'s freighters must cross the map while raiders hunt them. Get at least two of them to the far edge alive.'},
  convoy:{name:'Intercept Convoy',terr:0,pay:1.7,st:'convoy',d:'Three freighters are crossing under escort. Destroy them before they reach the far edge. Paid per freighter.'},
  assault:{name:'Assault Starbase',terr:0,pay:2.1,st:'base',d:'Destroy the starbase outright. No territory, the best pay there is.'},
  defplanet:{name:'Defend Planet',def:1,pay:1.1,st:'planet',d:'An attack is coming. Keep at least one defence battery alive and destroy the attackers, or the sector falls.'},
  defbase:{name:'Defend Starbase',def:1,pay:1.15,st:'base',d:'An attack is coming. Keep the starbase alive and destroy the attackers, or the sector falls.'}
 };
-function missionTypes(sid,client){const q=mulb(sid*131+save.g.n*17+EORD.indexOf(client)*7+3),L=save.fleet.some(f=>f.lo.hull==='lander'&&opOK(f));const t=pick2(['strike','capplanet','capbase','strike'],q);return[L?t:'strike',pick2(['raid','convoy','assault'],q)];}
+function missionTypes(sid,client){const q=mulb(sid*131+save.g.n*17+EORD.indexOf(client)*7+3),L=save.fleet.some(f=>f.lo.hull==='lander'&&opOK(f));const t=pick2(['strike','capplanet','capbase','strike'],q);return[L?t:'strike',pick2(['raid','convoy','assault','escort'],q)];}
 function contractsFor(sid){const g=save.g,o=g.own[sid],cl=[...new Set(nbrs(sid).map(n=>g.own[n]).filter(e=>e!==o))],out=[];
  for(const c of cl)out.push({client:c,foe:o,types:missionTypes(sid,c),refuses:repOf(c)<=-40});
  if(cl.length){const foe=cl.slice().sort((a,b)=>shareOf(b)-shareOf(a))[0],q=mulb(sid*71+g.n*13+5);out.push({client:o,foe,def:1,types:[pick2(['defplanet','defbase'],q)],refuses:repOf(o)<=-40});}
@@ -619,10 +620,10 @@ function contract(sid,client,type,foe){
  let B=Math.max(mapB,relB);if(repOf(foe)<=-60)B*=1.25;if(sc>.4&&!M.def)B*=1.2;
  const st=relB>mapB?clamp([3,2,1,1][S.r]+(sf>.3?1:0)+(repOf(foe)<=-60?1:0),1,4):clamp(Math.round(1+(B-700)/3500),1,4);
  // fixed defences soak up part of the budget; defenders get help, so attackers come in strength
- const FB=B*(M.def?1.4:M.st==='base'?.55:M.st==='planet'?.72:M.st==='convoy'?.7:1),n=M.st&&!M.def&&FB<900?0:Math.min(3,(FB<6500?1:FB<20000?2:3)+(M.def&&FB>=2500?1:0)),fleet=[],sm=clamp(B/7000,.3,1.25),nbat=B<2500?2:3;
+ const FB=B*(M.def?1.4:M.st==='base'?.55:M.st==='planet'?.72:M.st==='convoy'?.7:M.st==='escort'?.9:1),n=M.st&&M.st!=='escort'&&!M.def&&FB<900?0:Math.min(3,(FB<6500?1:FB<20000?2:3)+(M.def&&FB>=2500?1:0)),fleet=[],sm=clamp(B/7000,.3,1.25),nbat=B<2500?2:3;
  for(let i=0;i<n;i++){const lo=genEnemy(FB/n*rand(.85,1.15),foe);fleet.push({lo,pers:Math.random()<.6?EMP[foe].pers:pick(Object.keys(AIS))});}
  let ev=fleet.reduce((a,f)=>a+loValue(f.lo),0)*(M.def?.72:1);
- if(M.st==='base')ev+=(M.def?0:4000*(.8+.25*st)*sm);if(M.st==='planet')ev+=M.def?0:nbat*800*(.8+.2*st)*sm;if(M.st==='convoy')ev+=600;
+ if(M.st==='base')ev+=(M.def?0:4000*(.8+.25*st)*sm);if(M.st==='planet')ev+=M.def?0:nbat*800*(.8+.2*st)*sm;if(M.st==='convoy')ev+=600;if(M.st==='escort')ev*=.85;
  const reward=Math.round(((mapB*.35+350)*(sf>.4?1.3:1)+Math.max(0,B-mapB)*.03)*M.pay/10)*10;
  const pl=genPlanets(type);
  return g.offers[key]={sid,client,foe,type,fleet,ev,st,pl,nb:genNebulae(pl,type),reward,sm,nbat,marked:repOf(foe)<=-60,coal:sf>.4&&!M.def,name:M.name+' · '+S.name};
@@ -774,7 +775,7 @@ function dmgSys(s,k,a){const b=s.sys[k];s.sys[k]=Math.max(0,b-a);if(b>=35&&s.sys
 function killShip(s){if(!s.alive)return;
  // a starbase you mean to capture is knocked out, not blown up
  if(s.role==='base'&&mission&&mission.type==='capbase'&&s.team==='e'){if(!s.disabled){s.disabled=true;s.hull=1;s.sh=[0,0,0,0];for(const m of s.mods)m.act=0;boom(s.x,s.y,1.6,SPR.orange);sfx('boom',1);msg('STARBASE DISABLED · BRING IN THE LANDER','#ffe066');}return;}
- freeze=.18;s.alive=false;s.hull=0;deaths.push({s,t:0,n:0});sfx('boom',1);if(s.role==='frt')mission.kills=(mission.kills||0)+1;
+ freeze=.18;s.alive=false;s.hull=0;deaths.push({s,t:0,n:0});sfx('boom',1);if(s.role==='frt'){if(s.team==='e')mission.kills=(mission.kills||0)+1;else mission.lostF=(mission.lostF||0)+1;}
  msg(uname(s)+(s.role==='bat'?' DESTROYED':s.role==='frt'?' DESTROYED':' DESTROYED'),s.team==='p'?'#ff6b5a':'#7dffb0');
  if(s===player)selectNext();
  checkEnd();}
@@ -1039,10 +1040,10 @@ function pickTarget(e){
  return best;}
 // with nothing to shoot at, a captain heads where the fight should be
 function guardPoint(e){const M=mission.type,obj=ships.find(s=>s.alive&&s.obj&&s.role!=='frt');
- if(e.team==='e'){if(M==='convoy'){const f=ships.find(s=>s.alive&&s.role==='frt');if(f)return{x:f.x+(e.orbit>0?160:-160),y:f.y+200};}
+ if(e.team==='e'){if(M==='escort'){const f=ships.find(s=>s.alive&&s.role==='frt'&&s.team==='p');if(f)return f;}if(M==='convoy'){const f=ships.find(s=>s.alive&&s.role==='frt');if(f)return{x:f.x+(e.orbit>0?160:-160),y:f.y+200};}
   if(obj&&!MT[M].def)return{x:obj.x+200,y:obj.y};if(obj&&MT[M].def)return obj;return{x:600,y:0};}
  let best=null,ba=1e9;for(const o of ships)if(o.alive&&o.team!=='p'&&o.ctm.p){const a=ctAge('p',o);if(a<ba){ba=a;best=o.ctm.p;}}
- if(M==='convoy')return{x:mission.exit.x-200,y:0};
+ if(M==='convoy')return{x:mission.exit.x-200,y:0};if(M==='escort'){const f=ships.find(s=>s.alive&&s.role==='frt'&&s.team==='p');if(f)return{x:f.x+(e.orbit>0?220:-220),y:f.y+300};}
  if(best)return best;if(obj)return obj;return{x:0,y:0};}
 // where a Lander has to be to put marines down
 function landZone(){if(!mission)return null;const M=mission.type;
@@ -1167,6 +1168,7 @@ function checkEnd(){if(!mission||mission.result)return;const M=mission.type,live
  if(M==='raid'&&!live('e',s=>s.role==='bat'))return finish({win:true});
  if(M==='assault'&&!live('e',s=>s.role==='base'))return finish({win:true});
  if(M==='capplanet'||M==='capbase'){if(mission.hold>=2)return finish({win:true});if(!fleet.some(s=>s.alive&&s.role==='trans'))return finish({win:false,nolander:true});}
+ if(M==='escort'){if((mission.lostF||0)>=2)return finish({win:false});if(!live('p',s=>s.role==='frt')||!foeShips)return finish({win:true,saved:3-(mission.lostF||0)});}
  if(M==='convoy'&&!live('e',s=>s.role==='frt')){const k=mission.kills||0;return finish({win:k>=2,kills:k});}
  if(M==='defplanet'&&!live('p',s=>s.role==='bat'))return finish({win:false});
  if(M==='defbase'&&!live('p',s=>s.role==='base'))return finish({win:false});
@@ -1213,11 +1215,12 @@ function start(c,idx){
  ships=[];fleet=[];
  const M=c.type,MD=MT[M],o=OBJAT[M],FORM=[[0,0],[-150,-180],[-150,180]],py=MD.def?rand(-200,200):rand(-300,300);
  // your squadron
- idx.forEach((fi,k)=>{const f=save.fleet[fi],[fx,fy]=FORM[k],s=buildShip('player',f.lo,(MD.def?-1350:-1550)+fx,py+fy,0);
+ idx.forEach((fi,k)=>{const f=save.fleet[fi],[fx,fy]=FORM[k],s=M==='escort'?buildShip('player',f.lo,o.x-260+fx*.6,-2150+fy*.6,Math.PI/2):buildShip('player',f.lo,(MD.def?-1350:-1550)+fx,py+fy,0);
   s.nm=f.n;s.fi=fi;s.hull=Math.max(1,Math.round(s.maxHull*(1-f.dmg)));s.lastPat=defPat(s);s.ps={k:s.lastPat,ph:'',tm:0,side:k===2?-1:1};
   s.shAuto=true;s.thrAuto=true;s.act='hold';s.ai=mkAI(s,'warden',.72);ships.push(s);fleet.push(s);});
  // the opposition, in their empire's colours
- const E=EMP[c.foe];ECOL=E.col;ERGB=E.rgb;const eS={col:E.col,rgb:E.rgb,g:E.spr,torp:'red',miss:E.spr,bomb:'red',beam:E.spr,bc:E.rgb};
+ const E=EMP[c.foe],HO=c.foe==='terran';// Concord blue is too close to your own cyan, so their ships fight in hostile red
+ const ec=HO?'#ff6b5a':E.col,er=HO?'255,107,90':E.rgb,eg=HO?'red':E.spr;ECOL=ec;ERGB=er;const eS={col:ec,rgb:er,g:eg,torp:'red',miss:eg,bomb:'red',beam:eg,bc:er};
  const mk=(lo,x,y,a,pers)=>{const e=buildShip('enemy',lo,x,y,a);e.emp=c.foe;e.style=E.style;e.S=eS;e.ps={k:'manual',ph:'',tm:0,side:-1};e.thrAuto=true;e.patT=0;
   e.ai=mkAI(e,pers,.3+c.st*.16);e.dmgMul=.7+.12*c.st;const hm=.75+.1*c.st;e.maxHull=e.hull=Math.round(e.maxHull*hm);e.act='hold';ships.push(e);return e;};
  const fort=(side,hk,x,y,a)=>{const lo=newLo(hk),st=c.st;if(side==='enemy'){lo.upg.arm=clamp(st-1,0,4);lo.upg.shd=clamp(st-1,0,4);lo.mounts.forEach(m=>m.tier=clamp(st-1,1,3));}
@@ -1226,7 +1229,9 @@ function start(c,idx){
   s.known=true;s.obj=true;s.ps={k:'manual',ph:'',tm:0,side:1};s.shAuto=true;return s;};
  let ex=1550,ey=rand(-300,300);
  if(o&&!o.lane&&!MD.def){ex=o.x+420;ey=o.y+rand(-1,1)*420;}
- if(M==='convoy'){mission.exit={x:o.x,y:2650};for(let k=0;k<3;k++){const f=mk(newLo('freighter'),o.x+rand(-50,50),-2450-k*230,Math.PI/2,'warden');f.obj=true;f.known=true;}
+ if(M==='escort'){mission.exit={x:o.x,y:2650};for(let k=0;k<3;k++){const f=buildShip('player',newLo('freighter'),o.x+rand(-50,50),-2450-k*230,Math.PI/2);f.ai=mkAI(f,'warden',.5);f.auto=true;f.protect=true;f.known=true;f.obj=true;f.nm='Freighter '+(k+1);f.ps={k:'manual',ph:'',tm:0,side:1};ships.push(f);}
+  c.fleet.forEach((f,k)=>{const[fx,fy]=FORM[k];mk(f.lo,1550-fx,-600+fy+rand(-300,300),Math.PI,f.pers);});}
+ else if(M==='convoy'){mission.exit={x:o.x,y:2650};for(let k=0;k<3;k++){const f=mk(newLo('freighter'),o.x+rand(-50,50),-2450-k*230,Math.PI/2,'warden');f.obj=true;f.known=true;}
   c.fleet.forEach((f,k)=>mk(f.lo,o.x+(k%2?-170:170),-2150-k*120,Math.PI/2,f.pers));}
  else c.fleet.forEach((f,k)=>{const[fx,fy]=FORM[k];mk(f.lo,ex-fx,ey+fy,Math.PI,f.pers);});
  if(o&&o.pl){const P=planets.find(p=>p.obj),side=MD.def?'player':'enemy',base=MD.def?0:Math.PI;
@@ -1236,7 +1241,7 @@ function start(c,idx){
  for(const s of ships){const T=s.team==='p'?'e':'p';if(!s.ctm[T])s.ctm[T]={x:s.x,y:s.y,vx:0,vy:0,a:s.a,t:-TURN};}
  updSensors();for(const s of fleet)s.tgt=pickTarget(s);
  turnN=1;cam.x=0;cam.y=0;cam.z=.4;overview=false;zoomMul=1;updMapBtn();
- $('#eName').style.color=E.col;$('#eBar').style.background=E.col;$('#enemyCard').style.borderColor=`rgba(${E.rgb},.35)`;
+ $('#eName').style.color=ec;$('#eBar').style.background=ec;$('#enemyCard').style.borderColor=`rgba(${er},.35)`;
  player=null;select(fleet[0]);
  $('#scr').classList.remove('on');$('#hud').classList.add('on');$('#hud').classList.remove('exec');
  state='plan';measure();$('#muteBtn').style.opacity=muted?.4:1;
@@ -1270,7 +1275,7 @@ function endBattle(r){
  show(`<h1 style="color:${win?'var(--cy)':'#ff6b5a'}">${win?'VICTORY':retreat?'RETREAT':'DEFEAT'}</h1>
  <div class="tag">${sub}</div>
  <div class="stats">${row('Battle time',`${t/60|0}:${String(t%60).padStart(2,'0')}`)}${row('Damage dealt',Math.round(teamDealt('p')))}${row('Damage taken',Math.round(teamDealt('e')))}
- ${m.type==='convoy'?row('Freighters destroyed',(m.kills||0)+' of 3'):''}
+ ${m.type==='convoy'?row('Freighters destroyed',(m.kills||0)+' of 3'):''}${m.type==='escort'?row('Freighters lost',(m.lostF||0)+' of 3'):''}
  ${row(win?'Contract pay':'Salvage pay','<span class="cr">+'+(earned-pat)+' cr</span>')}${pat?row('Patronage','<span class="cr">+'+pat+' cr</span>'):''}${row('Balance','<span class="cr">'+save.credits+' cr</span>')}
  ${ch.map(([e,d])=>row(`<span style="color:${EMP[e].col}">${EMP[e].name}</span>`,`${d>0?'+':''}${d} → ${repOf(e)}`)).join('')}</div>
  <div style="font-size:11px;line-height:1.6;opacity:.9;margin-bottom:8px">${lines.join('<br>')}</div>
@@ -1287,7 +1292,7 @@ function step(dt){
  if(state==='exec')for(const s of fleet)if(s.alive&&!s.auto&&firing(s))for(const k of WTYPES)if(s.armed[k])fireType(s,k,s.tgt);
  collideAll();
  updProjs(dt);updBeams(dt);updMines(dt);updCombos();updParts(dt);updAps(dt);
- if(mission.type==='convoy'&&state!=='menu')for(const s of ships)if(s.alive&&s.role==='frt'&&Math.hypot(s.x-mission.exit.x,s.y-mission.exit.y)<260){s.alive=false;s.escaped=true;ring(s.x,s.y,80,.6,s.S.rgb,3);msg('A FREIGHTER ESCAPED','#ff9a6b');checkEnd();}
+ if((mission.type==='convoy'||mission.type==='escort')&&state!=='menu')for(const s of ships)if(s.alive&&s.role==='frt'&&Math.hypot(s.x-mission.exit.x,s.y-mission.exit.y)<260){s.alive=false;s.escaped=true;ring(s.x,s.y,80,.6,s.S.rgb,3);msg(s.team==='p'?'A FREIGHTER MADE IT THROUGH':'A FREIGHTER ESCAPED',s.team==='p'?'#7dffb0':'#ff9a6b');checkEnd();}
  wpPulse=Math.max(0,wpPulse-dt*1.5);
 }
 function updAps(dt){for(let i=aps.length-1;i>=0;i--){const a=aps[i];a.t+=dt;if(a.t>=a.dur)aps.splice(i,1);}}
@@ -1429,9 +1434,10 @@ function render(){
  // objectives: the landing zone, the convoy's exit, the assets you are guarding
  const lz=landZone();if(lz){const rdy=lz.ready,inz=!!landerIn();ctx.strokeStyle=`rgba(255,224,102,${rdy?.55+.3*Math.sin(gameTime*4):.25})`;ctx.lineWidth=(inz?3:1.6)/z;ctx.setLineDash([10/z,8/z]);ctx.lineDashOffset=gameTime*30;ctx.beginPath();ctx.arc(lz.x,lz.y,lz.r,0,TAU);ctx.stroke();ctx.setLineDash([]);
   ctx.fillStyle=`rgba(255,224,102,${rdy?.8:.45})`;ctx.font=`${11/z}px ui-monospace,Menlo,monospace`;ctx.textAlign='center';ctx.fillText(rdy?(mission.hold?'MARINES LANDING '+mission.hold+'/2':'LANDING ZONE · BRING THE LANDER'):'LANDING ZONE · DEFENCES UP',lz.x,lz.y-lz.r-8/z);}
- if(mission.type==='convoy'){const e=mission.exit;ctx.strokeStyle='rgba(255,154,107,.5)';ctx.lineWidth=1.5/z;ctx.setLineDash([8/z,8/z]);ctx.beginPath();ctx.arc(e.x,e.y,260,0,TAU);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle='rgba(255,154,107,.75)';ctx.font=`${11/z}px ui-monospace,Menlo,monospace`;ctx.textAlign='center';ctx.fillText('CONVOY EXIT',e.x,e.y-270);}
- for(const s of ships)if(s.alive&&s.protect){ctx.strokeStyle=`rgba(125,255,176,${.35+.2*Math.sin(gameTime*3)})`;ctx.lineWidth=1.4/z;ctx.setLineDash([4/z,6/z]);ctx.beginPath();ctx.arc(s.x,s.y,s.rad+30,0,TAU);ctx.stroke();ctx.setLineDash([]);}
+ if(mission.type==='convoy'||mission.type==='escort'){const e=mission.exit;ctx.strokeStyle='rgba(255,154,107,.5)';ctx.lineWidth=1.5/z;ctx.setLineDash([8/z,8/z]);ctx.beginPath();ctx.arc(e.x,e.y,260,0,TAU);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,154,107,.75)';ctx.font=`${11/z}px ui-monospace,Menlo,monospace`;ctx.textAlign='center';ctx.fillText(mission.type==='escort'?'GET THE FREIGHTERS HERE':'CONVOY EXIT',e.x,e.y-270);}
+ for(const s of ships)if(s.alive&&s.protect){ctx.strokeStyle=`rgba(125,255,176,${.35+.2*Math.sin(gameTime*3)})`;ctx.lineWidth=1.4/z;ctx.setLineDash([4/z,6/z]);ctx.beginPath();ctx.arc(s.x,s.y,s.rad+30,0,TAU);ctx.stroke();ctx.setLineDash([]);
+  if(s.role==='frt'){ctx.fillStyle='rgba(125,255,176,.85)';ctx.font=`${10/z}px ui-monospace,Menlo,monospace`;ctx.textAlign='center';ctx.fillText('FRIENDLY FREIGHTER',s.x,s.y-s.rad-36-4/z);}}
  if(player.alive){const sr=inNeb(player)?280:SENSOR*(player.H.sens||1);
   ctx.strokeStyle='rgba(125,255,176,.10)';ctx.lineWidth=1.2/z;ctx.setLineDash([3/z,9/z]);ctx.beginPath();ctx.arc(player.x,player.y,sr,0,TAU);ctx.stroke();ctx.setLineDash([]);
   const A=player.H.arcs;if(player.mounts.some(m=>m.t==='torp')){ctx.fillStyle='rgba(192,138,255,.045)';ctx.beginPath();ctx.moveTo(player.x,player.y);ctx.arc(player.x,player.y,WD.torp.range,player.a-A.torp*Math.PI/180,player.a+A.torp*Math.PI/180);ctx.closePath();ctx.fill();}
@@ -1558,6 +1564,7 @@ function objText(){if(!mission)return'';const M=mission.type,cnt=(T,f)=>ships.fi
   case'capplanet':{const z=landZone();return z&&z.ready?'BATTERIES DOWN · HOLD THE LANDER IN THE ZONE '+(mission.hold||0)+'/2':'DESTROY THE BATTERIES · '+cnt('e',s=>s.role==='bat')+' LEFT, THEN LAND';}
   case'capbase':{const b=ships.find(s=>s.role==='base');return b&&b.disabled?'STARBASE DISABLED · HOLD THE LANDER ALONGSIDE '+(mission.hold||0)+'/2':'DISABLE THE STARBASE · HULL '+Math.round(b?b.hull/b.maxHull*100:0)+'%';}
   case'assault':{const b=ships.find(s=>s.role==='base');return'DESTROY THE STARBASE · HULL '+Math.round(b&&b.alive?b.hull/b.maxHull*100:0)+'%';}
+  case'escort':return'ESCORT THE FREIGHTERS · '+cnt('p',s=>s.role==='frt')+' UNDERWAY · '+(mission.lostF||0)+' LOST OF 2 ALLOWED';
   case'convoy':return'FREIGHTERS · '+(mission.kills||0)+' DESTROYED · '+cnt('e',s=>s.role==='frt')+' STILL RUNNING';
   case'defplanet':return'PROTECT THE BATTERIES · '+cnt('p',s=>s.role==='bat')+' STANDING · '+cnt('e',s=>!s.fixed)+' ATTACKERS';
   case'defbase':{const b=ships.find(s=>s.role==='base'&&s.team==='p');return'PROTECT THE STARBASE · HULL '+Math.round(b&&b.alive?b.hull/b.maxHull*100:0)+'% · '+cnt('e',s=>!s.fixed)+' ATTACKERS';}}
@@ -1608,7 +1615,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.8.2';
+const VERSION='0.8.3';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1667,7 +1674,8 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:11.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Easier start: rim contracts now match a lone Kestrel, you start with 1,500 cr, Landers cost 3,000 and Wasps 3,500, and planet and starbase defences scale with the sector</li><li>Capture missions only show up once you own a working Lander</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>New mission: Escort Convoy. Your client's freighters cross the map and you keep the raiders off them</li><li>Your ships never damage each other or friendly freighters, and Concord enemies now show in hostile red so they can't be mistaken for your own ships</li></ul>
+ <p><b>0.8.2</b></p><ul style="margin-top:0"><li>Easier start: rim contracts now match a lone Kestrel, you start with 1,500 cr, Landers cost 3,000 and Wasps 3,500, and planet and starbase defences scale with the sector</li><li>Capture missions only show up once you own a working Lander</li></ul>
  <p><b>0.8.1</b></p><ul style="margin-top:0"><li>Pinch to zoom the battle map, and a MAP button that shows the whole battlefield</li></ul>
  <p><b>0.8.0</b></p><ul style="margin-top:0"><li>Fleets of up to three ships, new role hulls, railguns, eight mission types, repairs and salvage, jump apertures</li></ul>
  <p><b>0.7</b></p><ul style="margin-top:0"><li>Shots resolve within the turn, ordnance keeps its lock, swarms converge and bloom</li><li>Economy rebalance, update check, bigger battlefields</li><li>Title screen, save slots, save codes, options and privacy policy, and redesigned ships for every empire</li></ul>
@@ -1700,7 +1708,7 @@ function galPanels(){const g=save.g;
    for(const ty of c.types){const k=contract(gal.sel,c.client,ty,c.foe),[tl,tc]=threat(k.ev,k.st),M=MT[ty];
     const rg=M.terr||M.def?repGain(c.client,S.val):Math.ceil(repGain(c.client,S.val)*.6),rl=M.def?4+2*S.val:M.terr?6+3*S.val:8+3*S.val;
     h+=`<button class="ct" data-gact="go" data-arg="${gal.sel}:${c.client}:${ty}:${c.foe}"><div style="display:flex;justify-content:space-between;gap:6px"><b>${M.name.toUpperCase()}</b><span>${ty==='convoy'?'<small style="opacity:.6">up to </small>':''}${cr(k.reward)}</span></div>
-     <p>${M.terr?'Wins the sector':M.def?'Keeps the sector':'<b style="color:#ffe066">Pay only</b>'} · ${k.fleet.map(f=>HULLS[f.lo.hull].name).join(', ')}${M.st==='base'?(M.def?' attacking your starbase':' and a starbase'):M.st==='planet'?(M.def?' attacking the planet':' and 3 batteries'):M.st==='convoy'?' escorting 3 freighters':''}${M.lander?' · <b style="color:#ffd166">needs a Lander</b>':''}</p>
+     <p>${M.terr?'Wins the sector':M.def?'Keeps the sector':'<b style="color:#ffe066">Pay only</b>'} · ${k.fleet.map(f=>HULLS[f.lo.hull].name).join(', ')}${M.st==='base'?(M.def?' attacking your starbase':' and a starbase'):M.st==='planet'?(M.def?' attacking the planet':' and 3 batteries'):M.st==='convoy'?' escorting 3 freighters':M.st==='escort'?' hunting your 3 freighters':''}${M.lander?' · <b style="color:#ffd166">needs a Lander</b>':''}</p>
      <p><span class="thr" style="color:${tc};border:1px solid ${tc}">${tl}</span> <span class="stars">${'★'.repeat(k.st)}${'☆'.repeat(4-k.st)}</span> · ${E.short} +${rg}, ${F.short} −${rl}${k.coal?' · COALITION BOUNTY':''}${k.marked?' · THEY ARE HUNTING YOU':''}</p></button>`;}}
   h+=`<button class="btn alt sm" data-gact="desel" style="margin-top:8px">CLOSE</button>`;}
  $('#gbot').innerHTML=h;gal.k='';galGeom();
@@ -1759,7 +1767,7 @@ function briefScreen(){const c=brief.c,M=MT[c.type],S=SECT[c.sid],E=EMP[c.client
  <p style="font-size:11.5px;line-height:1.5;opacity:.88">${M.d}</p>
  <div class="row"><div class="t"><b style="color:${F.col}">OPPOSITION</b><span class="stars">${'★'.repeat(c.st)}${'☆'.repeat(4-c.st)}</span></div>
  ${c.fleet.map(f=>`<p><b>${HULLS[f.lo.hull].name}</b> ${ROLE[HULLS[f.lo.hull].role].toLowerCase()}, ${AIS[f.pers].label.toLowerCase()} captain · ${loSummary(f.lo)}</p>`).join('')}
- ${M.st==='base'&&!M.def?'<p><b>Starbase</b> with beams, torpedoes and a missile battery, and heavy shields</p>':''}${M.st==='planet'&&!M.def?'<p><b>Three defence batteries</b> in orbit, each with a beam and a torpedo tube</p>':''}${M.st==='convoy'?'<p><b>Three freighters</b>, unarmed, making for the far edge of the map</p>':''}
+ ${M.st==='base'&&!M.def?'<p><b>Starbase</b> with beams, torpedoes and a missile battery, and heavy shields</p>':''}${M.st==='planet'&&!M.def?'<p><b>Three defence batteries</b> in orbit, each with a beam and a torpedo tube</p>':''}${M.st==='convoy'?'<p><b>Three freighters</b>, unarmed, making for the far edge of the map</p>':''}${M.st==='escort'?'<p style="color:#7dffb0">On your side: three unarmed freighters. They fly themselves to the far edge.</p>':''}
  ${M.def?`<p style="color:#7dffb0">On your side: ${M.st==='base'?'the starbase':'three defence batteries'}, fighting on their own.</p>`:''}</div>
  <p style="font-size:11px">Pay ${cr(c.reward)}${c.type==='convoy'?' if all three freighters die, a third of it per kill':''} · against this squadron: <span class="thr" style="color:${tc};border:1px solid ${tc}">${tl}</span></p>
  <div class="tag" style="margin-bottom:2px">CHOOSE UP TO ${MAXDEPLOY} SHIPS · DAMAGE CARRIES OVER</div>`;
