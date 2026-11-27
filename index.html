@@ -242,9 +242,9 @@ const SPR={pink:glowSprite(255,143,208),cyan:glowSprite(95,227,255),amber:glowSp
 const HULLS={
  kestrel:{name:'Kestrel',cls:'Corvette',kesh:'Skiff',price:500,hull:240,sh:85,speed:215,accel:220,turn:2.0,keel:2.2,wmul:1,mass:1,mounts:2,mods:1,scale:.95,
   arcs:{beam:100,torp:50,barr:180,bomb:100,rail:12},stock:['beam','torp'],role:'esc',sens:1,desc:'Nimble starter ship. Light armour, cheap to run.'},
- wasp:{name:'Wasp',cls:'Skirmisher',price:4000,hull:170,sh:75,speed:290,accel:330,turn:2.3,keel:2.4,wmul:1.05,mass:.8,mounts:2,mods:1,scale:.9,
+ wasp:{name:'Wasp',cls:'Skirmisher',price:3500,hull:170,sh:75,speed:290,accel:330,turn:2.3,keel:2.4,wmul:1.05,mass:.8,mounts:2,mods:1,scale:.9,
   arcs:{beam:60,torp:40,barr:180,bomb:60,rail:12},stock:['barr','torp'],role:'sk',sens:1.1,desc:'Fast and fragile. Dart in, empty the racks, and run before they can answer.'},
- lander:{name:'Lander',cls:'Assault Transport',price:4500,hull:430,sh:130,speed:175,accel:160,turn:1.0,keel:1.6,wmul:.9,mass:2.2,mounts:1,mods:1,scale:1.15,
+ lander:{name:'Lander',cls:'Assault Transport',price:3000,hull:430,sh:130,speed:175,accel:160,turn:1.0,keel:1.6,wmul:.9,mass:2.2,mounts:1,mods:1,scale:1.15,
   arcs:{beam:150,torp:40,barr:180,bomb:80,rail:12},stock:['beam'],role:'trans',sens:.9,desc:'Carries the marines who take planets and starbases. Tough, slow and lightly armed. Capture missions need one.'},
  warhound:{name:'Warhound',cls:'Escort',kesh:'Fang',price:7000,hull:500,sh:110,speed:240,accel:260,turn:1.5,keel:1.9,wmul:1.2,mass:1.7,mounts:3,mods:1,scale:1.1,
   arcs:{beam:35,torp:30,barr:180,bomb:60,rail:15},stock:['beam','beam','torp'],role:'gun',sens:1,desc:'Fast and heavily armoured, but every gun points forward. You fight nose-in.'},
@@ -259,7 +259,7 @@ const HULLS={
   arcs:{beam:180,torp:180,barr:180,bomb:180,rail:180},stock:['beam','beam','torp','beam','barr','torp'],role:'base',sens:1.3,fixed:1},
  battery:{name:'Defence Battery',cls:'Battery',price:0,hull:300,sh:100,speed:0,accel:0,turn:0,keel:1,wmul:1,mass:30,mounts:2,mods:0,scale:1,
   arcs:{beam:180,torp:180,barr:180,bomb:180,rail:180},stock:['beam','torp'],role:'bat',sens:1,fixed:1},
- freighter:{name:'Freighter',cls:'Freighter',price:0,hull:230,sh:55,speed:96,accel:90,turn:.6,keel:1.4,wmul:1,mass:3,mounts:0,mods:0,scale:1.4,
+ freighter:{name:'Freighter',cls:'Freighter',price:0,hull:150,sh:35,speed:84,accel:90,turn:.6,keel:1.4,wmul:1,mass:3,mounts:0,mods:0,scale:1.4,
   arcs:{beam:180,torp:180,barr:180,bomb:180,rail:180},stock:[],role:'frt',sens:.8}
 };
 const HORDER=['kestrel','wasp','lander','warhound','halberd','longbow','leviathan'];
@@ -534,12 +534,14 @@ const KEY='starships_v1';
 function newLo(hk){return{hull:hk,upg:{shd:0,arm:0,eng:0,rct:0},extra:0,mounts:HULLS[hk].stock.map(t=>({t,tier:1,stock:1})),mods:[]};}
 const SNAMES=['Resolute','Tempest','Vigil','Meridian','Ardent','Halcyon','Corsair','Lodestar','Sentinel','Valkyrie','Kingfisher','Brightwater','Hesper','Endurance','Gallant','Wayfarer','Nightjar','Rook','Harrier','Equinox'];
 function newShipRec(hk){const used=save&&save.fleet?save.fleet.map(f=>f.n):[],free=SNAMES.filter(n=>!used.includes(n));return{n:free.length?pick(free):pick(SNAMES)+' II',lo:newLo(hk),dmg:0,wreck:0};}
-function defSave(home){const s={credits:600,wins:0,losses:0,home:home||'terran',fleet:[],sel:0,g:newGalaxy(home)};s.fleet.push({n:'Resolute',lo:newLo('kestrel'),dmg:0,wreck:0});return s;}
+function defSave(home){const s={b082:1,credits:1500,wins:0,losses:0,home:home||'terran',fleet:[],sel:0,g:newGalaxy(home)};s.fleet.push({n:'Resolute',lo:newLo('kestrel'),dmg:0,wreck:0});return s;}
 // older saves had one ship in s.lo
 function migrate(s){if(!s)return null;if(s.lo&&!s.fleet){s.fleet=[{n:'Resolute',lo:s.lo,dmg:0,wreck:0}];delete s.lo;}
  if(!Array.isArray(s.fleet))return null;s.fleet=s.fleet.filter(f=>f&&f.lo&&HULLS[f.lo.hull]&&HORDER.includes(f.lo.hull));
  for(const f of s.fleet){f.lo.mods=(f.lo.mods||[]).filter(k=>MODS[k]);f.lo.mounts=f.lo.mounts.filter(m=>!m.t||WD[m.t]);f.dmg=clamp(+f.dmg||0,0,1);f.wreck=f.wreck?1:0;if(!f.n)f.n=pick(SNAMES);}
- if(!s.fleet.length)s.fleet.push({n:'Resolute',lo:newLo('kestrel'),dmg:0,wreck:0});s.sel=clamp(s.sel|0,0,s.fleet.length-1);delete s.missions;return s;}
+ if(!s.fleet.length)s.fleet.push({n:'Resolute',lo:newLo('kestrel'),dmg:0,wreck:0});
+ // 0.8.2 rebalanced the early game: campaigns from before it get the new starting purse
+ if(!s.b082){s.b082=1;s.credits=Math.max(s.credits|0,1500);}s.sel=clamp(s.sel|0,0,s.fleet.length-1);delete s.missions;return s;}
 let save=(()=>{try{const s=migrate(JSON.parse(localStorage.getItem(KEY)));if(s){if(!s.g)s.g=newGalaxy();s.g.offers={};return s;}}catch(e){}return defSave();})();
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(save));}catch(e){}}
 function mountVal(m){if(!m.t)return 0;let v=(m.stock?0:WD[m.t].price)+(m.t==='torp'?tvOf(m).price:0);for(let t=1;t<m.tier;t++)v+=TIERC[t-1];return v;}
@@ -569,7 +571,7 @@ function genEnemy(B,emp){const E=EMP[emp]||EMP.kesh,wp=()=>Math.random()<.7?pick
   if(lo.extra<2)o.push({c:MC[lo.extra],f:()=>{lo.extra++;lo.mounts.push({t:null,tier:1,stock:0});}});
   if(lo.mods.length<HULLS[hk].mods){const pf=E.mods.filter(k=>!lo.mods.includes(k)),ks=Object.keys(MODS).filter(k=>!lo.mods.includes(k));const k=pf.length&&Math.random()<.75?pick(pf):pick(ks);o.push({c:MODS[k].price,f:()=>lo.mods.push(k)});}
   const af=o.filter(x=>x.c<=rem);if(!af.length)break;const x=pick(af);x.f();rem-=x.c;}
- lo.mounts.forEach(m=>{if(!m.t){m.t=wp();}if(m.t==='torp'&&!m.v)m.v=Math.random()<.6?E.tv:pick(['fusion','anti','grav']);});
+ lo.mounts.forEach(m=>{if(!m.t){m.t=wp();}if(m.t==='torp'&&!m.v){const v=Math.random()<.6?E.tv:pick(['fusion','anti','grav']);m.v=TV[v].price<=rem?v:'fusion';rem-=TV[m.v].price;}});
  return lo;
 }
 // where each mission puts its objective: a planet, a starbase, or the convoy lane
@@ -603,7 +605,7 @@ const MT={
  defplanet:{name:'Defend Planet',def:1,pay:1.1,st:'planet',d:'An attack is coming. Keep at least one defence battery alive and destroy the attackers, or the sector falls.'},
  defbase:{name:'Defend Starbase',def:1,pay:1.15,st:'base',d:'An attack is coming. Keep the starbase alive and destroy the attackers, or the sector falls.'}
 };
-function missionTypes(sid,client){const q=mulb(sid*131+save.g.n*17+EORD.indexOf(client)*7+3);return[pick2(['strike','capplanet','capbase','strike'],q),pick2(['raid','convoy','assault'],q)];}
+function missionTypes(sid,client){const q=mulb(sid*131+save.g.n*17+EORD.indexOf(client)*7+3),L=save.fleet.some(f=>f.lo.hull==='lander'&&opOK(f));const t=pick2(['strike','capplanet','capbase','strike'],q);return[L?t:'strike',pick2(['raid','convoy','assault'],q)];}
 function contractsFor(sid){const g=save.g,o=g.own[sid],cl=[...new Set(nbrs(sid).map(n=>g.own[n]).filter(e=>e!==o))],out=[];
  for(const c of cl)out.push({client:c,foe:o,types:missionTypes(sid,c),refuses:repOf(c)<=-40});
  if(cl.length){const foe=cl.slice().sort((a,b)=>shareOf(b)-shareOf(a))[0],q=mulb(sid*71+g.n*13+5);out.push({client:o,foe,def:1,types:[pick2(['defplanet','defbase'],q)],refuses:repOf(o)<=-40});}
@@ -613,18 +615,17 @@ function contract(sid,client,type,foe){
  const g=save.g,key=sid+':'+client+':'+type;if(g.offers[key])return g.offers[key];
  const S=SECT[sid],M=MT[type];foe=foe||g.own[sid];const sf=shareOf(foe),sc=shareOf(client);
  // the map sets a floor; each ring also keeps pace with your fleet, so the core always outclasses you and the rim never does
- const PS=2.5,mapB=PS*(300+S.val*S.val*350+sf*4000+g.n*60),pv=fleetValue(),relB=pv*[1.3,.95,.7,.45][S.r]*(.85+sf*.9);
+ const rf=[3.2,2,1.3,1][S.r],mapB=450*Math.pow(rf,2.2)+sf*1500*rf+g.n*110,pv=fleetValue(),relB=pv*[1.3,.95,.7,.45][S.r]*(.85+sf*.9);
  let B=Math.max(mapB,relB);if(repOf(foe)<=-60)B*=1.25;if(sc>.4&&!M.def)B*=1.2;
- const st=relB>mapB?clamp([3,2,1,1][S.r]+(sf>.3?1:0)+(repOf(foe)<=-60?1:0),1,4):clamp(Math.round(1+(B/PS-1500)/2000),1,4);
- // fixed defences soak up part of the budget
+ const st=relB>mapB?clamp([3,2,1,1][S.r]+(sf>.3?1:0)+(repOf(foe)<=-60?1:0),1,4):clamp(Math.round(1+(B-700)/3500),1,4);
  // fixed defences soak up part of the budget; defenders get help, so attackers come in strength
- const FB=B*(M.def?1.4:M.st==='base'?.55:M.st==='planet'?.72:M.st==='convoy'?.7:1),n=Math.min(3,(FB<6500?1:FB<20000?2:3)+(M.def?1:0)),fleet=[];
+ const FB=B*(M.def?1.4:M.st==='base'?.55:M.st==='planet'?.72:M.st==='convoy'?.7:1),n=M.st&&!M.def&&FB<900?0:Math.min(3,(FB<6500?1:FB<20000?2:3)+(M.def&&FB>=2500?1:0)),fleet=[],sm=clamp(B/7000,.3,1.25),nbat=B<2500?2:3;
  for(let i=0;i<n;i++){const lo=genEnemy(FB/n*rand(.85,1.15),foe);fleet.push({lo,pers:Math.random()<.6?EMP[foe].pers:pick(Object.keys(AIS))});}
  let ev=fleet.reduce((a,f)=>a+loValue(f.lo),0)*(M.def?.72:1);
- if(M.st==='base')ev+=(M.def?0:9000*(.8+.25*st));if(M.st==='planet')ev+=M.def?0:3*2600*(.8+.2*st);if(M.st==='convoy')ev+=3*900;
- const reward=Math.round(((mapB/PS*.3+130)*(1+.15*(S.val-1))*(sf>.4?1.3:1)+Math.max(0,B-mapB)/PS*.08)*M.pay/10)*10;
+ if(M.st==='base')ev+=(M.def?0:4000*(.8+.25*st)*sm);if(M.st==='planet')ev+=M.def?0:nbat*800*(.8+.2*st)*sm;if(M.st==='convoy')ev+=600;
+ const reward=Math.round(((mapB*.35+350)*(sf>.4?1.3:1)+Math.max(0,B-mapB)*.03)*M.pay/10)*10;
  const pl=genPlanets(type);
- return g.offers[key]={sid,client,foe,type,fleet,ev,st,pl,nb:genNebulae(pl,type),reward,marked:repOf(foe)<=-60,coal:sf>.4&&!M.def,name:M.name+' · '+S.name};
+ return g.offers[key]={sid,client,foe,type,fleet,ev,st,pl,nb:genNebulae(pl,type),reward,sm,nbat,marked:repOf(foe)<=-60,coal:sf>.4&&!M.def,name:M.name+' · '+S.name};
 }
 function repGain(e,v){const g=3+2*v;return repOf(e)>=50?Math.ceil(g/2):g;}
 function repAdd(e,d,ch){const g=save.g,b=g.rep[e]||0;g.rep[e]=clamp(Math.round(b+d),-100,100);if(ch&&g.rep[e]!==b)ch.push([e,g.rep[e]-b]);}
@@ -1220,7 +1221,8 @@ function start(c,idx){
  const mk=(lo,x,y,a,pers)=>{const e=buildShip('enemy',lo,x,y,a);e.emp=c.foe;e.style=E.style;e.S=eS;e.ps={k:'manual',ph:'',tm:0,side:-1};e.thrAuto=true;e.patT=0;
   e.ai=mkAI(e,pers,.3+c.st*.16);e.dmgMul=.7+.12*c.st;const hm=.75+.1*c.st;e.maxHull=e.hull=Math.round(e.maxHull*hm);e.act='hold';ships.push(e);return e;};
  const fort=(side,hk,x,y,a)=>{const lo=newLo(hk),st=c.st;if(side==='enemy'){lo.upg.arm=clamp(st-1,0,4);lo.upg.shd=clamp(st-1,0,4);lo.mounts.forEach(m=>m.tier=clamp(st-1,1,3));}
-  const s=side==='enemy'?mk(lo,x,y,a,'warden'):buildShip('player',lo,x,y,a);if(side==='player'){s.ai=mkAI(s,'warden',.55);s.dmgMul=.5;s.maxHull=s.hull=Math.round(s.maxHull*.7);if(hk==='starbase')s.mounts=s.mounts.slice(0,4);s.auto=true;s.protect=true;s.act='fire';ships.push(s);}
+  const s=side==='enemy'?mk(lo,x,y,a,'warden'):buildShip('player',lo,x,y,a);
+  if(side==='enemy'){const sm=c.sm||1;if(hk==='starbase')s.mounts=s.mounts.slice(0,sm<.45?3:sm<.85?4:6);s.maxHull=s.hull=Math.round(s.maxHull*sm);s.maxSh=Math.round(s.maxSh*(.5+.5*sm));s.sh=s.sh.map(()=>s.maxSh);s.dmgMul*=.55+.45*sm;}if(side==='player'){s.ai=mkAI(s,'warden',.55);s.dmgMul=.5;s.maxHull=s.hull=Math.round(s.maxHull*.7);if(hk==='starbase')s.mounts=s.mounts.slice(0,4);s.auto=true;s.protect=true;s.act='fire';ships.push(s);}
   s.known=true;s.obj=true;s.ps={k:'manual',ph:'',tm:0,side:1};s.shAuto=true;return s;};
  let ex=1550,ey=rand(-300,300);
  if(o&&!o.lane&&!MD.def){ex=o.x+420;ey=o.y+rand(-1,1)*420;}
@@ -1228,7 +1230,7 @@ function start(c,idx){
   c.fleet.forEach((f,k)=>mk(f.lo,o.x+(k%2?-170:170),-2150-k*120,Math.PI/2,f.pers));}
  else c.fleet.forEach((f,k)=>{const[fx,fy]=FORM[k];mk(f.lo,ex-fx,ey+fy,Math.PI,f.pers);});
  if(o&&o.pl){const P=planets.find(p=>p.obj),side=MD.def?'player':'enemy',base=MD.def?0:Math.PI;
-  for(const da of[-1.1,0,1.1]){const a=base+da;fort(side,'battery',P.x+Math.cos(a)*(P.r+55),P.y+Math.sin(a)*(P.r+55),a);}}
+  for(const da of(c.nbat===2&&!MD.def?[-.6,.6]:[-1.1,0,1.1])){const a=base+da;fort(side,'battery',P.x+Math.cos(a)*(P.r+55),P.y+Math.sin(a)*(P.r+55),a);}}
  if(M==='capbase'||M==='assault'||M==='defbase')fort(MD.def?'player':'enemy','starbase',o.x,o.y,0);
  // both sides start knowing roughly where the other came from
  for(const s of ships){const T=s.team==='p'?'e':'p';if(!s.ctm[T])s.ctm[T]={x:s.x,y:s.y,vx:0,vy:0,a:s.a,t:-TURN};}
@@ -1606,7 +1608,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.8.1';
+const VERSION='0.8.2';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1665,7 +1667,8 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:11.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Pinch to zoom the battle map, and a MAP button that shows the whole battlefield</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Easier start: rim contracts now match a lone Kestrel, you start with 1,500 cr, Landers cost 3,000 and Wasps 3,500, and planet and starbase defences scale with the sector</li><li>Capture missions only show up once you own a working Lander</li></ul>
+ <p><b>0.8.1</b></p><ul style="margin-top:0"><li>Pinch to zoom the battle map, and a MAP button that shows the whole battlefield</li></ul>
  <p><b>0.8.0</b></p><ul style="margin-top:0"><li>Fleets of up to three ships, new role hulls, railguns, eight mission types, repairs and salvage, jump apertures</li></ul>
  <p><b>0.7</b></p><ul style="margin-top:0"><li>Shots resolve within the turn, ordnance keeps its lock, swarms converge and bloom</li><li>Economy rebalance, update check, bigger battlefields</li><li>Title screen, save slots, save codes, options and privacy policy, and redesigned ships for every empire</li></ul>
  <p><b>Earlier</b></p><ul style="margin-top:0"><li>0.6 · Galaxy campaign with six empires, reputation and territory</li><li>0.5 · Torpedo warheads, fold space, mines, drone swarms</li><li>0.4 · Sensors, nebulae, action levers and capacitors</li><li>0.3 · Simultaneous turns</li></ul></div>
@@ -1674,7 +1677,7 @@ function applyOpt(){TURN=OPT.turn;muted=!OPT.sound;if(master)master.gain.value=.
 
 function show(html){$('#gal').classList.remove('on');$('#scrBox').innerHTML=html;$('#scrBox').dataset.k='';$('#scr').classList.add('on');$('#scrBox').scrollTop=0;}
 const cr=n=>`<span class="cr">${n.toLocaleString()} cr</span>`;
-function threat(ev,st,fv){const r=ev*(.75+.1*st)/Math.max(1,fv==null?fleetValue():fv);return r<.85?['EASY','#7dffb0']:r<1.15?['EVEN','#5fe3ff']:r<1.5?['HARD','#ffd166']:['DEADLY','#ff6b5a'];}
+function threat(ev,st,fv){const r=ev*(.6+.1*st)/Math.max(1,fv==null?fleetValue():fv);return r<.8?['EASY','#7dffb0']:r<1.15?['EVEN','#5fe3ff']:r<1.6?['HARD','#ffd166']:['DEADLY','#ff6b5a'];}
 function loSummary(lo){const ws={};lo.mounts.forEach(m=>{if(m.t){const k=m.t==='torp'?'torp:'+(m.v||'fusion'):m.t;ws[k]=(ws[k]||[]).concat('Mk '+MK[m.tier]);}});
  const best=a=>a.reduce((x,y)=>y.length>x.length?y:x,'Mk I');const up=Object.entries(lo.upg).filter(([k,v])=>v).map(([k,v])=>UPG[k].name+' '+v);
  return Object.entries(ws).map(([t,a])=>`${a.length>1?a.length+'x ':''}${t.startsWith('torp:')?TV[t.slice(5)].name+' '+WD.torp.name:WD[t].name}${best(a)!=='Mk I'?' '+best(a):''}`).join(', ')+(lo.mods.length?' · '+lo.mods.map(k=>MODS[k].name).join(', '):'')+(up.length?' · '+up.join(', '):'');}
