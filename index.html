@@ -188,6 +188,7 @@ ul{padding-left:16px;margin:10px 0 0;font-size:11px;line-height:1.55;opacity:.85
   <div id="trow">
    <button class="ib" id="pauseBtn">II</button>
    <div class="panel" id="sens"><span class="lbl">SENSORS</span><b id="sensV">CONTACT</b></div>
+   <button class="ib" id="mapBtn">MAP</button>
    <button class="ib" id="muteBtn">SND</button>
   </div>
   <div id="fleetw"><div id="fleet"></div><div id="obj"></div></div>
@@ -1232,7 +1233,7 @@ function start(c,idx){
  // both sides start knowing roughly where the other came from
  for(const s of ships){const T=s.team==='p'?'e':'p';if(!s.ctm[T])s.ctm[T]={x:s.x,y:s.y,vx:0,vy:0,a:s.a,t:-TURN};}
  updSensors();for(const s of fleet)s.tgt=pickTarget(s);
- turnN=1;cam.x=0;cam.y=0;cam.z=.4;
+ turnN=1;cam.x=0;cam.y=0;cam.z=.4;overview=false;zoomMul=1;updMapBtn();
  $('#eName').style.color=E.col;$('#eBar').style.background=E.col;$('#enemyCard').style.borderColor=`rgba(${E.rgb},.35)`;
  player=null;select(fleet[0]);
  $('#scr').classList.remove('on');$('#hud').classList.add('on');$('#hud').classList.remove('exec');
@@ -1291,8 +1292,9 @@ function updAps(dt){for(let i=aps.length-1;i>=0;i--){const a=aps[i];a.t+=dt;if(a
 function updCam(dt){
  const land=W>H,top=hudTop,bot=land?hudBotL:hudBot,ph=Math.max(160,H-top-bot);cam.cy=top+ph/2;cam.t=top;cam.b=H-bot;
  if(!player){cam.cy=H/2;cam.x+=dt*14;cam.y+=dt*5;cam.z=.7;return;}
- const pts=[],foldView=state==='plan'&&player.act==='fold'&&player.alive;
- if(state==='plan'){pts.push(player);if(player.pEnd)pts.push(player.pEnd);const t=player.tgt;
+ const pts=[],foldView=state==='plan'&&player.act==='fold'&&player.alive,wide=foldView||overview;
+ if(overview)pts.push({x:-ARENA,y:-ARENA},{x:ARENA,y:ARENA});
+ else if(state==='plan'){pts.push(player);if(player.pEnd)pts.push(player.pEnd);const t=player.tgt;
   if(t&&t.alive){if(t.vis.p){pts.push(t);if(t.pEnd)pts.push(t.pEnd);}else if(t.ctm.p&&ctAge('p',t)<TURN*3)pts.push(t.ctm.p);}
   if(foldView)pts.push({x:-ARENA,y:-ARENA},{x:ARENA,y:ARENA});}
  else{for(const s of fleet)if(s.alive)pts.push(s,{x:s.x+s.vx*1.5,y:s.y+s.vy*1.5});
@@ -1301,9 +1303,9 @@ function updCam(dt){
  if(!pts.length)pts.push(player);
  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const q of pts){x0=Math.min(x0,q.x);x1=Math.max(x1,q.x);y0=Math.min(y0,q.y);y1=Math.max(y1,q.y);}
  let mx=(x0+x1)/2,my=(y0+y1)/2;const dx=x1-x0+300,dy=y1-y0+300;
- const zt=clamp(Math.min(W*.92/dx,ph/dy),foldView?.04:.12,1.5);
+ const zt=clamp(Math.min(W*.92/dx,ph/dy)*(overview?1:zoomMul),wide||zoomMul<1?.03:.12,2.5);
  // when everything can't fit, keep the selected ship on screen
- if(player.alive){const hx=Math.max(0,W/2-60)/zt,hy=Math.max(0,ph/2-50)/zt;mx=clamp(mx,player.x-hx,player.x+hx);my=clamp(my,player.y-hy,player.y+hy);}
+ if(player.alive&&!overview){const hx=Math.max(0,W/2-60)/zt,hy=Math.max(0,ph/2-50)/zt;mx=clamp(mx,player.x-hx,player.x+hx);my=clamp(my,player.y-hy,player.y+hy);}
  const zk=Math.min(1,dt*(zt<cam.z?2.2:1.1)),k=Math.min(1,dt*2.2);
  cam.z+=(zt-cam.z)*zk;cam.x+=(mx-cam.x)*k;cam.y+=(my-cam.y)*k;
 }
@@ -1536,6 +1538,7 @@ function pause(){prevState=state;state='pause';show(`<h2>PAUSED</h2><div class="
  <li>Damage stays with your ships after the battle. Repair them in the shipyard. A destroyed ship is a wreck until you pay to salvage it.</li>
  <li>Nebulae hide you almost completely, but they blind your own sensors and stop shield recharge.</li>
  <li>Tap a weapon to include or exclude it from the selected ship's volleys. Bombs start excluded.</li>
+ <li>Pinch to zoom the battle map in or out, or tap MAP to see the whole battlefield at once. Tap it again to go back.</li>
  <li>Tap the bar during a turn to watch at double speed.</li></ul>`);}
 // choosing which of your ships the controls work on
 function select(s){if(!s||!s.alive)return;const ch=player!==s;player=s;enemy=s.tgt;if(ch){buildHUD();buildOrders();buildActs();}updFleetBar(true);}
@@ -1603,7 +1606,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.8.0';
+const VERSION='0.8.1';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1662,7 +1665,8 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:11.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Fleets: own up to five ships and take up to three on each mission. You give every ship its own orders each turn, or hand any of them to an AUTO captain</li><li>Seven hulls with real roles: the Wasp skirmisher, the Lander assault transport and the Longbow artillery ship join the Kestrel, Warhound, Halberd and Leviathan, sold by the empires that like you</li><li>Railguns: very long range, straight-flying slugs that fast ships can dodge. Your ships share sensors, so a spotter lets a Longbow hit far beyond its own sight</li><li>Eight kinds of mission: strike, capture a planet or starbase (territory), raid a planet, intercept a convoy or assault a starbase (better pay, no territory), and defend a planet or starbase for its owner</li><li>Damage stays with your ships between missions. Repairs cost credits, and a destroyed ship is a wreck until you pay to salvage it</li><li>Fold is now Jump: the ship dives into an aperture and comes out of another one</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Pinch to zoom the battle map, and a MAP button that shows the whole battlefield</li></ul>
+ <p><b>0.8.0</b></p><ul style="margin-top:0"><li>Fleets of up to three ships, new role hulls, railguns, eight mission types, repairs and salvage, jump apertures</li></ul>
  <p><b>0.7</b></p><ul style="margin-top:0"><li>Shots resolve within the turn, ordnance keeps its lock, swarms converge and bloom</li><li>Economy rebalance, update check, bigger battlefields</li><li>Title screen, save slots, save codes, options and privacy policy, and redesigned ships for every empire</li></ul>
  <p><b>Earlier</b></p><ul style="margin-top:0"><li>0.6 · Galaxy campaign with six empires, reputation and territory</li><li>0.5 · Torpedo warheads, fold space, mines, drone swarms</li><li>0.4 · Sensors, nebulae, action levers and capacitors</li><li>0.3 · Simultaneous turns</li></ul></div>
  <button class="btn alt" data-act="title">BACK</button>`);}
@@ -1890,9 +1894,25 @@ function setWP(e,first){if(state!=='plan'||!player)return;
  let x=x0,y=y0;const r=Math.hypot(x,y);if(r>ARENA){x*=ARENA/r;y*=ARENA/r;}
  if(player.auto){player.auto=false;updFleetBar(true);}
  if(player.ps.k!=='manual'){setPat(player,'manual');msg(uname(player)+' · MANUAL COURSE','#5fe3ff');}player.wp.x=x;player.wp.y=y;player.wpDone=false;wpPulse=1;}
-cvs.addEventListener('pointerdown',e=>{if(state==='galaxy'){galTap(e);return;}dragging=true;setWP(e,true);});
-addEventListener('pointermove',e=>{if(dragging&&player&&player.ps.k==='manual')setWP(e,false);});
-addEventListener('pointerup',()=>dragging=false);addEventListener('pointercancel',()=>dragging=false);
+// two fingers zoom the battle map; the first finger's tap is undone so a pinch never moves your ship
+const ptrs=new Map();let pinch=null,undo=null;
+function snapOrders(){if(!player)return null;return{p:player,wp:{x:player.wp.x,y:player.wp.y},wpDone:player.wpDone,ps:Object.assign({},player.ps),tgt:player.tgt,foldTo:player.foldTo,auto:player.auto,thrAuto:player.thrAuto};}
+function restoreOrders(u){if(!u||!u.p.alive)return;const p=u.p;if(player!==p)select(p);Object.assign(p,{wp:u.wp,wpDone:u.wpDone,ps:u.ps,tgt:u.tgt,foldTo:u.foldTo,auto:u.auto,thrAuto:u.thrAuto});enemy=u.tgt;updOrders();updFleetBar(true);}
+cvs.addEventListener('pointerdown',e=>{if(state==='galaxy'){galTap(e);return;}ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(ptrs.size===2){dragging=false;if(state==='plan')restoreOrders(undo);undo=null;const[a,b]=[...ptrs.values()];pinch={d:Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)),z:zoomMul,ov:overview};return;}
+ if(ptrs.size>2)return;undo=state==='plan'?snapOrders():null;dragging=true;setWP(e,true);});
+addEventListener('pointermove',e=>{if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pinch&&ptrs.size>=2){const[a,b]=[...ptrs.values()],r=Math.hypot(a.x-b.x,a.y-b.y)/pinch.d;
+  if(pinch.ov){if(r>1.08){overview=false;pinch.ov=false;pinch.z=.3/r;}else return;}
+  zoomMul=clamp(pinch.z*r,.15,5);updMapBtn();return;}
+ if(dragging&&player&&player.ps.k==='manual')setWP(e,false);});
+function ptrUp(e){ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;dragging=false;}
+addEventListener('pointerup',ptrUp);addEventListener('pointercancel',ptrUp);
+cvs.addEventListener('wheel',e=>{if(!player)return;e.preventDefault();if(overview&&e.deltaY<0){overview=false;zoomMul=.3;}else zoomMul=clamp(zoomMul*Math.exp(-e.deltaY*.0015),.15,5);updMapBtn();},{passive:false});
+// the whole battlefield at once
+let overview=false,zoomMul=1;
+function updMapBtn(){const b=$('#mapBtn');if(b){b.classList.toggle('on',overview);b.textContent=overview?'BACK':'MAP';}}
+$('#mapBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!player)return;overview=!overview;zoomMul=1;updMapBtn();});
 function measure(){if(state==='galaxy'){galGeom();return;}const t=$('#top').getBoundingClientRect(),b=$('#bot').getBoundingClientRect();if(!t.height)return;
  const ob=$('#orders');ob.style.setProperty('--ob',(H-b.top+6)+'px');const o=ob.getBoundingClientRect(),port=H>=W;
  hudTop=port?Math.max($("#trow").getBoundingClientRect().bottom,$("#fleetw").getBoundingClientRect().bottom):t.bottom;hudBot=port&&o.height?H-o.top:H-b.top;

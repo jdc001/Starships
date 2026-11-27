@@ -1,6 +1,6 @@
 # Starships (working title)
 
-Version 0.8.0
+Version 0.8.1
 
 A squadron-scale starship combat game for iPhone and iPad, played in simultaneous turns.
 
@@ -14,6 +14,7 @@ You take up to three ships on each mission. Each turn you give every ship a cour
 
 - **Course:** tap or drag in space, or pick a tactical order (Strafe, Orbit, Lance, Evade, About, Stop). The dotted line shows exactly where you will go.
 - **Action:** Hold (bank weapon charge), Fire (release it when your guns bear), Scan (reveal the board, and yourself), Flank (top speed, no firing). A cloak adds Cloak, Strike (fire then cloak) and Ambush (decloak and fire). A tractor beam adds Tractor.
+- **Map:** pinch to zoom in or out, or tap MAP to see the whole battlefield.
 - **Squadron:** tap a ship or its button in the fleet bar to select it; tap an enemy to make it that ship's target. Guns that can't bear on the target fire at anything else in reach. Your ships share sensors.
 - **Jump, mines, drones:** Jump opens an aperture and brings the ship out anywhere you tap, but takes its weapons offline for two turns. Aft mines drop on top of any action every three turns. The Drone Swarm module launches four point-defence drones for three turns that can shoot down torpedoes.
 - **Railguns:** the longest-ranged weapon. Slugs fly straight, so fast, jinking ships can dodge them.
