@@ -145,6 +145,11 @@ canvas{position:fixed;inset:0;display:block}
 #gbot .ct{display:block;width:100%;text-align:left;font:inherit;color:#cfe9f2;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:8px 9px;margin:6px 0 0}
 #gbot .ct:disabled{opacity:.4}
 #gbot p{margin:3px 0;line-height:1.45;opacity:.85}
+.news{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.news .nh{font-size:12px;letter-spacing:.2em;color:var(--cy);margin-bottom:6px}
+.news .ni{font-size:12.5px;line-height:1.45;padding:5px 0 5px 10px;border-left:2px solid rgba(95,227,255,.25);margin:3px 0;opacity:.9}
+.news .ni i{font-style:normal;display:inline-block;min-width:26px;font-size:10px;opacity:.5;letter-spacing:.06em}
+.news .ni i:not(:empty)::before{content:'#'}
 #gside{display:contents}#gmap{position:relative}#gzoom{position:absolute;right:4px;bottom:4px;display:flex;flex-direction:column;gap:5px;pointer-events:auto}#gzoom button{font:inherit;font-size:16px;width:40px;height:36px;color:var(--cy);background:rgba(6,12,22,.8);border:1px solid var(--line);border-radius:8px}#gzoom button[data-z='0']{font-size:10px;letter-spacing:.06em}
 #gtop{order:0;flex:0 0 auto}#gmap{order:1;flex:0 0 auto;width:100%;aspect-ratio:1/1;max-height:60vh;pointer-events:none}#gbot{order:2;flex:1 1 0;min-height:120px}
 @media (orientation:landscape){#gal{flex-direction:row;align-items:stretch}#gside{display:flex;flex-direction:column;gap:6px;width:min(400px,46vw);flex:0 0 auto}#gal .gp{width:100%;max-width:none;align-self:stretch}#gmap{flex:1 1 auto;aspect-ratio:auto;max-height:none;height:auto}#greps{grid-template-columns:repeat(2,1fr)}}
@@ -710,11 +715,11 @@ function contractsFor(sid){const g=save.g,o=g.own[sid],cl=[...new Set(nbrs(sid).
 // a contract: fight for `client` against `foe` in sector `sid`
 function contract(sid,client,type,foe){
  const g=save.g,key=sid+':'+client+':'+type;if(g.offers[key])return g.offers[key];
- const S=SECT[sid],M=MT[type];foe=foe||g.own[sid];const sf=shareOf(foe),sc=shareOf(client);
+ const S=SECT[sid],M=MT[type],RK=S.cap?0:S.r;// capitals fight like the corefoe=foe||g.own[sid];const sf=shareOf(foe),sc=shareOf(client);
  // the map sets a floor; each ring also keeps pace with your fleet, so the core always outclasses you and the rim never does
- const rf=[3.2,2,1.3,1][S.r],mapB=450*Math.pow(rf,2.2)+sf*1500*rf+g.n*110,pv=fleetValue(),relB=pv*[1.3,.95,.7,.45][S.r]*(.85+sf*.9);
+ const rf=[3.2,2,1.3,1][RK],mapB=450*Math.pow(rf,2.2)+sf*1500*rf+g.n*110,pv=fleetValue(),relB=pv*[1.3,.95,.7,.45][RK]*(.85+sf*.9);
  let B=Math.max(mapB,relB);if(repOf(foe)<=-60)B*=1.25;if(sc>.4&&!M.def)B*=1.2;
- const st=relB>mapB?clamp([3,2,1,1][S.r]+(sf>.3?1:0)+(repOf(foe)<=-60?1:0),1,4):clamp(Math.round(1+(B-700)/3500),1,4);
+ const st=relB>mapB?clamp([3,2,1,1][RK]+(sf>.3?1:0)+(repOf(foe)<=-60?1:0),1,4):clamp(Math.round(1+(B-700)/3500),1,4);
  // fixed defences soak up part of the budget; defenders get help, so attackers come in strength
  const FB=B*(M.def?1.4:M.st==='base'?.55:M.st==='planet'?.72:M.st==='convoy'?.7:M.st==='escort'?.9:1),n=M.st&&M.st!=='escort'&&!M.def&&FB<900?0:Math.min(3,(FB<6500?1:FB<20000?2:3)+(M.def&&FB>=2500?1:0)),fleet=[],sm=clamp(B/7000,.3,1.25),nbat=B<2500?2:3;
  for(let i=0;i<n;i++){const lo=genEnemy(FB/n*rand(.85,1.15),foe);fleet.push({lo,pers:Math.random()<.6?EMP[foe].pers:pick(Object.keys(AIS))});}
@@ -730,11 +735,12 @@ function patronage(){let t=0;for(const e of EORD){const r=repOf(e);if(r>=25&&ali
 function discount(){let b=0;for(const e of EORD)if(repOf(e)>=40)b=Math.max(b,shareOf(e)*40);return Math.min(30,Math.round(Math.min(25,b)+3*perkCount('shipyard')));}
 const price=p=>Math.round(p*(1-discount()/100)/10)*10;
 // the rest of the galaxy fights while you're busy
-function galDrift(lines){const g=save.g;
+function galDrift(lines,evs){const g=save.g;evs=evs||[];
  for(let k=0;k<2;k++){const pairs=[];for(let i=0;i<SECT.length;i++)for(const n of nbrs(i))if(g.own[i]!==g.own[n])pairs.push([i,n]);if(!pairs.length)return;
   const[a,b]=pick(pairs),att=g.own[a],def=g.own[b],sa=shareOf(att),sd=shareOf(def);
   let p=clamp(.5+(sa-sd)*.6,.25,.7);if(sa>.4)p*=.6;if(sd>.4)p=Math.min(.8,p*1.3);
-  if(Math.random()<p){g.own[b]=att;lines.push(`<span style="color:${EMP[att].col}">${EMP[att].short}</span> took ${SECT[b].name} from the <span style="color:${EMP[def].col}">${EMP[def].short}</span>`);
+  const took=Math.random()<p;evs.push({att,def,sid:b,src:a,took});
+  if(took){g.own[b]=att;lines.push(`<span style="color:${EMP[att].col}">${EMP[att].short}</span> took ${SECT[b].name} from the <span style="color:${EMP[def].col}">${EMP[def].short}</span>`);
    if(!alive(def))lines.push(`<b style="color:${EMP[def].col}">The ${EMP[def].name} has fallen.</b>`);}
   else lines.push(`<span style="color:${EMP[def].col}">${EMP[def].short}</span> held ${SECT[b].name} against the <span style="color:${EMP[att].col}">${EMP[att].short}</span>`);}
 }
@@ -1350,8 +1356,10 @@ function start(c,idx){
  cam.x=player.x;cam.y=player.y;for(let i=0;i<40;i++)updCam(.1);
  msg(MD.name.toUpperCase(),'#ffe066');if(OPT.hints)msg('ORDERS FOR EACH SHIP, THEN ENGAGE','#ffe066');
 }
+let galAnim=null;
 function endBattle(r){
  r=r||{win:false,retreat:true};
+ const own0=save.g.own.slice();
  const m=mission,g=save.g,S=SECT[m.sid],M=MT[m.type],ch=[],news=[],win=r.win,retreat=r.retreat;let earned=0,pat=0;
  // your ships come home with their damage, or they don't come home
  const lines=[];resDep=[];
@@ -1368,8 +1376,11 @@ function endBattle(r){
  else{earned=r.kills?Math.round(m.reward*r.kills/3/10)*10:retreat?0:Math.round(m.reward*.15/10)*10;save.losses++;repAdd(m.client,retreat?-4:-2,ch);
   if(M.def&&g.own[m.sid]===m.client){g.own[m.sid]=m.foe;news.push(`<span style="color:${EMP[m.foe].col}">${EMP[m.foe].short}</span> took ${S.name} from the <span style="color:${EMP[m.client].col}">${EMP[m.client].short}</span>`);
    if(!alive(m.client))news.push(`<b style="color:${EMP[m.client].col}">The ${EMP[m.client].name} has fallen.</b>`);}}
- g.n++;save.credits+=earned;galDrift(news);g.offers={};
- g.log=news.concat(g.log).slice(0,12);
+ // what the map does next: your own result first, then the rest of the galaxy's moves, played out on the map
+ const evs=[];if(M.terr||M.def){const took=g.own[m.sid]!==own0[m.sid],att=M.def?m.foe:m.client,def=M.def?m.client:m.foe;evs.push({att,def,sid:m.sid,src:SECT[m.sid].nb.find(n=>own0[n]===att),took,you:true,held:M.def&&!took});}
+ g.n++;save.credits+=earned;galDrift(news,evs);g.offers={};
+ galAnim={own0,evs,i:0,t:0};
+ g.log=news.map(l=>`<i>${g.n}</i>`+l).concat(g.log).slice(0,14);
  const won=checkWin();persist();
  $('#hud').classList.remove('on');state='menu';
  const t=Math.round(gameTime),row=(a,b)=>`<div><span>${a}</span><span>${b}</span></div>`;
@@ -1733,7 +1744,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.9.7';
+const VERSION='0.9.8';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1792,7 +1803,8 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:13.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>NEXT SHIP button beside ENGAGE to step through your squadron</li><li>RETREAT button in battle: your ships jump out, the mission is lost, but nobody is left behind</li><li>Pinching to zoom no longer changes the selected ship's orders</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>After each mission the galaxy map replays what happened: each attack flashes in the attacker's colour, and borders shift when a system falls. Tap to skip</li><li>Galaxy news has its own section, numbered by contract</li></ul>
+ <p><b>0.9.7</b></p><ul style="margin-top:0"><li>NEXT SHIP button beside ENGAGE to step through your squadron</li><li>RETREAT button in battle: your ships jump out, the mission is lost, but nobody is left behind</li><li>Pinching to zoom no longer changes the selected ship's orders</li></ul>
  <p><b>0.9.6</b></p><ul style="margin-top:0"><li>Zoom the galaxy map: pinch, scroll or use + and −, drag to move around. More system names appear the closer you zoom</li></ul>
  <p><b>0.9.5</b></p><ul style="margin-top:0"><li>Repair and salvage buttons for every ship on the results screen, plus REPAIR ALL</li></ul>
  <p><b>0.9.4</b></p><ul style="margin-top:0"><li>A redesigned shipyard: every hull shows its price, stat bars and role, and locked ships show which empires sell them, in their colours, with your standing</li><li>Trade-in: hand over any ship toward a new one, see exactly what it's worth and what you'll pay, and confirm. Buying asks for confirmation too</li></ul>
@@ -1818,13 +1830,21 @@ function loSummary(lo){const ws={};lo.mounts.forEach(m=>{if(m.t){const k=m.t==='
 let yardTab='ship';
 let gal={sel:-1,img:null,R:0,cx:0,cy:0,k:'',z:1,ox:0,oy:0};
 function hub(){if(ensureFleet())msg('THE GUILD LENDS YOU A KESTREL','#ffe066');galaxy();}
-function galaxy(){msgEl.innerHTML='';$('#scr').classList.remove('on');$('#hud').classList.remove('on');$('#gal').classList.add('on');state='galaxy';player=null;enemy=null;ships=[];galPanels();}
+function galaxy(){msgEl.innerHTML='';$('#scr').classList.remove('on');$('#hud').classList.remove('on');$('#gal').classList.add('on');state='galaxy';player=null;enemy=null;ships=[];
+ if(galAnim&&galAnim.evs.length){gal.anim=galAnim;gal.dispOwn=galAnim.own0.slice();gal.z=1;gal.ox=gal.oy=0;gal.sel=-1;}galAnim=null;galPanels();}
+// step the between-mission replay: each move flashes its target in the attacker's colour, then the border shifts if it fell
+function galAnimStep(dt){const A=gal.anim;if(!A)return;A.t+=dt;const e=A.evs[A.i];if(!e){endGalAnim();return;}
+ if(!e.done&&A.t>.75){e.done=true;if(e.took){gal.dispOwn[e.sid]=e.att;galBurst(e.sid,EMP[e.att].rgb);}}
+ if(A.t>1.45){A.i++;A.t=0;if(A.i>=A.evs.length)endGalAnim();}}
+function endGalAnim(){gal.anim=null;gal.dispOwn=null;gal.bursts=[];galPanels();}
+function galBurst(sid,rgb){(gal.bursts=gal.bursts||[]).push({sid,rgb,t:0});}
 function galPanels(){const g=save.g;
  $('#gcr').innerHTML=cr(save.credits);
  $('#greps').innerHTML=EORD.map(e=>{const r=repOf(e),a=alive(e);return`<span style="color:${EMP[e].col};opacity:${a?1:.35}"><b>${EMP[e].short}</b><i>${Math.round(shareOf(e)*100)}% · ${r>0?'+':''}${r}</i></span>`;}).join('');
  let h='';
  if(gal.sel<0){const ok=save.fleet.filter(opOK).length,hurt=save.fleet.filter(f=>!f.wreck&&f.dmg>.005).length,wr=save.fleet.length-ok;
-  h=`<h3>FLEET OF ${save.fleet.length} · RATING ${Math.round(fleetValue()).toLocaleString()}</h3><p>${save.fleet.map(f=>`${f.n} <span style="opacity:.6">${HULLS[f.lo.hull].name}${f.wreck?' · wrecked':f.dmg>.005?' · '+Math.round(100-f.dmg*100)+'%':''}</span>`).join(' · ')}</p>${hurt||wr?`<p style="color:#ffd166">${hurt?hurt+' damaged':''}${hurt&&wr?', ':''}${wr?wr+' wrecked':''}. The shipyard can fix that.</p>`:''}<p>Tap a star near a border to see the work on offer there. Gold-ringed stars are shipyards, trade hubs and forge worlds that help you while a friendly empire holds them. Core systems pay more and fight harder.</p>${g.log.slice(0,4).map(l=>`<p>${l}</p>`).join('')}`;}
+  h=`<h3>FLEET OF ${save.fleet.length} · RATING ${Math.round(fleetValue()).toLocaleString()}</h3><p>${save.fleet.map(f=>`${f.n} <span style="opacity:.6">${HULLS[f.lo.hull].name}${f.wreck?' · wrecked':f.dmg>.005?' · '+Math.round(100-f.dmg*100)+'%':''}</span>`).join(' · ')}</p>${hurt||wr?`<p style="color:#ffd166">${hurt?hurt+' damaged':''}${hurt&&wr?', ':''}${wr?wr+' wrecked':''}. The shipyard can fix that.</p>`:''}<p>Tap a star near a border to see the work on offer there. Gold-ringed stars are shipyards, trade hubs and forge worlds that help you while a friendly empire holds them. Core systems pay more and fight harder.</p>
+  ${g.log.length?`<div class="news"><div class="nh">GALAXY NEWS${gal.anim?' · REPLAYING':''}</div>${g.log.slice(0,8).map(l=>`<div class="ni">${l.startsWith('<i>')?l:'<i></i>'+l}</div>`).join('')}</div>`:''}`;}
  else{const S=SECT[gal.sel],o=g.own[gal.sel],cs=contractsFor(gal.sel);
   const T=STYPE[S.type];h=`<h3 style="color:${EMP[o].col}">${S.name.toUpperCase()}</h3><p><b>${T.n}</b> · ${RNAME[S.r].toLowerCase()} system · worth ${'★'.repeat(S.val)} · population ${S.pop} · held by the <span style="color:${EMP[o].col}">${EMP[o].name}</span></p>
    <p style="opacity:.75">${T.d.replace('{E}',EMP[o].short)}${S.id===SOL?' Home of humanity.':''}</p>${T.perk?`<p style="color:#ffe066">${T.perk}${repOf(o)>=25?' · active now':''}</p>`:''}`;
@@ -1850,7 +1870,7 @@ function galImg(R){const s=Math.ceil(R*2.2*DPR),c=document.createElement('canvas
  return c;}
 // territory: each pixel belongs to the nearest star, fading out into open space, so borders wander with the stars
 let terr={k:'',c:null};
-function terrImg(){const g=save.g,k=g.own.join(',');if(terr.k===k)return terr.c;
+function terrImg(){const g={own:gal.dispOwn||save.g.own},k=g.own.join(',');if(terr.k===k)return terr.c;
  const N=520,K=1.15,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d'),im=x.createImageData(N,N),own=new Array(N*N),dd=new Float32Array(N*N);
  const rgb={};for(const e of EORD)rgb[e]=EMP[e].rgb.split(',').map(Number);
  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const px=((i+.5)/N*2-1)*K,py=((j+.5)/N*2-1)*K;let b=-1,bd=9;
@@ -1864,7 +1884,7 @@ function terrImg(){const g=save.g,k=g.own.join(',');if(terr.k===k)return terr.c;
 const sxy=(S)=>({x:gal.cx+gal.ox+S.x*gal.R*gal.z,y:gal.cy+gal.oy+S.y*gal.R*gal.z});
 function drawGalaxy(){
  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#03050b';ctx.fillRect(0,0,W,H);
- const g=save.g;if(!gal.img)return;const Z=gal.z,R=gal.R*Z,cx=gal.cx+gal.ox,cy=gal.cy+gal.oy,iw=gal.img.width/DPR*Z/(gal.imgZ||1);
+ const g={own:gal.dispOwn||save.g.own};if(!gal.img)return;const Z=gal.z,R=gal.R*Z,cx=gal.cx+gal.ox,cy=gal.cy+gal.oy,iw=gal.img.width/DPR*Z/(gal.imgZ||1);
  ctx.globalAlpha=.8;ctx.drawImage(gal.img,cx-iw/2,cy-iw/2,iw,iw);ctx.globalAlpha=1;
  ctx.imageSmoothingEnabled=true;ctx.drawImage(terrImg(),cx-R*1.15,cy-R*1.15,R*2.3,R*2.3);
  const sel=gal.sel,cs=sel>=0?contractsFor(sel):[],cand=cs.map(c=>c.client),pl=.5+.5*Math.sin(performance.now()/250);
@@ -1889,12 +1909,26 @@ function drawGalaxy(){
  ctx.font='bold 10px ui-monospace,Menlo,monospace';
  for(const S of SECT)if(S.cap){const o=g.own[S.id],p=sxy(S);ctx.fillStyle=EMP[o].col;ctx.fillText(EMP[o].short.toUpperCase()+(o!==S.cap?' (TAKEN)':''),p.x,p.y+19);}
  ctx.shadowBlur=0;
+ const A=gal.anim;if(A){galAnimStep(1/60);const e=A.evs[A.i];
+  if(e){const S=SECT[e.sid],p=sxy(S),E=EMP[e.att],k=Math.min(1,A.t/.75),pl=.5+.5*Math.sin(A.t*18);
+   if(e.src!=null){const q=sxy(SECT[e.src]),f=Math.min(1,A.t/.6);ctx.strokeStyle=`rgba(${E.rgb},.95)`;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(q.x+(p.x-q.x)*f,q.y+(p.y-q.y)*f);ctx.stroke();}
+   ctx.fillStyle=`rgba(${E.rgb},${.25+.35*pl})`;ctx.beginPath();ctx.arc(p.x,p.y,14+10*k,0,TAU);ctx.fill();
+   ctx.strokeStyle=`rgba(${E.rgb},.95)`;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(p.x,p.y,10+22*(1-k)+6*pl,0,TAU);ctx.stroke();
+   if(!e.took&&A.t>.75){const D=EMP[e.def];ctx.strokeStyle=`rgba(${D.rgb},.95)`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,16,0,TAU);ctx.stroke();}
+   // caption
+   const txt=e.you?(e.held?`YOU HELD ${S.name.toUpperCase()} FOR THE ${EMP[e.def].short.toUpperCase()}`:e.took?`${EMP[e.att].short.toUpperCase()} TAKE ${S.name.toUpperCase()} · YOUR WORK`:`${EMP[e.def].short.toUpperCase()} HOLD ${S.name.toUpperCase()}`)
+    :e.took?`${EMP[e.att].short.toUpperCase()} TAKE ${S.name.toUpperCase()} FROM THE ${EMP[e.def].short.toUpperCase()}`:`${EMP[e.def].short.toUpperCase()} HOLD ${S.name.toUpperCase()} AGAINST THE ${EMP[e.att].short.toUpperCase()}`;
+   const m=$('#gmap').getBoundingClientRect();ctx.font='bold 13px ui-monospace,Menlo,monospace';ctx.textAlign='center';const tw=ctx.measureText(txt).width+24;
+   ctx.fillStyle='rgba(4,8,16,.85)';ctx.fillRect(m.left+m.width/2-tw/2,m.top+8,tw,26);ctx.fillStyle=e.took?E.col:EMP[e.def].col;ctx.fillText(txt,m.left+m.width/2,m.top+26);
+   ctx.font='10px ui-monospace,Menlo,monospace';ctx.fillStyle='rgba(220,230,255,.6)';ctx.fillText(`MOVE ${A.i+1} OF ${A.evs.length} · TAP TO SKIP`,m.left+m.width/2,m.top+46);}}
+ for(const b of gal.bursts||[]){b.t+=1/60;const p=sxy(SECT[b.sid]),f=b.t/1;if(f>1)continue;ctx.strokeStyle=`rgba(${b.rgb},${1-f})`;ctx.lineWidth=4*(1-f)+1;ctx.beginPath();ctx.arc(p.x,p.y,10+60*f,0,TAU);ctx.stroke();}
+ if(gal.bursts)gal.bursts=gal.bursts.filter(b=>b.t<1);
 }
 // pinch or scroll to zoom the galaxy, drag to pan, tap a star to select it
 const gptr=new Map();let gdrag=null,gpinch=null;
 function galZoom(nz,mx,my){nz=clamp(nz,1,5);const u=(mx-gal.cx-gal.ox)/(gal.R*gal.z),v=(my-gal.cy-gal.oy)/(gal.R*gal.z);gal.z=nz;gal.ox=mx-gal.cx-u*gal.R*nz;gal.oy=my-gal.cy-v*gal.R*nz;galClamp();}
 function galClamp(){const L=gal.R*(gal.z-1)+gal.R*.3;if(gal.z<=1.001){gal.ox=gal.oy=0;}gal.ox=clamp(gal.ox,-L,L);gal.oy=clamp(gal.oy,-L,L);}
-function galDown(e){gptr.set(e.pointerId,{x:e.clientX,y:e.clientY});
+function galDown(e){if(gal.anim){endGalAnim();return;}gptr.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(gptr.size===2){const[a,b]=[...gptr.values()];gpinch={d:Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)),z:gal.z};gdrag=null;return;}
  gdrag={x:e.clientX,y:e.clientY,ox:gal.ox,oy:gal.oy,moved:false};}
 function galMove(e){if(!gptr.has(e.pointerId))return;gptr.set(e.pointerId,{x:e.clientX,y:e.clientY});
