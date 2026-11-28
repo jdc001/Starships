@@ -1680,7 +1680,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.9.0';
+const VERSION='0.9.1';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1702,7 +1702,7 @@ function title(){state='title';player=null;enemy=null;ships=[];msgEl.innerHTML='
  <button class="btn ${g?'alt':''} wide" data-act="newgame">NEW CAMPAIGN</button>
  <button class="btn alt wide" data-act="saves">SAVE AND LOAD</button>
  <button class="btn alt wide" data-act="options">OPTIONS</button>
- <div style="margin-top:10px"><button class="btn alt sm" data-act="about">ABOUT</button><button class="btn alt sm" data-act="privacy">PRIVACY POLICY</button></div>
+ <div style="margin-top:10px">${newer?'':'<button class="btn alt sm" data-act="checkupd">CHECK FOR UPDATE</button>'}<button class="btn alt sm" data-act="about">ABOUT</button><button class="btn alt sm" data-act="privacy">PRIVACY POLICY</button></div>
  <div style="font-size:11px;opacity:.4;margin-top:12px;letter-spacing:.14em">v${VERSION}</div></div>`);}
 function newGame(){show(`<h2>NEW CAMPAIGN</h2><div class="tag">CHOOSE YOUR HOME PORT</div>
  <p style="font-size:13px;opacity:.8;line-height:1.5">You're an independent captain with one Kestrel and a little money. Build it into a squadron of up to three ships per mission. Your home port starts out friendly; every other empire is neutral. You can work for anyone.${hasGame()?' <b style="color:#ff9a6b">Starting a new campaign replaces your current one. Save it to a slot first if you want to keep it.</b>':''}</p>
@@ -1739,7 +1739,8 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:13.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>A new galaxy: 96 named star systems strung along the spiral arms and linked by hyperlanes, with organic borders that grow out from six capitals instead of pie slices</li><li>Every system has a character: shipyards, trade hubs, forge worlds, fortress worlds, ocean worlds, ancient ruins, nebula havens and more, each with a population and a description, and battles there are fought over that world</li><li>Shipyards, trade hubs and forge worlds held by friendly empires make ships, patronage and repairs better for you</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>A CHECK FOR UPDATE button on the title screen</li></ul>
+ <p><b>0.9.0</b></p><ul style="margin-top:0"><li>A new galaxy: 96 named star systems strung along the spiral arms and linked by hyperlanes, with organic borders that grow out from six capitals instead of pie slices</li><li>Every system has a character: shipyards, trade hubs, forge worlds, fortress worlds, ocean worlds, ancient ruins, nebula havens and more, each with a population and a description, and battles there are fought over that world</li><li>Shipyards, trade hubs and forge worlds held by friendly empires make ships, patronage and repairs better for you</li></ul>
  <p><b>0.8.3</b></p><ul style="margin-top:0"><li>New mission: Escort Convoy. Your client's freighters cross the map and you keep the raiders off them</li><li>Your ships never damage each other or friendly freighters, and Concord enemies now show in hostile red so they can't be mistaken for your own ships</li></ul>
  <p><b>0.8.2</b></p><ul style="margin-top:0"><li>Easier start: rim contracts now match a lone Kestrel, you start with 1,500 cr, Landers cost 3,000 and Wasps 3,500, and planet and starbase defences scale with the sector</li><li>Capture missions only show up once you own a working Lander</li></ul>
  <p><b>0.8.1</b></p><ul style="margin-top:0"><li>Pinch to zoom the battle map, and a MAP button that shows the whole battlefield</li></ul>
@@ -1920,6 +1921,10 @@ function act(a,arg){
   case'hub':hub();break;
   case'title':title();break;
   case'update':location.replace(location.pathname+'?v='+newer+'.'+Date.now());break;
+  // ask the server for the latest version, and reload past the phone's cache whatever the answer
+  case'checkupd':{msg('CHECKING FOR UPDATES','#5fe3ff');let done=false;const go=v=>{if(done)return;done=true;if(v&&vnum(v)>vnum(VERSION)){msg('UPDATING TO '+v,'#7dffb0');setTimeout(()=>location.replace(location.pathname+'?v='+v+'.'+Date.now()),400);}
+    else if(v){msg('UP TO DATE · VERSION '+VERSION,'#7dffb0');}else{msg('COULD NOT REACH THE SERVER · RELOADING','#ffd166');setTimeout(()=>location.replace(location.pathname+'?v=r'+Date.now()),600);}};
+   try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>go(j&&j.version),()=>go(null));}catch(e){go(null);}setTimeout(()=>go(null),6000);break;}
   case'continue':titleBack='hub';hub();break;
   case'newgame':newGame();break;
   case'startgame':save=defSave(arg);persist();gal.sel=-1;titleBack='hub';hub();break;
