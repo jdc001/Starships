@@ -55,6 +55,8 @@ canvas{position:fixed;inset:0;display:block}
 .ac.on{border-color:#a8ffcf;background:rgba(168,255,207,.15);box-shadow:0 0 10px rgba(168,255,207,.35)}.ac.on b,.ac.on small{color:#a8ffcf;opacity:1}
 .ac:disabled{opacity:.25}
 .wb .pips{font-size:9px;letter-spacing:1px;color:var(--wc)}
+#engRow{display:flex;gap:6px}#engRow #engBtn{flex:1}
+#nextBtn{font:inherit;font-size:12px;font-weight:700;letter-spacing:.1em;color:#ffe066;background:rgba(8,16,28,.85);border:1px solid rgba(255,224,102,.55);border-radius:10px;padding:0 10px;white-space:nowrap}
 #engBtn{position:relative;overflow:hidden;font:inherit;font-size:13px;font-weight:700;letter-spacing:.22em;color:#04060c;background:#ffe066;border:0;border-radius:10px;padding:11px 0;box-shadow:0 0 16px rgba(255,224,102,.45)}
 #engBtn span{position:relative}
 #engBar{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.35)}
@@ -72,7 +74,7 @@ canvas{position:fixed;inset:0;display:block}
 @media (orientation:portrait){#orders{position:fixed;left:6px;right:6px;bottom:var(--ob,200px)}.ob{flex:1;width:auto;max-width:72px}}
 @media (orientation:landscape){#top{display:grid;grid-template-columns:minmax(0,190px) 1fr minmax(0,190px);grid-template-areas:"p t e" "p f e" "p o e";column-gap:8px;row-gap:5px;align-items:start}
  .cards{display:contents}#pCard{grid-area:p;width:auto}#enemyCard{grid-area:e;width:auto}#trow{grid-area:t}#orders{grid-area:o}#fleetw{grid-area:f}
- #engBtn{position:fixed;left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));width:190px;z-index:2}
+ #engRow{position:fixed;left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));width:330px;z-index:2}
  #acts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(max(10px,env(safe-area-inset-bottom)) + 50px);width:min(440px,52vw);z-index:2}
  #shw{display:none}}
 #trow .panel{display:flex;padding:3px;gap:3px;align-items:center}
@@ -209,10 +211,11 @@ ul{padding-left:18px;margin:10px 0 0;font-size:13px;line-height:1.55;opacity:.85
    <div class="panel" id="sens"><span class="lbl">SENSORS</span><b id="sensV">CONTACT</b></div>
    <button class="ib" id="crsBtn" style="display:none">+ WAYPOINT</button>
    <button class="ib" id="mapBtn">MAP</button>
-   <button class="ib" id="muteBtn">SND</button>
+   <button class="ib" id="muteBtn" style="display:none">SND</button>
+   <button class="ib" id="retBtn" style="color:#ff9a6b;border-color:rgba(255,154,107,.5)">RETREAT</button>
   </div>
   <div id="fleetw"><div id="fleet"></div><div id="obj"></div></div>
-  <div id="orders"><button id="engBtn"><i id="engBar"></i><span id="engL">ENGAGE</span></button><div id="acts"></div><div id="pats"></div></div>
+  <div id="orders"><div id="engRow"><button id="nextBtn">NEXT SHIP ▶</button><button id="engBtn"><i id="engBar"></i><span id="engL">ENGAGE</span></button></div><div id="acts"></div><div id="pats"></div></div>
  </div>
  <div id="bot">
   <div style="display:flex;gap:6px;align-items:flex-end">
@@ -1646,7 +1649,7 @@ $('#pauseBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(state===
 $('#engBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!player)return;initAudio();if(state==='plan')engage();else if(state==='exec')ffwd=ffwd>1?1:2;});
 $('#muteBtn').addEventListener('pointerdown',e=>{e.preventDefault();initAudio();muted=!muted;OPT.sound=!muted;applyOpt();$('#muteBtn').style.opacity=muted?.4:1;});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='exec')pause();});
-function pause(){prevState=state;state='pause';show(`<h2>PAUSED</h2><div class="tag">${mission.name.toUpperCase()}</div><p style="font-size:13.5px;opacity:.85">${MT[mission.type].d}</p><button class="btn" data-act="resume">RESUME</button><button class="btn alt" data-act="retreat">RETREAT</button>
+function pause(){prevState=state;state='pause';show(`<h2>PAUSED</h2><div class="tag">${mission.name.toUpperCase()}</div><p style="font-size:13.5px;opacity:.85">${MT[mission.type].d}</p><button class="btn" data-act="resume">RESUME</button><button class="btn alt" data-act="retreatq">RETREAT</button><button class="btn alt" data-act="sndtog" id="sndP">SOUND ${muted?'OFF':'ON'}</button>
  <ul><li>You command up to three ships. Tap a ship (or its button in the fleet bar) to select it, then give it a course and ONE action. When every ship has orders, ENGAGE. Everyone, friend and enemy, carries out their orders together. The enemy chooses in secret.</li>
  <li>AUTO hands a ship to its own captain. Tap AUTO again, or give it any order, to take it back.</li>
  <li>Tap an enemy, or use ◀ ▶ on the target card, to choose the selected ship's target. FOCUS (the default) keeps its guns on that target only. Switch to FREE and guns that can't bear on the target fire at anything else in reach.</li>
@@ -1719,7 +1722,7 @@ function updHUD(){
   b.style.background=`conic-gradient(${colOf(k)} ${ch/cp*100}%, rgba(255,255,255,.08) 0)`;
   b.querySelector('.pips').textContent='●'.repeat(Math.floor(ch))+'○'.repeat(cp-Math.floor(ch));
   b.querySelector('span').textContent=!ar?'OFF':state==='exec'&&firing(player)&&ts.st==='ok'?'FIRING':ch<1?Math.floor(ch*100)+'%':'READY';});
- const eb=$('#engBtn');eb.classList.toggle('run',state!=='plan');
+ const eb=$('#engBtn');eb.classList.toggle('run',state!=='plan');{const nb=$('#nextBtn'),n=fleet.filter(s=>s.alive).length;nb.style.display=n>1&&state==='plan'?'':'none';}
  $('#engL').textContent=state==='plan'?'ENGAGE · TURN '+turnN:state==='exec'?(turnT>=TURN?'TURN '+turnN+' · RESOLVING':'TURN '+turnN+(ffwd>1?' · 2X':' · TAP FOR 2X')):'';
  $('#engBar').style.width=(state==='exec'?Math.min(1,turnT/TURN)*100:0)+'%';
  const tp=player.thr*100;$('#thrF').style.height=tp+'%';$('#thrK').style.bottom=`calc(${tp}% - 2px)`;$('#thrV').textContent=flankOn(player)?'MAX':player.thrAuto&&player.ps.k!=='manual'?'AUTO':Math.round(tp);
@@ -1730,7 +1733,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.9.6';
+const VERSION='0.9.7';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1789,7 +1792,8 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:13.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Zoom the galaxy map: pinch, scroll or use + and −, drag to move around. More system names appear the closer you zoom</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>NEXT SHIP button beside ENGAGE to step through your squadron</li><li>RETREAT button in battle: your ships jump out, the mission is lost, but nobody is left behind</li><li>Pinching to zoom no longer changes the selected ship's orders</li></ul>
+ <p><b>0.9.6</b></p><ul style="margin-top:0"><li>Zoom the galaxy map: pinch, scroll or use + and −, drag to move around. More system names appear the closer you zoom</li></ul>
  <p><b>0.9.5</b></p><ul style="margin-top:0"><li>Repair and salvage buttons for every ship on the results screen, plus REPAIR ALL</li></ul>
  <p><b>0.9.4</b></p><ul style="margin-top:0"><li>A redesigned shipyard: every hull shows its price, stat bars and role, and locked ships show which empires sell them, in their colours, with your standing</li><li>Trade-in: hand over any ship toward a new one, see exactly what it's worth and what you'll pay, and confirm. Buying asks for confirmation too</li></ul>
  <p><b>0.9.3</b></p><ul style="margin-top:0"><li>Ships no longer fire any weapon through a planet</li><li>Target control: ◀ ▶ on the target card cycles targets, and FOCUS keeps the ship's guns on its chosen target only (tap for FREE fire)</li><li>Precise courses: up to five waypoints with + WAYPOINT, drag any waypoint to move it, tap one to remove it, and tap the last one to make the ship brake to a stop there and turn to face its target</li></ul>
@@ -2056,7 +2060,11 @@ function act(a,arg){
   case'buymod':{const M=MODS[arg];if(!unlocked('mod',arg))return;if(M.price>save.credits||lo.mods.length>=HULLS[lo.hull].mods)return;save.credits-=M.price;lo.mods.push(arg);persist();yard();break;}
   case'sellmod':{save.credits+=Math.round(MODS[arg].price/2);lo.mods=lo.mods.filter(k=>k!==arg);persist();yard();break;}
   case'resume':$('#scr').classList.remove('on');state=prevState;last=performance.now();break;
-  case'retreat':$('#scr').classList.remove('on');endBattle({win:false,retreat:true});break;
+  case'retreatq':if(state!=='pause'){prevState=state;state='pause';}
+   show(`<h2>RETREAT?</h2><p style="font-size:14px;line-height:1.55;opacity:.9">Every ship still flying jumps out now. The mission counts as a loss with no pay, and the ${EMP[mission.client].short} think a little less of you.${MT[mission.type].def?' Without you, the sector falls.':''} Your ships keep the damage they've taken, but none are lost.</p>
+   <button class="btn" data-act="retreat">RETREAT NOW</button><button class="btn alt" data-act="resume">KEEP FIGHTING</button>`);break;
+  case'retreat':$('#scr').classList.remove('on');for(const s of fleet)if(s.alive){aperture(s.x+Math.cos(s.a)*40,s.y+Math.sin(s.a)*40,50,s.S.rgb,s.a,'p');}sfx('phase',1);endBattle({win:false,retreat:true});break;
+  case'sndtog':initAudio();muted=!muted;OPT.sound=!muted;applyOpt();$('#sndP').textContent='SOUND '+(muted?'OFF':'ON');break;
   case'opt:sound':OPT.sound=!OPT.sound;applyOpt();optionsScreen();break;
   case'opt:vol-':OPT.vol=Math.max(0,Math.round((OPT.vol-.1)*10)/10);applyOpt();optionsScreen();break;
   case'opt:vol+':OPT.vol=Math.min(1,Math.round((OPT.vol+.1)*10)/10);applyOpt();optionsScreen();break;
@@ -2106,6 +2114,9 @@ function cycleTarget(d){const P=player;if(!P||!P.alive)return;const L=ships.filt
 function updCrs(){const b=$('#crsBtn');if(!b)return;const m=player&&player.alive&&!player.auto&&player.ps.k==='manual'&&state==='plan';b.style.display=m?'':'none';b.classList.toggle('on',addWP);b.textContent=addWP?'TAP MAP':'+ WAYPOINT';
  const f=$('#focusBtn');if(f&&player){f.textContent=player.focus?'FOCUS':'FREE';f.classList.toggle('on',!!player.focus);}}
 $('#crsBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state!=='plan'||!player)return;if(!player.wps||!player.wps.length){msg('TAP THE MAP TO START A COURSE FIRST','#ff9a6b');return;}if(player.wps.length>=5){msg('FIVE WAYPOINTS AT MOST','#ff9a6b');return;}addWP=!addWP;updCrs();if(addWP)msg('TAP THE MAP TO ADD A WAYPOINT','#5fe3ff');});
+function nextShip(){const L=fleet.filter(s=>s.alive);if(L.length<2)return;const n=L[(L.indexOf(player)+1)%L.length];select(n);msg(uname(n)+(n.auto?' · AUTO':'')+' SELECTED','#ffe066');}
+$('#nextBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();nextShip();});
+$('#retBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='plan'||state==='exec')act('retreatq');});
 $('#tPrev').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();cycleTarget(-1);});
 $('#tNext').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();cycleTarget(1);});
 $('#focusBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!player)return;player.focus=!player.focus;updCrs();msg(player.focus?uname(player)+' FIRES ONLY ON ITS TARGET':uname(player)+' FIRES ON ANYTHING IN REACH, TARGET FIRST','#ffe066');});
@@ -2113,15 +2124,18 @@ $('#focusBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropa
 const ptrs=new Map();let pinch=null,undo=null;
 function snapOrders(){if(!player)return null;return{p:player,wps:(player.wps||[]).map(w=>({x:w.x,y:w.y})),wpStop:player.wpStop,wp:{x:player.wp.x,y:player.wp.y},wpDone:player.wpDone,ps:Object.assign({},player.ps),tgt:player.tgt,foldTo:player.foldTo,auto:player.auto,thrAuto:player.thrAuto};}
 function restoreOrders(u){if(!u||!u.p.alive)return;const p=u.p;if(player!==p)select(p);Object.assign(p,{wps:u.wps,wpStop:u.wpStop,wp:u.wp,wpDone:u.wpDone,ps:u.ps,tgt:u.tgt,foldTo:u.foldTo,auto:u.auto,thrAuto:u.thrAuto});enemy=u.tgt;updOrders();updFleetBar(true);}
+// a touch does nothing until it is clearly a tap (lifted) or a drag (moved); a second finger turns it into a pinch with no orders changed
+let pend=null;
 cvs.addEventListener('pointerdown',e=>{if(state==='galaxy'){galDown(e);return;}ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
- if(ptrs.size===2){dragging=false;if(state==='plan')restoreOrders(undo);undo=null;const[a,b]=[...ptrs.values()];pinch={d:Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)),z:zoomMul,ov:overview};return;}
- if(ptrs.size>2)return;undo=state==='plan'?snapOrders():null;dragging=true;setWP(e,true);});
+ if(ptrs.size===2){dragging=false;if(pend&&pend.applied&&state==='plan')restoreOrders(undo);pend=null;undo=null;const[a,b]=[...ptrs.values()];pinch={d:Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)),z:zoomMul,ov:overview};return;}
+ if(ptrs.size>2)return;undo=state==='plan'?snapOrders():null;dragging=true;pend={ev:{clientX:e.clientX,clientY:e.clientY},applied:false,t:performance.now()};});
 addEventListener('pointermove',e=>{if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(pinch&&ptrs.size>=2){const[a,b]=[...ptrs.values()],r=Math.hypot(a.x-b.x,a.y-b.y)/pinch.d;
   if(pinch.ov){if(r>1.08){overview=false;pinch.ov=false;pinch.z=.3/r;}else return;}
   zoomMul=clamp(pinch.z*r,.15,5);updMapBtn();return;}
- if(dragging&&player&&player.ps.k==='manual')setWP(e,false);});
-function ptrUp(e){if(dragging&&!pinch&&ptrs.size===1)wpTapEnd();ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;dragging=false;dragWP=-1;}
+ if(dragging&&pend&&player){if(!pend.applied){if(Math.hypot(e.clientX-pend.ev.clientX,e.clientY-pend.ev.clientY)<10)return;pend.applied=true;setWP(pend.ev,true);}
+  if(player.ps.k==='manual')setWP(e,false);}});
+function ptrUp(e){if(dragging&&!pinch&&ptrs.size===1&&pend){if(!pend.applied){pend.applied=true;setWP(pend.ev,true);}wpTapEnd();}pend=null;ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;dragging=false;dragWP=-1;}
 addEventListener('pointerup',ptrUp);addEventListener('pointercancel',ptrUp);
 cvs.addEventListener('wheel',e=>{if(!player)return;e.preventDefault();if(overview&&e.deltaY<0){overview=false;zoomMul=.3;}else zoomMul=clamp(zoomMul*Math.exp(-e.deltaY*.0015),.15,5);updMapBtn();},{passive:false});
 // the whole battlefield at once
