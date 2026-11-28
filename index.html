@@ -177,6 +177,20 @@ h2{margin:0 0 4px;font-size:18px;letter-spacing:.2em;color:var(--cy)}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .stats{font-size:14px;line-height:1.8;margin:12px 0 6px}
 .stats div{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06)}
+.shipcard{border:1px solid rgba(255,255,255,.1);border-left:3px solid var(--rc);border-radius:12px;padding:12px 13px;margin:10px 0;background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01))}
+.sc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.sc-name{font-size:17px;letter-spacing:.14em;display:block}
+.sc-role{display:inline-block;margin-top:4px;font-size:11px;letter-spacing:.12em;color:var(--rc);border:1px solid var(--rc);border-radius:5px;padding:2px 6px}
+.sc-price{font-size:16px;color:#ffe066;white-space:nowrap}.sc-price s{font-size:12px;opacity:.5;color:#cfe9f2}
+.sc-body{display:flex;gap:12px;align-items:center;margin:8px 0 4px;flex-wrap:wrap}
+.sc-img{width:150px;flex:0 0 auto;filter:drop-shadow(0 0 10px rgba(95,227,255,.25))}
+.bars{flex:1 1 170px;display:grid;grid-template-columns:auto 1fr auto;gap:5px 8px;align-items:center;font-size:12px}
+.bars span{opacity:.7}.bars b{font-weight:600;text-align:right}
+.bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;background:var(--rc);border-radius:3px}
+.sc-desc{font-size:13px;line-height:1.5;opacity:.85;margin:6px 0}
+.sc-kit{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;opacity:.85}.sc-kit b{color:#fff;font-weight:600}
+.sc-lock{font-size:12.5px;margin:10px 0 0;line-height:1.7}
+.sc-btns{margin-top:8px}
 ul{padding-left:18px;margin:10px 0 0;font-size:13px;line-height:1.55;opacity:.85}
 </style>
 </head>
@@ -422,7 +436,12 @@ const UNLOCK={
 };
 const repOf=e=>save.g?save.g.rep[e]||0:0;
 function unlocked(cat,k){const u=UNLOCK[cat][k];return !u||u.some(([e,r])=>repOf(e)>=r);}
-function lockTxt(cat,k){return 'NEEDS '+UNLOCK[cat][k].map(([e,r])=>`${EMP[e].short.toUpperCase()} REP ${r}`).join(' OR ');}
+// who sells it: each empire in its own colour, with your standing next to the rep they ask for
+function lockTxt(cat,k){return '<span style="opacity:.7">NEEDS</span> '+UNLOCK[cat][k].map(([e,r])=>`<span style="color:${EMP[e].col};white-space:nowrap"><b>${EMP[e].short.toUpperCase()}</b> ${r}<span style="opacity:.65"> (YOU ${repOf(e)})</span></span>`).join(' <span style="opacity:.6">OR</span> ');}
+const ROLECOL={esc:'#5fe3ff',sk:'#ff8fd0',trans:'#ffd166',gun:'#ff9a6b',line:'#7dffb0',art:'#c9a8ff',cap:'#4f8cff'};
+const SMAX={hull:660,sh:200,speed:290,turn:2.3,sens:1.35};
+function statBars(X){const b=(l,v,m,t)=>`<span>${l}</span><div class="bar"><i style="width:${Math.round(Math.min(1,v/m)*100)}%"></i></div><b>${t}</b>`;
+ return`<div class="bars">${b('Hull',X.hull,SMAX.hull,X.hull)}${b('Shields',X.sh,SMAX.sh,X.sh)}${b('Speed',X.speed,SMAX.speed,X.speed)}${b('Agility',X.turn,SMAX.turn,X.turn)}${b('Sensors',X.sens||1,SMAX.sens,Math.round((X.sens||1)*100)+'%')}</div>`;}
 const RINGS=4,RVAL=[3,2,1,1],RNAME=['Core','Inner','Mid','Rim'],GROT=1.75;
 function mulb(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 function pick2(a,q){return a[Math.floor(q()*a.length)];}
@@ -1699,7 +1718,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.9.3';
+const VERSION='0.9.4';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1758,7 +1777,8 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:13.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Ships no longer fire any weapon through a planet</li><li>Target control: ◀ ▶ on the target card cycles targets, and FOCUS keeps the ship's guns on its chosen target only (tap for FREE fire)</li><li>Precise courses: up to five waypoints with + WAYPOINT, drag any waypoint to move it, tap one to remove it, and tap the last one to make the ship brake to a stop there and turn to face its target</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>A redesigned shipyard: every hull shows its price, stat bars and role, and locked ships show which empires sell them, in their colours, with your standing</li><li>Trade-in: hand over any ship toward a new one, see exactly what it's worth and what you'll pay, and confirm. Buying asks for confirmation too</li></ul>
+ <p><b>0.9.3</b></p><ul style="margin-top:0"><li>Ships no longer fire any weapon through a planet</li><li>Target control: ◀ ▶ on the target card cycles targets, and FOCUS keeps the ship's guns on its chosen target only (tap for FREE fire)</li><li>Precise courses: up to five waypoints with + WAYPOINT, drag any waypoint to move it, tap one to remove it, and tap the last one to make the ship brake to a stop there and turn to face its target</li></ul>
  <p><b>0.9.2</b></p><ul style="margin-top:0"><li>More hyperlanes, including lanes across the gaps between spiral arms, so you can push from the rim toward the core and back</li></ul>
  <p><b>0.9.1</b></p><ul style="margin-top:0"><li>A CHECK FOR UPDATE button on the title screen</li></ul>
  <p><b>0.9.0</b></p><ul style="margin-top:0"><li>A new galaxy: 96 named star systems strung along the spiral arms and linked by hyperlanes, with organic borders that grow out from six capitals instead of pie slices</li><li>Every system has a character: shipyards, trade hubs, forge worlds, fortress worlds, ocean worlds, ancient ruins, nebula havens and more, each with a population and a description, and battles there are fought over that world</li><li>Shipyards, trade hubs and forge worlds held by friendly empires make ships, patronage and repairs better for you</li></ul>
@@ -1910,12 +1930,14 @@ function yard(){
   ${f.wreck?`<button class="btn gold sm" data-act="salvage" data-arg="${save.sel}" ${salvageCost(f)>save.credits?'disabled':''}>SALVAGE AND REBUILD · ${salvageCost(f).toLocaleString()} cr</button>`:f.dmg>.005?`<button class="btn gold sm" data-act="repair" data-arg="${save.sel}" ${repairCost(f)>save.credits?'disabled':''}>REPAIR · ${repairCost(f).toLocaleString()} cr</button>`:'<p style="color:var(--cy)">Fully repaired</p>'}
   <button class="btn alt sm" data-act="sellship" ${save.fleet.length<2?'disabled':''}>${f.wreck?'SCRAP':'SELL'} · +${sellVal(f).toLocaleString()} cr</button></div>
   <p style="font-size:13px;opacity:.7">You can keep up to ${MAXFLEET} ships and send up to ${MAXDEPLOY} on each mission. Damage stays with a ship until you repair it, and a destroyed ship stays a wreck until you salvage it.</p>`;}
- if(yardTab==='buy'){
-  h+=`<p style="font-size:13px;opacity:.75">Every hull fills a different role. Friendly empires sell their best designs. New ships come with stock weapons. Hangar: ${save.fleet.length}/${MAXFLEET}.${discount()?' Patron discount '+discount()+'%.':''}</p>`;
-  for(const k of HORDER){const X=HULLS[k],lk=!unlocked('hull',k),p=price(X.price),full=save.fleet.length>=MAXFLEET;
-   h+=`<div class="row"><div class="t"><b>${X.name.toUpperCase()}</b><span style="font-size:12px;opacity:.6">${ROLE[X.role].toUpperCase()}</span></div><img src="${shipPic('line',k,'95,227,255')}" style="width:150px;display:block;margin:2px 0"><p>${X.desc}</p>
-   <div class="kv"><span>Hull <b>${X.hull}</b></span><span>Shields <b>${X.sh}</b></span><span>Speed <b>${X.speed}</b></span><span>Turn <b>${X.turn}</b></span><span>Mounts <b>${X.mounts}+2</b></span><span>Modules <b>${X.mods}</b></span><span>Beams <b>${arcTxt(X.arcs.beam)}</b></span><span>Sensors <b>${Math.round((X.sens||1)*100)}%</b></span><span>Stock <b>${X.stock.map(t=>WD[t].name).join(', ')}</b></span></div>
-   ${lk?`<p style="color:#ff9a6b">${lockTxt('hull',k)}</p>`:`<button class="btn sm ${p<=save.credits&&!full?'gold':''}" data-act="buyship" data-arg="${k}" ${p>save.credits||full?'disabled':''}>${full?'HANGAR FULL':'BUY · '+p.toLocaleString()+' cr'}</button>`}</div>`;}}
+ if(yardTab==='buy'){const full=save.fleet.length>=MAXFLEET;
+  h+=`<p style="font-size:13px;opacity:.8">Every hull fills a different role. Empires that like you sell their designs. New ships come with stock weapons. Hangar ${save.fleet.length}/${MAXFLEET}.${discount()?` <span style="color:#ffe066">Patron discount ${discount()}%.</span>`:''}</p>`;
+  for(const k of HORDER){const X=HULLS[k],lk=!unlocked('hull',k),p=price(X.price),rc=ROLECOL[X.role];
+   h+=`<div class="shipcard" style="--rc:${rc}"><div class="sc-top"><div><b class="sc-name">${X.name.toUpperCase()}</b><span class="sc-role">${ROLE[X.role].toUpperCase()}</span></div><span class="sc-price">${p.toLocaleString()} cr${p<X.price?` <s>${X.price.toLocaleString()}</s>`:''}</span></div>
+   <div class="sc-body"><img src="${shipPic('line',k,'95,227,255')}" class="sc-img" style="opacity:${lk?.55:1}">${statBars(X)}</div>
+   <p class="sc-desc">${X.desc}</p>
+   <div class="sc-kit"><span>Weapons <b>${X.stock.map(t=>WD[t].name).join(', ')}</b></span><span>Mounts <b>${X.mounts}+2</b></span><span>Modules <b>${X.mods}</b></span><span>Beams <b>${arcTxt(X.arcs.beam)}</b></span></div>
+   ${lk?`<p class="sc-lock">${lockTxt('hull',k)}</p>`:`<div class="sc-btns"><button class="btn sm ${p<=save.credits&&!full?'gold':''}" data-act="buyq" data-arg="${k}" ${p>save.credits||full?'disabled':''}>${full?'HANGAR FULL':'BUY'}</button><button class="btn alt sm" data-act="tradepick" data-arg="${k}">TRADE IN A SHIP</button></div>`}</div>`;}}
  if(yardTab==='systems'&&!wrecked){for(const k in UPG){const l=lo.upg[k],c=UPC[l];
   h+=`<div class="row"><div class="t"><b>${UPG[k].name.toUpperCase()}</b><span class="lv">${'●'.repeat(l)}${'○'.repeat(4-l)}</span></div><p>${UPG[k].d}</p>
   ${l<4?`<button class="btn sm" data-act="upg" data-arg="${k}" ${c>save.credits?'disabled':''}>UPGRADE · ${c.toLocaleString()} cr</button>`:'<p style="color:var(--cy)">Maxed</p>'}</div>`;}}
@@ -1966,6 +1988,24 @@ function act(a,arg){
    OPT={sound:true,vol:.7,shake:true,turn:6,fast:false,hints:true};applyOpt();try{localStorage.removeItem(OPT_KEY);}catch(e){}save=defSave();title();break;
     case'yard':yardTab='ship';yard();$('#scrBox').scrollTop=0;break;
   case'selship':save.sel=+arg;if(yardTab==='buy')yardTab='ship';yard();break;
+  case'buyq':{const X=HULLS[arg],p=price(X.price);if(!unlocked('hull',arg)||save.fleet.length>=MAXFLEET||p>save.credits)return;
+   show(`<h2>BUY A ${X.name.toUpperCase()}?</h2><img src="${shipPic('line',arg,'95,227,255')}" style="width:200px;display:block;margin:6px auto">
+   <div class="stats"><div><span>Price</span><span class="cr">${p.toLocaleString()} cr</span></div><div><span>Your credits</span><span>${save.credits.toLocaleString()} cr</span></div><div><span>Left after</span><span class="cr">${(save.credits-p).toLocaleString()} cr</span></div><div><span>Hangar</span><span>${save.fleet.length+1}/${MAXFLEET}</span></div></div>
+   <button class="btn gold" data-act="buyship" data-arg="${arg}">BUY IT</button><button class="btn alt" data-act="tab" data-arg="buy">CANCEL</button>`);break;}
+  case'tradepick':{const X=HULLS[arg],p=price(X.price);if(!unlocked('hull',arg))return;
+   show(`<h2>TRADE IN FOR A ${X.name.toUpperCase()}</h2><div class="tag">PRICE ${p.toLocaleString()} CR · YOU HAVE ${save.credits.toLocaleString()} CR</div><p style="font-size:13px;opacity:.8">Choose the ship you want to hand over. It goes with everything fitted to it, and its value comes off the price.</p>
+   ${save.fleet.map((f,i)=>{const v=sellVal(f),net=p-v,ok=net<=save.credits;return`<div class="row"><div class="t"><b>${f.n.toUpperCase()}</b><span style="font-size:12px;opacity:.65">${HULLS[f.lo.hull].name.toUpperCase()}${f.wreck?' · WRECK':f.dmg>.005?' · '+Math.round(100-f.dmg*100)+'%':''}</span></div>
+    <div style="display:flex;gap:10px;align-items:center"><img src="${shipPic('line',f.lo.hull,'95,227,255',f.lo.mounts.filter(m=>m.t))}" style="width:110px;opacity:${f.wreck?.35:1}"><p style="margin:0">Trade-in value <b class="cr">${v.toLocaleString()} cr</b><br>${net>=0?`You pay <b class="cr">${net.toLocaleString()} cr</b>`:`You get back <b class="cr">${(-net).toLocaleString()} cr</b>`}</p></div>
+    <button class="btn sm ${ok?'gold':''}" data-act="tradeq" data-arg="${arg}:${i}" ${ok?'':'disabled'}>${ok?'TRADE THIS SHIP':'NOT ENOUGH CREDITS'}</button></div>`;}).join('')}
+   <button class="btn alt" data-act="tab" data-arg="buy">CANCEL</button>`);break;}
+  case'tradeq':{const[hk,si]=arg.split(':'),f=save.fleet[+si],X=HULLS[hk],p=price(X.price),v=sellVal(f),net=p-v;if(!f||net>save.credits)return;
+   show(`<h2>CONFIRM TRADE-IN</h2><div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0"><img src="${shipPic('line',f.lo.hull,'95,227,255',f.lo.mounts.filter(m=>m.t))}" style="width:120px;opacity:.7"><b style="font-size:22px;color:#ffe066">→</b><img src="${shipPic('line',hk,'95,227,255')}" style="width:120px"></div>
+   <div class="stats"><div><span>You hand over</span><span>${f.n} (${HULLS[f.lo.hull].name})</span></div><div><span>Trade-in value</span><span class="cr">${v.toLocaleString()} cr</span></div><div><span>${X.name} price</span><span class="cr">${p.toLocaleString()} cr</span></div>
+   <div><span>${net>=0?'You pay':'You get back'}</span><span class="cr">${Math.abs(net).toLocaleString()} cr</span></div><div><span>Credits after</span><span class="cr">${(save.credits-net).toLocaleString()} cr</span></div></div>
+   <p style="font-size:13px;opacity:.8">The new ${X.name} keeps the name ${f.n} and comes with stock weapons. Upgrades, weapons and modules on the old ship go with it.</p>
+   <button class="btn gold" data-act="tradeship" data-arg="${arg}">TRADE IT IN</button><button class="btn alt" data-act="tradepick" data-arg="${hk}">BACK</button>`);break;}
+  case'tradeship':{const[hk,si]=arg.split(':'),i=+si,f=save.fleet[i],p=price(HULLS[hk].price),net=p-(f?sellVal(f):0);if(!f||!unlocked('hull',hk)||net>save.credits)return;
+   save.credits-=net;save.fleet[i]={n:f.n,lo:newLo(hk),dmg:0,wreck:0};save.sel=i;persist();msg(f.n.toUpperCase()+' IS NOW A '+HULLS[hk].name.toUpperCase(),'#ffe066');yardTab='ship';yard();$('#scrBox').scrollTop=0;break;}
   case'buyship':{if(!unlocked('hull',arg)||save.fleet.length>=MAXFLEET)return;const p=price(HULLS[arg].price);if(p>save.credits)return;save.credits-=p;save.fleet.push(newShipRec(arg));save.sel=save.fleet.length-1;persist();msg('NEW SHIP: '+curShip().n.toUpperCase()+' · '+HULLS[arg].name.toUpperCase(),'#ffe066');yardTab='ship';yard();$('#scrBox').scrollTop=0;break;}
   case'sellship':{if(save.fleet.length<2)return;show(`<h2>${cf.wreck?'SCRAP':'SELL'} ${cf.n.toUpperCase()}?</h2><p style="font-size:14px;opacity:.8">You get ${sellVal(cf).toLocaleString()} cr for the ${HULLS[lo.hull].name} and everything fitted to it.</p><button class="btn" data-act="sellship2">${cf.wreck?'SCRAP':'SELL'}</button><button class="btn alt" data-act="yard">CANCEL</button>`);break;}
   case'sellship2':{if(save.fleet.length<2)return;save.credits+=sellVal(cf);save.fleet.splice(save.sel,1);save.sel=0;persist();yardTab='ship';yard();break;}
