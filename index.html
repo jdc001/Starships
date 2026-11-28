@@ -1350,9 +1350,9 @@ function endBattle(r){
  r=r||{win:false,retreat:true};
  const m=mission,g=save.g,S=SECT[m.sid],M=MT[m.type],ch=[],news=[],win=r.win,retreat=r.retreat;let earned=0,pat=0;
  // your ships come home with their damage, or they don't come home
- const lines=[];
+ const lines=[];resDep=[];
  for(const s of fleet){const f=save.fleet[s.fi];if(!f)continue;
-  if(s.alive){f.dmg=clamp(1-s.hull/s.maxHull,0,1);lines.push(`${f.n} (${HULLS[f.lo.hull].name}) · hull ${Math.round(100-f.dmg*100)}%${f.dmg>.005?' · repair '+repairCost(f).toLocaleString()+' cr':''}`);}
+  resDep.push(s.fi);if(s.alive){f.dmg=clamp(1-s.hull/s.maxHull,0,1);lines.push(`${f.n} (${HULLS[f.lo.hull].name}) · hull ${Math.round(100-f.dmg*100)}%${f.dmg>.005?' · repair '+repairCost(f).toLocaleString()+' cr':''}`);}
   else{f.wreck=1;f.dmg=1;lines.push(`<span style="color:#ff6b5a">${f.n} (${HULLS[f.lo.hull].name}) destroyed · salvage ${salvageCost(f).toLocaleString()} cr</span>`);}}
  if(win){earned=m.type==='convoy'?Math.round(m.reward*(r.kills||0)/3/10)*10:m.reward;save.wins++;
   if(M.terr&&g.own[m.sid]===m.foe){g.own[m.sid]=m.client;news.push(`<b style="color:${EMP[m.client].col}">${EMP[m.client].short}</b> took ${S.name} from the <span style="color:${EMP[m.foe].col}">${EMP[m.foe].short}</span>`);
@@ -1374,14 +1374,25 @@ function endBattle(r){
  <div class="tag">${sub}</div>
  <div class="stats">${row('Battle time',`${t/60|0}:${String(t%60).padStart(2,'0')}`)}${row('Damage dealt',Math.round(teamDealt('p')))}${row('Damage taken',Math.round(teamDealt('e')))}
  ${m.type==='convoy'?row('Freighters destroyed',(m.kills||0)+' of 3'):''}${m.type==='escort'?row('Freighters lost',(m.lostF||0)+' of 3'):''}
- ${row(win?'Contract pay':'Salvage pay','<span class="cr">+'+(earned-pat)+' cr</span>')}${pat?row('Patronage','<span class="cr">+'+pat+' cr</span>'):''}${row('Balance','<span class="cr">'+save.credits+' cr</span>')}
+ ${row(win?'Contract pay':'Salvage pay','<span class="cr">+'+(earned-pat)+' cr</span>')}${pat?row('Patronage','<span class="cr">+'+pat+' cr</span>'):''}${row('Balance','<span class="cr" id="rbal">'+save.credits+' cr</span>')}
  ${ch.map(([e,d])=>row(`<span style="color:${EMP[e].col}">${EMP[e].name}</span>`,`${d>0?'+':''}${d} → ${repOf(e)}`)).join('')}</div>
- <div style="font-size:13px;line-height:1.6;opacity:.9;margin-bottom:8px">${lines.join('<br>')}</div>
+ <div id="rlines" style="margin-bottom:12px">${resLines()}</div>
  <div style="font-size:13px;line-height:1.6;opacity:.85">${news.join('<br>')}</div>
  ${won?`<div class="row cur" style="margin-top:10px"><b style="color:#ffe066">${won.type==='conquest'?'GALACTIC CONQUEST':'BALANCE OF POWER'}</b><p>${won.type==='conquest'?`The ${EMP[won.e[0]].name} rules two thirds of the galaxy, and you put them there.`:`You have kept ${won.e.map(e=>'the '+EMP[e].short).join(', ')} strong and in balance, and every one of them owes you.`} You can keep playing or start a new campaign from Standings.</p></div>`:''}
  <button class="btn" data-act="hub">CONTINUE</button> <button class="btn alt" data-act="yard">SHIPYARD</button>`);
  player=null;enemy=null;ships=[];fleet=[];
 }
+// the squadron on the results screen, with repair and salvage right there
+let resDep=[];
+function resLines(){const dmg=save.fleet.filter(f=>!f.wreck&&f.dmg>.005),tot=dmg.reduce((a,f)=>a+repairCost(f),0);
+ let h=resDep.map(i=>{const f=save.fleet[i];if(!f)return'';const X=HULLS[f.lo.hull];
+  return`<div class="row" style="display:flex;align-items:center;gap:10px;padding:8px 10px"><img src="${shipPic('line',f.lo.hull,'95,227,255',f.lo.mounts.filter(m=>m.t))}" style="width:80px;opacity:${f.wreck?.3:1}">
+   <div style="flex:1"><b style="font-size:14px;letter-spacing:.08em">${f.n.toUpperCase()}</b> <span style="opacity:.6;font-size:12px">${X.name}</span><br>
+   ${f.wreck?'<span style="color:#ff6b5a">Destroyed</span>':`Hull <b style="color:${f.dmg>.5?'#ff6b5a':f.dmg>.005?'#ffd166':'#7dffb0'}">${Math.round(100-f.dmg*100)}%</b>`}</div>
+   ${f.wreck?`<button class="btn sm" data-act="rsalv" data-arg="${i}" ${salvageCost(f)>save.credits?'disabled':''}>SALVAGE ${salvageCost(f).toLocaleString()}</button>`:f.dmg>.005?`<button class="btn sm gold" data-act="rrep" data-arg="${i}" ${repairCost(f)>save.credits?'disabled':''}>REPAIR ${repairCost(f).toLocaleString()}</button>`:'<span style="color:#7dffb0;font-size:12px">READY</span>'}</div>`;}).join('');
+ if(dmg.length)h+=`<button class="btn gold" data-act="rrepall" ${dmg.some(f=>repairCost(f)<=save.credits)?'':'disabled'}>REPAIR ALL${dmg.length>resDep.length?' '+dmg.length+' SHIPS':''} · ${tot.toLocaleString()} cr</button>${tot>save.credits?'<div style="font-size:12px;opacity:.7;margin-top:4px">Not enough for everything: the cheapest repairs go first.</div>':''}`;
+ return h;}
+function resRefresh(){const el=$('#rlines');if(el)el.innerHTML=resLines();const b=$('#rbal');if(b)b.textContent=save.credits.toLocaleString()+' cr';}
 function step(dt){
  gameTime+=dt;
  if(state==='exec')for(const s of ships)if(s.alive&&(s.team==='e'||s.auto))aiFire(s,dt);
@@ -1718,7 +1729,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.9.4';
+const VERSION='0.9.5';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1777,7 +1788,8 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:13.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>A redesigned shipyard: every hull shows its price, stat bars and role, and locked ships show which empires sell them, in their colours, with your standing</li><li>Trade-in: hand over any ship toward a new one, see exactly what it's worth and what you'll pay, and confirm. Buying asks for confirmation too</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Repair and salvage buttons for every ship on the results screen, plus REPAIR ALL</li></ul>
+ <p><b>0.9.4</b></p><ul style="margin-top:0"><li>A redesigned shipyard: every hull shows its price, stat bars and role, and locked ships show which empires sell them, in their colours, with your standing</li><li>Trade-in: hand over any ship toward a new one, see exactly what it's worth and what you'll pay, and confirm. Buying asks for confirmation too</li></ul>
  <p><b>0.9.3</b></p><ul style="margin-top:0"><li>Ships no longer fire any weapon through a planet</li><li>Target control: ◀ ▶ on the target card cycles targets, and FOCUS keeps the ship's guns on its chosen target only (tap for FREE fire)</li><li>Precise courses: up to five waypoints with + WAYPOINT, drag any waypoint to move it, tap one to remove it, and tap the last one to make the ship brake to a stop there and turn to face its target</li></ul>
  <p><b>0.9.2</b></p><ul style="margin-top:0"><li>More hyperlanes, including lanes across the gaps between spiral arms, so you can push from the rim toward the core and back</li></ul>
  <p><b>0.9.1</b></p><ul style="margin-top:0"><li>A CHECK FOR UPDATE button on the title screen</li></ul>
@@ -1988,6 +2000,8 @@ function act(a,arg){
    OPT={sound:true,vol:.7,shake:true,turn:6,fast:false,hints:true};applyOpt();try{localStorage.removeItem(OPT_KEY);}catch(e){}save=defSave();title();break;
     case'yard':yardTab='ship';yard();$('#scrBox').scrollTop=0;break;
   case'selship':save.sel=+arg;if(yardTab==='buy')yardTab='ship';yard();break;
+  case'rrep':case'rsalv':{const f=save.fleet[+arg];if(!f)return;const c=a==='rrep'?repairCost(f):salvageCost(f);if(c>save.credits)return;save.credits-=c;if(a==='rrep')f.dmg=0;else{f.wreck=0;f.dmg=0;}persist();resRefresh();msg(f.n.toUpperCase()+(a==='rrep'?' REPAIRED':' REBUILT'),'#7dffb0');break;}
+  case'rrepall':{const L=save.fleet.filter(f=>!f.wreck&&f.dmg>.005).sort((x,y)=>repairCost(x)-repairCost(y));let n=0;for(const f of L){const c=repairCost(f);if(c>save.credits)continue;save.credits-=c;f.dmg=0;n++;}persist();resRefresh();msg(n?n+' SHIP'+(n>1?'S':'')+' REPAIRED':'NOT ENOUGH CREDITS',n?'#7dffb0':'#ff9a6b');break;}
   case'buyq':{const X=HULLS[arg],p=price(X.price);if(!unlocked('hull',arg)||save.fleet.length>=MAXFLEET||p>save.credits)return;
    show(`<h2>BUY A ${X.name.toUpperCase()}?</h2><img src="${shipPic('line',arg,'95,227,255')}" style="width:200px;display:block;margin:6px auto">
    <div class="stats"><div><span>Price</span><span class="cr">${p.toLocaleString()} cr</span></div><div><span>Your credits</span><span>${save.credits.toLocaleString()} cr</span></div><div><span>Left after</span><span class="cr">${(save.credits-p).toLocaleString()} cr</span></div><div><span>Hangar</span><span>${save.fleet.length+1}/${MAXFLEET}</span></div></div>

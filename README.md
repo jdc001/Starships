@@ -1,6 +1,6 @@
 # Starships (working title)
 
-Version 0.9.4
+Version 0.9.5
 
 A squadron-scale starship combat game for iPhone and iPad, played in simultaneous turns.
 
