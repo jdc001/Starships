@@ -1,6 +1,6 @@
 # Starships (working title)
 
-Version 0.8.3
+Version 0.9.0
 
 A squadron-scale starship combat game for iPhone and iPad, played in simultaneous turns.
 
@@ -44,9 +44,11 @@ Damage stays with a ship after a mission and costs credits to repair. A destroye
 
 ## The galaxy
 
-Six empires share a spiral galaxy, each starting with a sixth of it: the Terran Concord (home to Sol), the Kesh Dominion, the Orrun Hegemony, the Vael Collective, the Thane Free Worlds and the Sylari Choir. The map has 96 sectors in four rings. Core sectors are worth three times a rim sector and are defended by much stronger ships.
+Six empires share a spiral galaxy: the Terran Concord (capital Sol), the Kesh Dominion (Khessaru), the Orrun Hegemony (Grul Anvil), the Vael Collective (The Bloom), the Thane Free Worlds (Freeport) and the Sylari Choir (Choirhold). The map has 96 named star systems strung along the spiral arms and joined by hyperlanes, and each empire's territory grows out from its capital, so borders follow the stars. Every system has a type (shipyard, trade hub, forge world, fortress world, ocean world, ancient ruins, nebula haven, frontier outpost and more), a population and a description, and battles there are fought over that kind of world. Core systems are worth three times a rim system and are defended by much stronger ships.
 
-- **Contracts:** tap any border sector to see the missions on offer from each neighbouring empire, and the defence contract from its owner. Then pick your squadron in the briefing.
+- **Special systems:** shipyards (ships 3% cheaper each), trade hubs (patronage +10% each) and forge worlds (repairs 10% cheaper each, up to 40%) help you while an empire friendly to you (+25) holds them. They show as gold-ringed stars.
+
+- **Contracts:** tap any border system to see the missions on offer from each neighbouring empire, and the defence contract from its owner. Then pick your squadron in the briefing.
 - **Difficulty comes from the map:** how deep the sector is, how big the defending empire is, and how far into the campaign you are. Contracts also keep pace with your three best ships. Building a stronger squadron is how you push into the core.
 - **Reputation:** working for an empire raises your standing with it and lowers it with the one you hit. Below -40 an empire refuses to hire you; below -60 it sends its best against you.
 - **What reputation buys:** each empire unlocks its own hulls, modules and torpedo warheads. Friendly empires pay patronage after every win, scaled by their size, and allies give shipyard discounts.

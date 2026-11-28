@@ -22,7 +22,7 @@ canvas{position:fixed;inset:0;display:block}
 #top{display:flex;flex-direction:column;gap:6px}
 .cards{display:flex;justify-content:space-between;gap:8px}
 .card{width:min(42vw,250px);padding:6px 8px}
-.card .nm{font-size:10px;letter-spacing:.12em;display:flex;justify-content:space-between;gap:6px;white-space:nowrap;overflow:hidden}
+.card .nm{font-size:11px;letter-spacing:.12em;display:flex;justify-content:space-between;gap:6px;white-space:nowrap;overflow:hidden}
 .card .nm i{font-style:normal;opacity:.6}
 .hb{height:7px;border-radius:4px;background:rgba(255,255,255,.08);margin-top:4px;overflow:hidden}
 .hb b{display:block;height:100%;width:100%;border-radius:4px;transition:width .15s}
@@ -33,22 +33,22 @@ canvas{position:fixed;inset:0;display:block}
 #fleetw{pointer-events:auto;display:flex;flex-direction:column;gap:3px}
 #fleet{display:flex;gap:4px;justify-content:center}
 .fs{position:relative;font:inherit;color:#cfe9f2;background:var(--pan);border:1px solid var(--line);border-radius:8px;padding:4px 34px 6px 6px;flex:1;max-width:150px;min-width:0;text-align:left;overflow:hidden;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.fs .n{display:block;font-size:9px;letter-spacing:.08em;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fs .c{display:block;font-size:7.5px;letter-spacing:.08em;opacity:.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fs .n{display:block;font-size:10.5px;letter-spacing:.08em;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fs .c{display:block;font-size:8.5px;letter-spacing:.08em;opacity:.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fs i{position:absolute;left:0;bottom:0;height:2px}
 .fs.on{border-color:#ffe066;box-shadow:0 0 10px rgba(255,224,102,.35)}.fs.on .n{color:#ffe066}
 .fs.dead{opacity:.35}
-.fs .au{position:absolute;right:4px;top:50%;transform:translateY(-50%);font-style:normal;font-size:7px;letter-spacing:.06em;border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:3px 3px}
+.fs .au{position:absolute;right:4px;top:50%;transform:translateY(-50%);font-style:normal;font-size:8px;letter-spacing:.06em;border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:3px 3px}
 .fs .au.on{border-color:#7dffb0;color:#7dffb0;background:rgba(125,255,176,.12)}
-#obj{font-size:9px;letter-spacing:.1em;text-align:center;color:#ffe066;opacity:.85;text-shadow:0 0 6px rgba(0,0,0,.9)}
+#obj{font-size:10.5px;letter-spacing:.1em;text-align:center;color:#ffe066;opacity:.85;text-shadow:0 0 6px rgba(0,0,0,.9)}
 #orders{display:flex;flex-direction:column;gap:5px;align-items:stretch;pointer-events:auto}
 #pats,#acts{display:flex;gap:4px;justify-content:center}
 #acts{flex-wrap:wrap}#acts .ac{flex:1 1 18%}
 #sens{display:flex;align-items:center;gap:4px;padding:5px 8px;font-size:10px;letter-spacing:.1em}
 #sens b{font-weight:600;color:#7dffb0}#sens b.lost{color:#ff9a6b}#sens b.neb{color:#c9a8ff}
 .ac{font:inherit;color:#cfe9f2;background:var(--pan);border:1px solid rgba(168,255,207,.25);border-radius:8px;padding:5px 0;flex:1;max-width:80px;min-width:0;display:flex;flex-direction:column;align-items:center;gap:1px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.ac b{font-size:9px;letter-spacing:.05em;font-weight:600;white-space:nowrap}
-.ac small{font-size:7px;letter-spacing:.08em;opacity:.55;white-space:nowrap}
+.ac b{font-size:10.5px;letter-spacing:.05em;font-weight:600;white-space:nowrap}
+.ac small{font-size:8px;letter-spacing:.08em;opacity:.55;white-space:nowrap}
 .ac.on{border-color:#a8ffcf;background:rgba(168,255,207,.15);box-shadow:0 0 10px rgba(168,255,207,.35)}.ac.on b,.ac.on small{color:#a8ffcf;opacity:1}
 .ac:disabled{opacity:.25}
 .wb .pips{font-size:9px;letter-spacing:1px;color:var(--wc)}
@@ -61,8 +61,8 @@ canvas{position:fixed;inset:0;display:block}
 .mb.q{box-shadow:0 0 12px #ffe066}
 #hud.exec #orders .ob,#hud.exec #orders .ac,#hud.exec #wcol,#hud.exec #power,#hud.exec #thr{opacity:.55}
 .ob{font:inherit;color:#cfe9f2;background:var(--pan);border:1px solid var(--line);border-radius:8px;padding:4px 0 5px;width:60px;display:flex;flex-direction:column;align-items:center;gap:1px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.ob small{font-size:7px;letter-spacing:.14em;opacity:.55}
-.ob b{font-size:10px;letter-spacing:.06em;font-weight:600}
+.ob small{font-size:8px;letter-spacing:.14em;opacity:.55}
+.ob b{font-size:11.5px;letter-spacing:.06em;font-weight:600}
 .ob.on{border-color:#ffe066;background:rgba(255,224,102,.14);box-shadow:0 0 10px rgba(255,224,102,.35)}
 .ob.on b,.ob.on small{color:#ffe066;opacity:1}
 .ob.fit b::after{content:'•';color:#7dffb0;margin-left:2px}
@@ -73,12 +73,12 @@ canvas{position:fixed;inset:0;display:block}
  #acts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(max(10px,env(safe-area-inset-bottom)) + 50px);width:min(440px,52vw);z-index:2}
  #shw{display:none}}
 #trow .panel{display:flex;padding:3px;gap:3px;align-items:center}
-.lbl{font-size:9px;letter-spacing:.12em;opacity:.6;padding:0 4px}
-.tb,.ib{font:inherit;font-size:10px;letter-spacing:.08em;color:#cfe9f2;background:transparent;border:1px solid transparent;border-radius:6px;padding:5px 7px}
+.lbl{font-size:10px;letter-spacing:.12em;opacity:.6;padding:0 4px}
+.tb,.ib{font:inherit;font-size:11px;letter-spacing:.08em;color:#cfe9f2;background:transparent;border:1px solid transparent;border-radius:6px;padding:5px 7px}
 .ib.on{border-color:#ffe066;color:#ffe066}
 .tb.on{border-color:var(--cy);color:var(--cy);background:rgba(95,227,255,.12)}
 .ib{pointer-events:auto;background:var(--pan);border-color:var(--line);min-width:32px}
-#msg{position:fixed;left:0;right:0;top:calc(max(8px,env(safe-area-inset-top)) + 96px);display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none;font-size:12px;letter-spacing:.14em;font-weight:700;z-index:3}
+#msg{position:fixed;left:0;right:0;top:calc(max(8px,env(safe-area-inset-top)) + 96px);display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none;font-size:13px;letter-spacing:.14em;font-weight:700;z-index:3}
 #msg div{text-shadow:0 0 8px currentColor;animation:fade 1.7s forwards}
 @keyframes fade{0%{opacity:0;transform:translateY(4px)}10%{opacity:1;transform:none}75%{opacity:1}100%{opacity:0}}
 #bot{display:flex;justify-content:space-between;align-items:flex-end;gap:8px}
@@ -128,52 +128,53 @@ canvas{position:fixed;inset:0;display:block}
 @media (orientation:landscape){#bot{justify-content:flex-start}#wcol{margin-left:auto}}
 @media (max-width:440px){#thr{width:36px}#thrT{height:96px}#weap{grid-template-columns:repeat(2,58px);gap:5px}.wb{width:58px;height:58px}.mb{width:38px;height:38px}.pcol,.crew{width:30px}.pcols,.crow{gap:5px}#power{padding:6px}#shw{width:84px;transform:scale(.92);transform-origin:bottom center}#bot{gap:4px}}
 /* galaxy */
-#gal{position:fixed;inset:0;display:none;flex-direction:column;justify-content:space-between;pointer-events:none;z-index:4;padding:max(8px,env(safe-area-inset-top)) 8px max(8px,env(safe-area-inset-bottom))}
+#gal{position:fixed;inset:0;display:none;flex-direction:column;justify-content:flex-start;gap:6px;pointer-events:none;z-index:4;padding:max(8px,env(safe-area-inset-top)) 8px max(8px,env(safe-area-inset-bottom))}
 #gal.on{display:flex}
 .gp{pointer-events:auto;background:rgba(6,12,22,.82);border:1px solid var(--line);border-radius:12px;padding:8px 10px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);max-width:560px;width:100%;align-self:center}
-.gh{display:flex;justify-content:space-between;align-items:center;font-size:13px;letter-spacing:.24em;color:var(--cy)}
-#greps{display:grid;grid-template-columns:repeat(3,1fr);gap:3px 8px;margin:6px 0 4px;font-size:10px}
+.gh{display:flex;justify-content:space-between;align-items:center;font-size:15px;letter-spacing:.24em;color:var(--cy)}
+#greps{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 10px;margin:8px 0 6px;font-size:12px}
 #greps span{display:flex;justify-content:space-between;gap:4px}#greps i{font-style:normal;opacity:.8}
 .gb{display:flex;gap:6px}.gb .btn{margin:0}
-#gbot{max-height:46vh;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;font-size:11px}
-#gbot h3{margin:0;font-size:13px;letter-spacing:.14em}
+#gbot{overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;font-size:13px}
+#gbot h3{margin:0;font-size:16px;letter-spacing:.14em}
 #gbot .ct{display:block;width:100%;text-align:left;font:inherit;color:#cfe9f2;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:8px 9px;margin:6px 0 0}
 #gbot .ct:disabled{opacity:.4}
 #gbot p{margin:3px 0;line-height:1.45;opacity:.85}
-@media (orientation:landscape){#gal{flex-direction:row;align-items:stretch;justify-content:space-between}#gal .gp{width:min(300px,34vw);align-self:auto}#gbot{max-height:none}#greps{grid-template-columns:repeat(2,1fr)}}
+#gside{display:contents}#gtop{order:0;flex:0 0 auto}#gmap{order:1;flex:0 0 auto;width:100%;aspect-ratio:1/1;max-height:60vh;pointer-events:none}#gbot{order:2;flex:1 1 0;min-height:120px}
+@media (orientation:landscape){#gal{flex-direction:row;align-items:stretch}#gside{display:flex;flex-direction:column;gap:6px;width:min(400px,46vw);flex:0 0 auto}#gal .gp{width:100%;max-width:none;align-self:stretch}#gmap{flex:1 1 auto;aspect-ratio:auto;max-height:none;height:auto}#greps{grid-template-columns:repeat(2,1fr)}}
 /* screens */
 .ov{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:max(14px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom));background:rgba(2,4,10,.6);z-index:5}
 .ov.on{display:flex}
-.box{max-width:540px;width:100%;max-height:100%;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:18px 16px;background:rgba(6,12,22,.94);border:1px solid var(--line);border-radius:14px}
+.box{max-width:640px;width:100%;max-height:100%;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:20px 18px;background:rgba(6,12,22,.94);border:1px solid var(--line);border-radius:14px}
 h1{margin:0;font-size:28px;letter-spacing:.3em;color:var(--cy);text-shadow:0 0 18px rgba(95,227,255,.6)}
-h2{margin:0 0 4px;font-size:15px;letter-spacing:.2em;color:var(--cy)}
-.tag{font-size:10px;letter-spacing:.2em;opacity:.55;margin:4px 0 12px}
+h2{margin:0 0 4px;font-size:18px;letter-spacing:.2em;color:var(--cy)}
+.tag{font-size:12px;letter-spacing:.2em;opacity:.55;margin:4px 0 12px}
 .hdr{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
-.cr{color:#ffe066;font-size:13px;letter-spacing:.08em;white-space:nowrap}
-.btn{font:inherit;font-size:11px;letter-spacing:.12em;color:#04060c;background:var(--cy);border:0;border-radius:8px;padding:9px 13px;margin:4px 6px 0 0}
-.btn.wide{display:block;width:min(260px,80%);margin:7px auto 0;padding:12px 0;font-size:12px}
+.cr{color:#ffe066;font-size:15px;letter-spacing:.08em;white-space:nowrap}
+.btn{font:inherit;font-size:13px;letter-spacing:.12em;color:#04060c;background:var(--cy);border:0;border-radius:9px;padding:10px 15px;margin:4px 6px 0 0}
+.btn.wide{display:block;width:min(300px,84%);margin:8px auto 0;padding:14px 0;font-size:14px}
 .btn.alt{background:transparent;color:var(--cy);border:1px solid var(--cy)}
-.btn.sm{font-size:10px;padding:6px 9px;letter-spacing:.06em}
+.btn.sm{font-size:12px;padding:8px 11px;letter-spacing:.06em}
 .btn:disabled{opacity:.3}
 .btn.gold{background:#ffe066}
 .row{border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 11px;margin:7px 0;background:rgba(255,255,255,.02)}
 .row.cur{border-color:var(--cy)}
 .row .t{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
-.row .t b{font-size:13px;letter-spacing:.1em}
-.row p{margin:4px 0 0;font-size:11px;opacity:.75;line-height:1.45}
+.row .t b{font-size:15px;letter-spacing:.1em}
+.row p{margin:5px 0 0;font-size:13px;opacity:.8;line-height:1.45}
 .mis{display:block;width:100%;text-align:left;font:inherit;color:#cfe9f2;background:rgba(255,179,71,.05);border:1px solid rgba(255,179,71,.35);border-radius:10px;padding:10px 11px;margin:7px 0}
 .stars{color:#ffe066;letter-spacing:.1em}
-.thr{font-size:10px;letter-spacing:.12em;padding:2px 6px;border-radius:4px}
+.thr{font-size:11px;letter-spacing:.12em;padding:2px 6px;border-radius:4px}
 .tabs{display:flex;gap:4px;margin:4px 0 6px;flex-wrap:wrap}
-.tabs button{font:inherit;font-size:10px;letter-spacing:.12em;color:#cfe9f2;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:6px 9px}
+.tabs button{font:inherit;font-size:12px;letter-spacing:.1em;color:#cfe9f2;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:8px 11px}
 .tabs button.on{border-color:var(--cy);color:var(--cy);background:rgba(95,227,255,.1)}
-.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:3px 10px;font-size:10px;margin-top:6px;opacity:.85}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 10px;font-size:12px;margin-top:6px;opacity:.85}
 .kv span b{color:#fff;font-weight:600}
 .lv{letter-spacing:.2em;color:var(--cy)}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.stats{font-size:12px;line-height:1.8;margin:12px 0 6px}
+.stats{font-size:14px;line-height:1.8;margin:12px 0 6px}
 .stats div{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06)}
-ul{padding-left:16px;margin:10px 0 0;font-size:11px;line-height:1.55;opacity:.85}
+ul{padding-left:18px;margin:10px 0 0;font-size:13px;line-height:1.55;opacity:.85}
 </style>
 </head>
 <body>
@@ -215,9 +216,10 @@ ul{padding-left:16px;margin:10px 0 0;font-size:11px;line-height:1.55;opacity:.85
 </div>
 <div id="msg"></div>
 <div id="gal">
- <div id="gtop" class="gp"><div class="gh"><b>STARSHIPS</b><span id="gcr"></span></div><div id="greps"></div>
+ <div id="gside"><div id="gtop" class="gp"><div class="gh"><b>STARSHIPS</b><span id="gcr"></span></div><div id="greps"></div>
   <div class="gb"><button class="btn sm" data-gact="yard">SHIPYARD</button><button class="btn alt sm" data-gact="stand">STANDINGS</button><button class="btn alt sm" data-gact="menu">MENU</button></div></div>
- <div id="gbot" class="gp"></div>
+ <div id="gbot" class="gp"></div></div>
+ <div id="gmap"></div>
 </div>
 <div class="ov on" id="scr"><div class="box" id="scrBox"></div></div>
 
@@ -417,16 +419,77 @@ const UNLOCK={
 const repOf=e=>save.g?save.g.rep[e]||0:0;
 function unlocked(cat,k){const u=UNLOCK[cat][k];return !u||u.some(([e,r])=>repOf(e)>=r);}
 function lockTxt(cat,k){return 'NEEDS '+UNLOCK[cat][k].map(([e,r])=>`${EMP[e].short.toUpperCase()} REP ${r}`).join(' OR ');}
-const RINGS=4,CELLS=24,RR=[.15,.36,.56,.76,.98],RVAL=[3,2,1,1],RNAME=['Core','Inner','Mid','Rim'],GROT=1.75;
-const SOL=2*CELLS+1;
+const RINGS=4,RVAL=[3,2,1,1],RNAME=['Core','Inner','Mid','Rim'],GROT=1.75;
 function mulb(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 function pick2(a,q){return a[Math.floor(q()*a.length)];}
-const SY1=['Vey','Or','Cal','Tesh','Mar','Il','Ash','Cor','Hol','Pel','Qui','Bra','Zan','Lu','Ny','Ser','Tal','Var','Eo','Kai','Rho','Dra','Mer','Sab'],SY2=['ra','rin','dor','u','an','sen','fall','van','low','na','et','mos','dar','ix','eth','ul','os','ia','ane','ok'],SY3=['Reach','Gate','Drift','Verge','Deep','Crown','Narrows','Expanse','Belt','Shoals','March','Cluster','Rift','Hold','Spur','Veil'];
-const SECT=[];for(let r=0;r<RINGS;r++)for(let c=0;c<CELLS;c++){const id=r*CELLS+c,q=mulb(id*977+13);SECT.push({id,r,c,val:RVAL[r],name:id===SOL?'Sol':`${pick2(SY1,q)}${pick2(SY2,q)} ${pick2(SY3,q)}`});}
-function nbrs(id){const r=Math.floor(id/CELLS),c=id%CELLS,o=[r*CELLS+(c+1)%CELLS,r*CELLS+(c+CELLS-1)%CELLS];if(r>0)o.push((r-1)*CELLS+c);if(r<RINGS-1)o.push((r+1)*CELLS+c);return o;}
+const SY1=['Vey','Or','Cal','Tesh','Mar','Il','Ash','Cor','Hol','Pel','Qui','Bra','Zan','Lu','Ny','Ser','Tal','Var','Eo','Kai','Rho','Dra','Mer','Sab','Ost','Gher','Ama','Thu','Vel','Isk'],SY2=['ra','rin','dor','u','an','sen','fall','van','low','na','et','mos','dar','ix','eth','ul','os','ia','ane','ok','ith','ara','ond','eus'];
+// what kind of place a system is. Shipyards, trade hubs and forge worlds held by friendly empires help you directly.
+const STYPE={
+ capital:{n:'Capital',d:'Seat of the {E}. The most heavily defended system in their space.',w:[0,0,0,0]},
+ shipyard:{n:'Shipyard',d:'Orbital slips that build warships for the {E}.',perk:'Ships cost 3% less while a friendly empire holds it',w:[3,2,1,0]},
+ trade:{n:'Trade Hub',d:'A free port where half the {E} economy changes hands.',perk:'Patronage pays 10% more while a friendly empire holds it',w:[3,2,1,1]},
+ forge:{n:'Forge World',d:'Foundries and repair docks wrapped around a molten world.',perk:'Repairs and salvage cost 10% less while a friendly empire holds it',w:[2,2,1,0]},
+ fortress:{n:'Fortress World',d:'Bunkered, gunned and garrisoned. The {E} will not give it up cheaply.',w:[3,2,1,0]},
+ research:{n:'Research Station',d:'Quiet laboratories studying something strange nearby.',w:[2,2,1,1]},
+ agri:{n:'Agri World',d:'Endless farmland that feeds the {E} core worlds.',w:[1,2,2,1]},
+ ocean:{n:'Ocean World',d:'Floating cities on a planet-wide sea.',w:[1,2,2,1]},
+ mine:{n:'Mining Colony',d:'Deep shafts and ore haulers working a bright asteroid belt.',w:[0,1,2,3]},
+ refinery:{n:'Gas Giant Refinery',d:'Skimmers dive into the storms for starship fuel.',w:[1,1,2,2]},
+ ice:{n:'Ice Moon',d:'A frozen moon with an ocean under the crust and a hardy colony on top.',w:[0,1,2,2]},
+ ruins:{n:'Ancient Ruins',d:'Something built here long before any of the six empires. Nobody agrees what.',w:[1,1,1,1]},
+ shrine:{n:'Pilgrim Shrine',d:'Pilgrims from every empire make the crossing to see it.',w:[1,1,1,1]},
+ haven:{n:'Nebula Haven',d:'Hidden in glowing gas and popular with smugglers.',w:[0,1,2,3]},
+ outpost:{n:'Frontier Outpost',d:'A few hundred settlers, a beacon and a lot of empty sky.',w:[0,0,2,4]}
+};
+const PLT={refinery:0,ice:1,ocean:1,mine:2,fortress:2,ruins:2,outpost:2,forge:3,shipyard:2};
+const CAPS={terran:'Sol',kesh:'Khessaru',orrun:'Grul Anvil',vael:'The Bloom',thane:'Freeport',sylari:'Choirhold'};
+// one fixed, hand-shaped-feeling galaxy: stars strung along the spiral arms, a dense core, six capitals
+const SECT=[];let SOL=0;
+(()=>{const q=mulb(90210),pts=[],used=new Set();
+ const ok=(x,y,m)=>Math.hypot(x,y)<.95&&pts.every(p=>Math.hypot(p.x-x,p.y-y)>m);
+ // capitals sit out on the arms, one per sixth of the disc
+ EORD.forEach((e,k)=>{const arm=k%2,t=[.42,.62,.82][Math.floor(k/2)],th=t*3.6*Math.PI+arm*Math.PI+GROT,r=.08+.88*t;pts.push({x:Math.cos(th)*r,y:Math.sin(th)*r,cap:e});});
+ let guard=0;while(pts.length<96&&guard++<20000){let x,y;
+  if(q()<.2){const a=q()*TAU,r=.1+.2*Math.sqrt(q());x=Math.cos(a)*r;y=Math.sin(a)*r;}
+  else{const arm=q()<.5?0:1,t=Math.pow(q(),.85),th=t*3.6*Math.PI+arm*Math.PI+GROT,r=.08+.88*t,j=(q()-.5)*.2;x=Math.cos(th)*r+Math.cos(th+1.57)*j;y=Math.sin(th)*r+Math.sin(th+1.57)*j;}
+  if(ok(x,y,.083))pts.push({x,y});}
+ pts.forEach((p,id)=>{const d=Math.hypot(p.x,p.y),r=d<.3?0:d<.48?1:d<.7?2:3,qq=mulb(id*977+13);
+  let type='capital',name=CAPS[p.cap];
+  if(!p.cap){const tw=Object.entries(STYPE).filter(([k])=>k!=='capital').map(([k,v])=>[k,v.w[r]]),tot=tw.reduce((a,x)=>a+x[1],0);let u=qq()*tot;type=tw.find(x=>(u-=x[1])<0)[0];
+   for(let k=0;k<20;k++){name=pick2(SY1,qq)+pick2(SY2,qq);if(!used.has(name))break;}}
+  used.add(name);
+  const pop=p.cap?(4+qq()*8).toFixed(1)+' billion':['outpost','haven','research','ruins'].includes(type)?Math.round(2+qq()*90)+' thousand':type==='mine'||type==='ice'?Math.round(20+qq()*800)+' thousand':(0.2+qq()*(4-r)*1.4).toFixed(1)+' billion';
+  SECT.push({id,x:p.x,y:p.y,r,val:p.cap?3:RVAL[r],name,type,cap:p.cap||null,pop,pt:PLT[type]!=null?PLT[type]:Math.floor(qq()*4)});
+  if(p.cap==='terran')SOL=id;});
+ // hyperlanes: each system links to its nearest neighbours, and the map is kept in one piece
+ const L=SECT.map(()=>new Set()),D=(a,b)=>Math.hypot(SECT[a].x-SECT[b].x,SECT[a].y-SECT[b].y);
+ for(const S of SECT){const ns=SECT.filter(o=>o!==S).sort((a,b)=>D(S.id,a.id)-D(S.id,b.id));for(let k=0;k<4;k++){const o=ns[k];if(k<2||D(S.id,o.id)<.2){L[S.id].add(o.id);L[o.id].add(S.id);}}}
+ for(;;){const seen=new Set([0]),st=[0];while(st.length){const a=st.pop();for(const b of L[a])if(!seen.has(b)){seen.add(b);st.push(b);}}
+  if(seen.size===SECT.length)break;let best=null,bd=9;for(const a of seen)for(const b of SECT)if(!seen.has(b.id)&&D(a,b.id)<bd){bd=D(a,b.id);best=[a,b.id];}L[best[0]].add(best[1]);L[best[1]].add(best[0]);}
+ SECT.forEach(S=>S.nb=[...L[S.id]]);})();
+const nbrs=id=>SECT[id].nb;
 const TOTV=SECT.reduce((a,x)=>a+x.val,0);
-function newGalaxy(home){const rep={};EORD.forEach(e=>rep[e]=0);rep[home||'terran']=15;return{own:SECT.map(x=>EORD[Math.floor(x.c/4)]),rep,n:0,log:[],offers:{},won:null};}
+// empires grow outward from their capitals along the lanes, so borders follow the map instead of slicing it
+function growOwn(target,seed){const q=mulb(seed||777),own=SECT.map(()=>null),cnt={},cap={};EORD.forEach(e=>cnt[e]=0);
+ let left=SECT.length;for(const S of SECT)if(S.cap){cap[S.cap]=S;if((target[S.cap]||0)>0){own[S.id]=S.cap;cnt[S.cap]=1;left--;}}
+ const D=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+ while(left>0){
+  const es=EORD.filter(e=>(target[e]||0)>cnt[e]).sort((a,b)=>cnt[a]/target[a]-cnt[b]/target[b]);let took=false;
+  const pickFor=e=>{let best=null,bs=9;if(!cnt[e])return null;for(const S of SECT)if(own[S.id]===e)for(const n of S.nb)if(!own[n]){const sc=D(SECT[n],cap[e])+q()*.1;if(sc<bs){bs=sc;best=n;}}return best==null?null:[best,bs];};
+  for(const e of es){const b=pickFor(e);if(b){own[b[0]]=e;cnt[e]++;left--;took=true;break;}}
+  // everyone is at size: whoever is closest takes what's left
+  if(!took){let bb=null,be=null;for(const e of EORD){const b=pickFor(e);if(b&&(!bb||b[1]<bb[1])){bb=b;be=e;}}if(bb){own[bb[0]]=be;cnt[be]++;left--;took=true;}}
+  if(!took){for(const S of SECT)if(!own[S.id]){own[S.id]=EORD[0];left--;}}}
+ // even things out along the borders where growth got boxed in
+ for(let it=0;it<400;it++){const c={};EORD.forEach(e=>c[e]=0);own.forEach(o=>c[o]++);let moved=false;
+  const short=EORD.filter(e=>c[e]<(target[e]||0)).sort((a,b)=>(c[a]-target[a])-(c[b]-target[b]));
+  for(const e of short){for(const S of SECT){const o=own[S.id];if(o===e||S.cap||c[o]<=(target[o]||0))continue;if(S.nb.some(n=>own[n]===e)){own[S.id]=e;moved=true;break;}}if(moved)break;}
+  if(!moved)break;}
+ return own;}
+function newGalaxy(home){const rep={};EORD.forEach(e=>rep[e]=0);rep[home||'terran']=15;const t={};EORD.forEach(e=>t[e]=16);return{map:2,own:growOwn(t),rep,n:0,log:[],offers:{},won:null};}
 const shareOf=e=>save.g.own.reduce((a,o,i)=>a+(o===e?SECT[i].val:0),0)/TOTV;
+// friendly-held special systems
+function perkCount(type){let n=0;save.g.own.forEach((o,i)=>{if(SECT[i].type===type&&repOf(o)>=25)n++;});return n;}
 const alive=e=>save.g.own.includes(e);
 
 /* ================= SHIP ART ================= */
@@ -541,6 +604,7 @@ function migrate(s){if(!s)return null;if(s.lo&&!s.fleet){s.fleet=[{n:'Resolute',
  for(const f of s.fleet){f.lo.mods=(f.lo.mods||[]).filter(k=>MODS[k]);f.lo.mounts=f.lo.mounts.filter(m=>!m.t||WD[m.t]);f.dmg=clamp(+f.dmg||0,0,1);f.wreck=f.wreck?1:0;if(!f.n)f.n=pick(SNAMES);}
  if(!s.fleet.length)s.fleet.push({n:'Resolute',lo:newLo('kestrel'),dmg:0,wreck:0});
  // 0.8.2 rebalanced the early game: campaigns from before it get the new starting purse
+ if(s.g&&s.g.own&&!s.g.map){const t={};EORD.forEach(e=>t[e]=0);s.g.own.forEach(o=>{if(t[o]!=null)t[o]++;});s.g.own=growOwn(t);s.g.map=2;s.g.offers={};}
  if(!s.b082){s.b082=1;s.credits=Math.max(s.credits|0,1500);}s.sel=clamp(s.sel|0,0,s.fleet.length-1);delete s.missions;return s;}
 let save=(()=>{try{const s=migrate(JSON.parse(localStorage.getItem(KEY)));if(s){if(!s.g)s.g=newGalaxy();s.g.offers={};return s;}}catch(e){}return defSave();})();
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(save));}catch(e){}}
@@ -549,8 +613,9 @@ function loValue(lo){let v=HULLS[lo.hull].price;for(const k in lo.upg)for(let l=
  for(let i=0;i<(lo.extra||0);i++)v+=MC[i];for(const m of lo.mounts)v+=mountVal(m);for(const k of lo.mods)v+=MODS[k].price;return v;}
 const MAXFLEET=5,MAXDEPLOY=3;
 const sellVal=f=>Math.round(loValue(f.lo)*(f.wreck?.08:.6*(1-f.dmg*.5))/10)*10;
-const repairCost=f=>Math.round(f.dmg*loValue(f.lo)*.3/10)*10;
-const salvageCost=f=>Math.round(loValue(f.lo)*.45/10)*10;
+const forgeK=()=>1-Math.min(.4,.1*perkCount('forge'));
+const repairCost=f=>Math.round(f.dmg*loValue(f.lo)*.3*forgeK()/10)*10;
+const salvageCost=f=>Math.round(loValue(f.lo)*.45*forgeK()/10)*10;
 const opOK=f=>!f.wreck;
 const curShip=()=>save.fleet[clamp(save.sel|0,0,save.fleet.length-1)];
 // what your three best working ships are worth: contracts keep pace with this
@@ -576,9 +641,9 @@ function genEnemy(B,emp){const E=EMP[emp]||EMP.kesh,wp=()=>Math.random()<.7?pick
 }
 // where each mission puts its objective: a planet, a starbase, or the convoy lane
 const OBJAT={escort:{x:-250,y:0,lane:1},capplanet:{x:950,y:0,pl:1},raid:{x:950,y:0,pl:1},defplanet:{x:-850,y:0,pl:1},capbase:{x:1000,y:0},assault:{x:1000,y:0},defbase:{x:-1000,y:0},convoy:{x:650,y:0,lane:1}};
-function genPlanets(type){
- const ps=[],o=OBJAT[type];
- if(o&&o.pl)ps.push({t:Math.random()*4|0,r:rand(130,165),x:o.x,y:o.y+rand(-150,150),obj:1});
+function genPlanets(type,sid){
+ const ps=[],o=OBJAT[type],spt=sid!=null?SECT[sid].pt:Math.random()*4|0;
+ if(o&&o.pl)ps.push({t:spt,r:rand(130,165),x:o.x,y:o.y+rand(-150,150),obj:1});
  const n=1+(Math.random()*(o?2:3)|0);
  for(let i=0;i<n;i++){for(let k=0;k<60;k++){const q={t:Math.random()*4|0,r:rand(95,170),x:rand(-2300,2300),y:rand(-2300,2300)};
   if(Math.hypot(q.x,q.y)+q.r>ARENA-300)continue;if(Math.hypot(Math.abs(q.x)-1550,q.y)<q.r+450)continue;
@@ -625,13 +690,13 @@ function contract(sid,client,type,foe){
  let ev=fleet.reduce((a,f)=>a+loValue(f.lo),0)*(M.def?.72:1);
  if(M.st==='base')ev+=(M.def?0:4000*(.8+.25*st)*sm);if(M.st==='planet')ev+=M.def?0:nbat*800*(.8+.2*st)*sm;if(M.st==='convoy')ev+=600;if(M.st==='escort')ev*=.85;
  const reward=Math.round(((mapB*.35+350)*(sf>.4?1.3:1)+Math.max(0,B-mapB)*.03)*M.pay/10)*10;
- const pl=genPlanets(type);
+ const pl=genPlanets(type,sid);if(pl.length&&!pl[0].obj)pl[0].t=SECT[sid].pt;
  return g.offers[key]={sid,client,foe,type,fleet,ev,st,pl,nb:genNebulae(pl,type),reward,sm,nbat,marked:repOf(foe)<=-60,coal:sf>.4&&!M.def,name:M.name+' · '+S.name};
 }
 function repGain(e,v){const g=3+2*v;return repOf(e)>=50?Math.ceil(g/2):g;}
 function repAdd(e,d,ch){const g=save.g,b=g.rep[e]||0;g.rep[e]=clamp(Math.round(b+d),-100,100);if(ch&&g.rep[e]!==b)ch.push([e,g.rep[e]-b]);}
-function patronage(){let t=0;for(const e of EORD){const r=repOf(e);if(r>=25&&alive(e))t+=shareOf(e)*r*12;}return Math.round(t/10)*10;}
-function discount(){let b=0;for(const e of EORD)if(repOf(e)>=40)b=Math.max(b,shareOf(e)*40);return Math.min(25,Math.round(b));}
+function patronage(){let t=0;for(const e of EORD){const r=repOf(e);if(r>=25&&alive(e))t+=shareOf(e)*r*12;}return Math.round(t*(1+.1*perkCount('trade'))/10)*10;}
+function discount(){let b=0;for(const e of EORD)if(repOf(e)>=40)b=Math.max(b,shareOf(e)*40);return Math.min(30,Math.round(Math.min(25,b)+3*perkCount('shipyard')));}
 const price=p=>Math.round(p*(1-discount()/100)/10)*10;
 // the rest of the galaxy fights while you're busy
 function galDrift(lines){const g=save.g;
@@ -1278,8 +1343,8 @@ function endBattle(r){
  ${m.type==='convoy'?row('Freighters destroyed',(m.kills||0)+' of 3'):''}${m.type==='escort'?row('Freighters lost',(m.lostF||0)+' of 3'):''}
  ${row(win?'Contract pay':'Salvage pay','<span class="cr">+'+(earned-pat)+' cr</span>')}${pat?row('Patronage','<span class="cr">+'+pat+' cr</span>'):''}${row('Balance','<span class="cr">'+save.credits+' cr</span>')}
  ${ch.map(([e,d])=>row(`<span style="color:${EMP[e].col}">${EMP[e].name}</span>`,`${d>0?'+':''}${d} → ${repOf(e)}`)).join('')}</div>
- <div style="font-size:11px;line-height:1.6;opacity:.9;margin-bottom:8px">${lines.join('<br>')}</div>
- <div style="font-size:11px;line-height:1.6;opacity:.85">${news.join('<br>')}</div>
+ <div style="font-size:13px;line-height:1.6;opacity:.9;margin-bottom:8px">${lines.join('<br>')}</div>
+ <div style="font-size:13px;line-height:1.6;opacity:.85">${news.join('<br>')}</div>
  ${won?`<div class="row cur" style="margin-top:10px"><b style="color:#ffe066">${won.type==='conquest'?'GALACTIC CONQUEST':'BALANCE OF POWER'}</b><p>${won.type==='conquest'?`The ${EMP[won.e[0]].name} rules two thirds of the galaxy, and you put them there.`:`You have kept ${won.e.map(e=>'the '+EMP[e].short).join(', ')} strong and in balance, and every one of them owes you.`} You can keep playing or start a new campaign from Standings.</p></div>`:''}
  <button class="btn" data-act="hub">CONTINUE</button> <button class="btn alt" data-act="yard">SHIPYARD</button>`);
  player=null;enemy=null;ships=[];fleet=[];
@@ -1437,7 +1502,7 @@ function render(){
  if(mission.type==='convoy'||mission.type==='escort'){const e=mission.exit;ctx.strokeStyle='rgba(255,154,107,.5)';ctx.lineWidth=1.5/z;ctx.setLineDash([8/z,8/z]);ctx.beginPath();ctx.arc(e.x,e.y,260,0,TAU);ctx.stroke();ctx.setLineDash([]);
   ctx.fillStyle='rgba(255,154,107,.75)';ctx.font=`${11/z}px ui-monospace,Menlo,monospace`;ctx.textAlign='center';ctx.fillText(mission.type==='escort'?'GET THE FREIGHTERS HERE':'CONVOY EXIT',e.x,e.y-270);}
  for(const s of ships)if(s.alive&&s.protect){ctx.strokeStyle=`rgba(125,255,176,${.35+.2*Math.sin(gameTime*3)})`;ctx.lineWidth=1.4/z;ctx.setLineDash([4/z,6/z]);ctx.beginPath();ctx.arc(s.x,s.y,s.rad+30,0,TAU);ctx.stroke();ctx.setLineDash([]);
-  if(s.role==='frt'){ctx.fillStyle='rgba(125,255,176,.85)';ctx.font=`${10/z}px ui-monospace,Menlo,monospace`;ctx.textAlign='center';ctx.fillText('FRIENDLY FREIGHTER',s.x,s.y-s.rad-36-4/z);}}
+  if(s.role==='frt'){ctx.fillStyle='rgba(125,255,176,.85)';ctx.font=`${11.5/z}px ui-monospace,Menlo,monospace`;ctx.textAlign='center';ctx.fillText('FRIENDLY FREIGHTER',s.x,s.y-s.rad-36-4/z);}}
  if(player.alive){const sr=inNeb(player)?280:SENSOR*(player.H.sens||1);
   ctx.strokeStyle='rgba(125,255,176,.10)';ctx.lineWidth=1.2/z;ctx.setLineDash([3/z,9/z]);ctx.beginPath();ctx.arc(player.x,player.y,sr,0,TAU);ctx.stroke();ctx.setLineDash([]);
   const A=player.H.arcs;if(player.mounts.some(m=>m.t==='torp')){ctx.fillStyle='rgba(192,138,255,.045)';ctx.beginPath();ctx.moveTo(player.x,player.y);ctx.arc(player.x,player.y,WD.torp.range,player.a-A.torp*Math.PI/180,player.a+A.torp*Math.PI/180);ctx.closePath();ctx.fill();}
@@ -1486,7 +1551,7 @@ function render(){
  ctx.globalCompositeOperation='source-over';
  for(const n of nebulae){ctx.globalAlpha=.9;ctx.drawImage(n.img,n.x-n.img.width/2,n.y-n.img.height/2);}ctx.globalAlpha=1;
  // markers that stay readable when zoomed far out
- ctx.font=`${10/z}px ui-monospace,Menlo,monospace`;ctx.textAlign='center';
+ ctx.font=`${11.5/z}px ui-monospace,Menlo,monospace`;ctx.textAlign='center';
  fleet.forEach((s,i)=>{if(!s.alive)return;const sel=s===player,r=Math.max(s.rad+8,14/z);ctx.strokeStyle=sel?'rgba(255,224,102,.95)':'rgba(95,227,255,.6)';ctx.lineWidth=(sel?2:1.2)/z;ctx.beginPath();ctx.arc(s.x,s.y,r,0,TAU);ctx.stroke();
   ctx.fillStyle=sel?'#ffe066':'rgba(95,227,255,.85)';ctx.fillText((i+1)+' '+s.nm.toUpperCase()+(s.auto?' · AUTO':''),s.x,s.y-r-5/z);});
  for(const e of ships){if(!e.alive||e.team!=='e')continue;const isT=player.tgt===e;
@@ -1533,7 +1598,7 @@ $('#pauseBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(state===
 $('#engBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!player)return;initAudio();if(state==='plan')engage();else if(state==='exec')ffwd=ffwd>1?1:2;});
 $('#muteBtn').addEventListener('pointerdown',e=>{e.preventDefault();initAudio();muted=!muted;OPT.sound=!muted;applyOpt();$('#muteBtn').style.opacity=muted?.4:1;});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='exec')pause();});
-function pause(){prevState=state;state='pause';show(`<h2>PAUSED</h2><div class="tag">${mission.name.toUpperCase()}</div><p style="font-size:11.5px;opacity:.85">${MT[mission.type].d}</p><button class="btn" data-act="resume">RESUME</button><button class="btn alt" data-act="retreat">RETREAT</button>
+function pause(){prevState=state;state='pause';show(`<h2>PAUSED</h2><div class="tag">${mission.name.toUpperCase()}</div><p style="font-size:13.5px;opacity:.85">${MT[mission.type].d}</p><button class="btn" data-act="resume">RESUME</button><button class="btn alt" data-act="retreat">RETREAT</button>
  <ul><li>You command up to three ships. Tap a ship (or its button in the fleet bar) to select it, then give it a course and ONE action. When every ship has orders, ENGAGE. Everyone, friend and enemy, carries out their orders together. The enemy chooses in secret.</li>
  <li>AUTO hands a ship to its own captain. Tap AUTO again, or give it any order, to take it back.</li>
  <li>Tap an enemy to make it the selected ship's target. Guns that can't bear on the target fire at anything else in reach.</li>
@@ -1615,7 +1680,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.8.3';
+const VERSION='0.9.0';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1630,23 +1695,23 @@ function checkUpdate(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}
 function title(){state='title';player=null;enemy=null;ships=[];msgEl.innerHTML='';$('#hud').classList.remove('on');$('#gal').classList.remove('on');
  if(!lineup)lineup=HORDER.map(k=>shipPic('line',k,'95,227,255'));
  const g=hasGame();
- show(`<div style="text-align:center"><h1 style="font-size:34px">STARSHIPS</h1><div class="tag">VERSION ${VERSION} · WORKING TITLE</div>
+ show(`<div style="text-align:center"><h1 style="font-size:35px">STARSHIPS</h1><div class="tag">VERSION ${VERSION} · WORKING TITLE</div>
  <div style="display:flex;justify-content:center;align-items:flex-end;gap:2px;margin:4px 0 14px">${lineup.map((u,i)=>`<img src="${u}" style="width:${Math.round(30*HULLS[HORDER[i]].scale+10)}px;opacity:.95">`).join('')}</div>
- ${newer?`<button class="btn gold wide" data-act="update">UPDATE TO VERSION ${newer}</button><div style="font-size:10px;opacity:.6;margin:2px 0 6px">Your campaign and saves are kept</div>`:''}
- ${g?`<button class="btn wide" data-act="continue">CONTINUE</button><div style="font-size:10px;opacity:.6;margin:2px 0 6px">${slotSummary(save)}</div>`:''}
+ ${newer?`<button class="btn gold wide" data-act="update">UPDATE TO VERSION ${newer}</button><div style="font-size:12px;opacity:.6;margin:2px 0 6px">Your campaign and saves are kept</div>`:''}
+ ${g?`<button class="btn wide" data-act="continue">CONTINUE</button><div style="font-size:12px;opacity:.6;margin:2px 0 6px">${slotSummary(save)}</div>`:''}
  <button class="btn ${g?'alt':''} wide" data-act="newgame">NEW CAMPAIGN</button>
  <button class="btn alt wide" data-act="saves">SAVE AND LOAD</button>
  <button class="btn alt wide" data-act="options">OPTIONS</button>
  <div style="margin-top:10px"><button class="btn alt sm" data-act="about">ABOUT</button><button class="btn alt sm" data-act="privacy">PRIVACY POLICY</button></div>
- <div style="font-size:9px;opacity:.4;margin-top:12px;letter-spacing:.14em">v${VERSION}</div></div>`);}
+ <div style="font-size:11px;opacity:.4;margin-top:12px;letter-spacing:.14em">v${VERSION}</div></div>`);}
 function newGame(){show(`<h2>NEW CAMPAIGN</h2><div class="tag">CHOOSE YOUR HOME PORT</div>
- <p style="font-size:11px;opacity:.8;line-height:1.5">You're an independent captain with one Kestrel and a little money. Build it into a squadron of up to three ships per mission. Your home port starts out friendly; every other empire is neutral. You can work for anyone.${hasGame()?' <b style="color:#ff9a6b">Starting a new campaign replaces your current one. Save it to a slot first if you want to keep it.</b>':''}</p>
- ${EORD.map(e=>`<button class="mis" data-act="startgame" data-arg="${e}" style="border-color:rgba(${EMP[e].rgb},.45);background:rgba(${EMP[e].rgb},.05)"><b style="color:${EMP[e].col};letter-spacing:.12em">${EMP[e].name.toUpperCase()}</b>${e==='terran'?' <span style="font-size:10px;opacity:.7">· home of Sol</span>':''}<p style="margin:3px 0 0;font-size:11px;opacity:.75">${EMP[e].bio}</p></button>`).join('')}
+ <p style="font-size:13px;opacity:.8;line-height:1.5">You're an independent captain with one Kestrel and a little money. Build it into a squadron of up to three ships per mission. Your home port starts out friendly; every other empire is neutral. You can work for anyone.${hasGame()?' <b style="color:#ff9a6b">Starting a new campaign replaces your current one. Save it to a slot first if you want to keep it.</b>':''}</p>
+ ${EORD.map(e=>`<button class="mis" data-act="startgame" data-arg="${e}" style="border-color:rgba(${EMP[e].rgb},.45);background:rgba(${EMP[e].rgb},.05)"><b style="color:${EMP[e].col};letter-spacing:.12em">${EMP[e].name.toUpperCase()}</b>${e==='terran'?' <span style="font-size:12px;opacity:.7">· home of Sol</span>':''}<p style="margin:3px 0 0;font-size:13px;opacity:.75">${EMP[e].bio}</p></button>`).join('')}
  <button class="btn alt" data-act="title">BACK</button>`);}
 function savesScreen(){const g=hasGame();let h=`<h2>SAVE AND LOAD</h2><div class="tag">YOUR GAME ALSO SAVES ITSELF AFTER EVERY MISSION</div>`;
- h+=g?`<div class="row cur"><div class="t"><b>CURRENT CAMPAIGN</b></div><p>${slotSummary(save)}</p></div>`:`<p style="font-size:11px;opacity:.7">No campaign in progress.</p>`;
+ h+=g?`<div class="row cur"><div class="t"><b>CURRENT CAMPAIGN</b></div><p>${slotSummary(save)}</p></div>`:`<p style="font-size:13px;opacity:.7">No campaign in progress.</p>`;
  for(let i=1;i<=SLOTS;i++){const d=readSlot(i);
-  h+=`<div class="row"><div class="t"><b>SLOT ${i}</b><span style="font-size:10px;opacity:.6">${d?fmtDate(d.t):''}</span></div><p>${d?slotSummary(d.data):'Empty'}</p>
+  h+=`<div class="row"><div class="t"><b>SLOT ${i}</b><span style="font-size:12px;opacity:.6">${d?fmtDate(d.t):''}</span></div><p>${d?slotSummary(d.data):'Empty'}</p>
   ${g?`<button class="btn sm" data-act="slotsave" data-arg="${i}">${d?'OVERWRITE':'SAVE HERE'}</button>`:''}${d?`<button class="btn alt sm" data-act="slotload" data-arg="${i}">LOAD</button><button class="btn alt sm" data-act="slotdel" data-arg="${i}">DELETE</button>`:''}</div>`;}
  h+=`<div class="row"><div class="t"><b>SAVE CODE</b></div><p>Copy your campaign as a code to keep it safe or move it to another device, or paste a code to load one.</p>
  ${g?`<button class="btn sm" data-act="export">SHOW MY CODE</button>`:''}<textarea id="codebox" rows="3" style="width:100%;margin-top:6px;font:10px ui-monospace,monospace;background:#05090f;color:#cfe9f2;border:1px solid var(--line);border-radius:6px;padding:6px;user-select:text;-webkit-user-select:text" placeholder="Paste a save code here"></textarea>
@@ -1654,7 +1719,7 @@ function savesScreen(){const g=hasGame();let h=`<h2>SAVE AND LOAD</h2><div class
  <button class="btn alt" data-act="${titleBack}">BACK</button>`;show(h);}
 function optionsScreen(){const o=OPT,b=(on,a,l)=>`<button class="btn ${on?'':'alt'} sm" data-act="${a}">${l}</button>`;
  show(`<h2>OPTIONS</h2><div class="tag">VERSION ${VERSION}</div>
- <div class="row"><div class="t"><b>SOUND</b></div>${b(o.sound,'opt:sound',o.sound?'ON':'OFF')} <span style="font-size:11px;margin:0 6px">Volume ${Math.round(o.vol*100)}%</span>${b(0,'opt:vol-','−')}${b(0,'opt:vol+','+')}</div>
+ <div class="row"><div class="t"><b>SOUND</b></div>${b(o.sound,'opt:sound',o.sound?'ON':'OFF')} <span style="font-size:13px;margin:0 6px">Volume ${Math.round(o.vol*100)}%</span>${b(0,'opt:vol-','−')}${b(0,'opt:vol+','+')}</div>
  <div class="row"><div class="t"><b>SCREEN SHAKE</b></div><p>Shake on heavy hits and explosions.</p>${b(o.shake,'opt:shake',o.shake?'ON':'OFF')}</div>
  <div class="row"><div class="t"><b>TURN LENGTH</b></div><p>How many seconds each turn plays out. Shorter turns give finer control.</p>${[4,6,8].map(t=>b(o.turn===t,'opt:turn'+t,t+' SEC')).join(' ')}</div>
  <div class="row"><div class="t"><b>WATCH SPEED</b></div><p>Default speed when a turn plays out. You can still tap the bar to change it.</p>${b(!o.fast,'opt:fast0','1X')} ${b(o.fast,'opt:fast1','2X')}</div>
@@ -1662,7 +1727,7 @@ function optionsScreen(){const o=OPT,b=(on,a,l)=>`<button class="btn ${on?'':'al
  <div class="row"><div class="t"><b>DELETE ALL DATA</b></div><p>Erases your campaign, save slots and options from this device.</p><button class="btn alt sm" data-act="wipe">DELETE EVERYTHING</button></div>
  <button class="btn alt" data-act="${titleBack}">BACK</button> <button class="btn alt sm" data-act="privacy">PRIVACY POLICY</button>`);}
 function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · LAST UPDATED NOVEMBER 2026</div>
- <div style="font-size:11.5px;line-height:1.6;opacity:.9">
+ <div style="font-size:13.5px;line-height:1.6;opacity:.9">
  <p><b>The short version:</b> Starships does not collect, store or share any personal information. There are no accounts, no ads, no analytics and no tracking.</p>
  <p><b>What is stored.</b> Your campaign, save slots and options are stored only on your device, in your browser's local storage (or the app's equivalent storage). They never leave your device unless you copy a save code yourself.</p>
  <p><b>What is not collected.</b> We do not collect your name, email address, location, contacts, device identifiers, usage data or crash reports. The game makes no network requests while you play.</p>
@@ -1673,8 +1738,9 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <p><b>Contact.</b> [Publisher name] · [support email]</p></div>
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
- <div style="font-size:11.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>New mission: Escort Convoy. Your client's freighters cross the map and you keep the raiders off them</li><li>Your ships never damage each other or friendly freighters, and Concord enemies now show in hostile red so they can't be mistaken for your own ships</li></ul>
+ <div style="font-size:13.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>A new galaxy: 96 named star systems strung along the spiral arms and linked by hyperlanes, with organic borders that grow out from six capitals instead of pie slices</li><li>Every system has a character: shipyards, trade hubs, forge worlds, fortress worlds, ocean worlds, ancient ruins, nebula havens and more, each with a population and a description, and battles there are fought over that world</li><li>Shipyards, trade hubs and forge worlds held by friendly empires make ships, patronage and repairs better for you</li></ul>
+ <p><b>0.8.3</b></p><ul style="margin-top:0"><li>New mission: Escort Convoy. Your client's freighters cross the map and you keep the raiders off them</li><li>Your ships never damage each other or friendly freighters, and Concord enemies now show in hostile red so they can't be mistaken for your own ships</li></ul>
  <p><b>0.8.2</b></p><ul style="margin-top:0"><li>Easier start: rim contracts now match a lone Kestrel, you start with 1,500 cr, Landers cost 3,000 and Wasps 3,500, and planet and starbase defences scale with the sector</li><li>Capture missions only show up once you own a working Lander</li></ul>
  <p><b>0.8.1</b></p><ul style="margin-top:0"><li>Pinch to zoom the battle map, and a MAP button that shows the whole battlefield</li></ul>
  <p><b>0.8.0</b></p><ul style="margin-top:0"><li>Fleets of up to three ships, new role hulls, railguns, eight mission types, repairs and salvage, jump apertures</li></ul>
@@ -1698,24 +1764,23 @@ function galPanels(){const g=save.g;
  $('#greps').innerHTML=EORD.map(e=>{const r=repOf(e),a=alive(e);return`<span style="color:${EMP[e].col};opacity:${a?1:.35}"><b>${EMP[e].short}</b><i>${Math.round(shareOf(e)*100)}% · ${r>0?'+':''}${r}</i></span>`;}).join('');
  let h='';
  if(gal.sel<0){const ok=save.fleet.filter(opOK).length,hurt=save.fleet.filter(f=>!f.wreck&&f.dmg>.005).length,wr=save.fleet.length-ok;
-  h=`<h3>FLEET OF ${save.fleet.length} · RATING ${Math.round(fleetValue()).toLocaleString()}</h3><p>${save.fleet.map(f=>`${f.n} <span style="opacity:.6">${HULLS[f.lo.hull].name}${f.wreck?' · wrecked':f.dmg>.005?' · '+Math.round(100-f.dmg*100)+'%':''}</span>`).join(' · ')}</p>${hurt||wr?`<p style="color:#ffd166">${hurt?hurt+' damaged':''}${hurt&&wr?', ':''}${wr?wr+' wrecked':''}. The shipyard can fix that.</p>`:''}<p>Tap a sector on a border to see the work on offer. Core sectors are worth more and fight harder.</p>${g.log.slice(0,4).map(l=>`<p>${l}</p>`).join('')}`;}
+  h=`<h3>FLEET OF ${save.fleet.length} · RATING ${Math.round(fleetValue()).toLocaleString()}</h3><p>${save.fleet.map(f=>`${f.n} <span style="opacity:.6">${HULLS[f.lo.hull].name}${f.wreck?' · wrecked':f.dmg>.005?' · '+Math.round(100-f.dmg*100)+'%':''}</span>`).join(' · ')}</p>${hurt||wr?`<p style="color:#ffd166">${hurt?hurt+' damaged':''}${hurt&&wr?', ':''}${wr?wr+' wrecked':''}. The shipyard can fix that.</p>`:''}<p>Tap a star near a border to see the work on offer there. Gold-ringed stars are shipyards, trade hubs and forge worlds that help you while a friendly empire holds them. Core systems pay more and fight harder.</p>${g.log.slice(0,4).map(l=>`<p>${l}</p>`).join('')}`;}
  else{const S=SECT[gal.sel],o=g.own[gal.sel],cs=contractsFor(gal.sel);
-  h=`<h3 style="color:${EMP[o].col}">${S.name.toUpperCase()}</h3><p>${RNAME[S.r]} sector · worth ${'★'.repeat(S.val)} · held by the <span style="color:${EMP[o].col}">${EMP[o].name}</span></p>`;
+  const T=STYPE[S.type];h=`<h3 style="color:${EMP[o].col}">${S.name.toUpperCase()}</h3><p><b>${T.n}</b> · ${RNAME[S.r].toLowerCase()} system · worth ${'★'.repeat(S.val)} · population ${S.pop} · held by the <span style="color:${EMP[o].col}">${EMP[o].name}</span></p>
+   <p style="opacity:.75">${T.d.replace('{E}',EMP[o].short)}${S.id===SOL?' Home of humanity.':''}</p>${T.perk?`<p style="color:#ffe066">${T.perk}${repOf(o)>=25?' · active now':''}</p>`:''}`;
   if(!cs.length)h+=`<p>Deep inside ${EMP[o].short} space. No other empire can reach it yet.</p>`;
   for(const c of cs){const E=EMP[c.client],F=EMP[c.foe];
    if(c.refuses){h+=`<button class="ct" disabled><b style="color:${E.col}">${E.short.toUpperCase()}</b> refuses to hire you (rep ${repOf(c.client)})</button>`;continue;}
-   h+=`<div style="margin:10px 0 0;font-size:10px;letter-spacing:.12em"><b style="color:${E.col}">${c.def?'DEFEND IT FOR':'FIGHT FOR'} THE ${E.short.toUpperCase()}</b>${c.def?` <span style="opacity:.7">· the <span style="color:${F.col}">${F.short}</span> are coming</span>`:''}</div>`;
+   h+=`<div style="margin:10px 0 0;font-size:12px;letter-spacing:.12em"><b style="color:${E.col}">${c.def?'DEFEND IT FOR':'FIGHT FOR'} THE ${E.short.toUpperCase()}</b>${c.def?` <span style="opacity:.7">· the <span style="color:${F.col}">${F.short}</span> are coming</span>`:''}</div>`;
    for(const ty of c.types){const k=contract(gal.sel,c.client,ty,c.foe),[tl,tc]=threat(k.ev,k.st),M=MT[ty];
     const rg=M.terr||M.def?repGain(c.client,S.val):Math.ceil(repGain(c.client,S.val)*.6),rl=M.def?4+2*S.val:M.terr?6+3*S.val:8+3*S.val;
     h+=`<button class="ct" data-gact="go" data-arg="${gal.sel}:${c.client}:${ty}:${c.foe}"><div style="display:flex;justify-content:space-between;gap:6px"><b>${M.name.toUpperCase()}</b><span>${ty==='convoy'?'<small style="opacity:.6">up to </small>':''}${cr(k.reward)}</span></div>
-     <p>${M.terr?'Wins the sector':M.def?'Keeps the sector':'<b style="color:#ffe066">Pay only</b>'} · ${k.fleet.map(f=>HULLS[f.lo.hull].name).join(', ')}${M.st==='base'?(M.def?' attacking your starbase':' and a starbase'):M.st==='planet'?(M.def?' attacking the planet':' and 3 batteries'):M.st==='convoy'?' escorting 3 freighters':M.st==='escort'?' hunting your 3 freighters':''}${M.lander?' · <b style="color:#ffd166">needs a Lander</b>':''}</p>
+     <p>${M.terr?'Wins the sector':M.def?'Keeps the sector':'<b style="color:#ffe066">Pay only</b>'} · ${k.fleet.map(f=>HULLS[f.lo.hull].name).join(', ')||'No ships'}${M.st==='base'?(M.def?' attacking your starbase':', a starbase'):M.st==='planet'?(M.def?' attacking the planet':', '+(k.nbat||3)+' batteries'):M.st==='convoy'?' escorting 3 freighters':M.st==='escort'?' hunting your 3 freighters':''}${M.lander?' · <b style="color:#ffd166">needs a Lander</b>':''}</p>
      <p><span class="thr" style="color:${tc};border:1px solid ${tc}">${tl}</span> <span class="stars">${'★'.repeat(k.st)}${'☆'.repeat(4-k.st)}</span> · ${E.short} +${rg}, ${F.short} −${rl}${k.coal?' · COALITION BOUNTY':''}${k.marked?' · THEY ARE HUNTING YOU':''}</p></button>`;}}
   h+=`<button class="btn alt sm" data-gact="desel" style="margin-top:8px">CLOSE</button>`;}
  $('#gbot').innerHTML=h;gal.k='';galGeom();
 }
-function galGeom(){const land=W>H,t=$('#gtop').getBoundingClientRect(),b=$('#gbot').getBoundingClientRect();
- if(land){const l=t.right,r=W-b.left;gal.cx=l+(W-l-r)/2;gal.cy=H/2;gal.R=Math.max(80,Math.min(W-l-r-12,H-16)/2);}
- else{gal.cx=W/2;gal.cy=t.bottom+(b.top-t.bottom)/2;gal.R=Math.max(80,Math.min(W-12,b.top-t.bottom-12)/2);}
+function galGeom(){const m=$('#gmap').getBoundingClientRect();if(!m.width)return;gal.cx=m.left+m.width/2;gal.cy=m.top+m.height/2;gal.R=Math.max(80,Math.min(m.width,m.height)/2/1.05-4);
  const k=Math.round(gal.R)+':'+DPR;if(gal.k!==k){gal.k=k;gal.img=galImg(gal.R);}}
 function galImg(R){const s=Math.ceil(R*2.2*DPR),c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d'),cx=s/2,RR0=R*DPR,q=mulb(7);
  const cg=x.createRadialGradient(cx,cx,0,cx,cx,RR0);cg.addColorStop(0,'rgba(255,236,200,.55)');cg.addColorStop(.12,'rgba(255,210,160,.22)');cg.addColorStop(.5,'rgba(120,110,200,.08)');cg.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=cg;x.fillRect(0,0,s,s);
@@ -1723,33 +1788,48 @@ function galImg(R){const s=Math.ceil(R*2.2*DPR),c=document.createElement('canvas
   const px=cx+Math.cos(a)*r+Math.cos(a+1.57)*j,py=cx+Math.sin(a)*r+Math.sin(a+1.57)*j,b=q();x.fillStyle=b<.1?'rgba(255,200,170,.9)':b<.3?'rgba(170,200,255,.8)':'rgba(230,235,255,.55)';const z=(q()*1.4+.4)*DPR;x.fillRect(px,py,z,z);}
  for(let i=0;i<900;i++){const a=q()*TAU,r=RR0*Math.sqrt(q());x.fillStyle='rgba(220,225,255,.35)';x.fillRect(cx+Math.cos(a)*r,cx+Math.sin(a)*r,DPR*.8,DPR*.8);}
  return c;}
-function cellAng(c){return c*TAU/CELLS+GROT;}
-function secPath(id,R,cx,cy){const S=SECT[id],a0=cellAng(S.c),a1=cellAng(S.c+1),r0=RR[S.r]*R,r1=RR[S.r+1]*R;ctx.beginPath();ctx.arc(cx,cy,r1,a0,a1);ctx.arc(cx,cy,r0,a1,a0,true);ctx.closePath();}
+// territory: each pixel belongs to the nearest star, fading out into open space, so borders wander with the stars
+let terr={k:'',c:null};
+function terrImg(){const g=save.g,k=g.own.join(',');if(terr.k===k)return terr.c;
+ const N=340,K=1.15,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d'),im=x.createImageData(N,N),own=new Array(N*N),dd=new Float32Array(N*N);
+ const rgb={};for(const e of EORD)rgb[e]=EMP[e].rgb.split(',').map(Number);
+ for(let j=0;j<N;j++)for(let i=0;i<N;i++){const px=((i+.5)/N*2-1)*K,py=((j+.5)/N*2-1)*K;let b=-1,bd=9;
+  for(const S of SECT){const d=(S.x-px)*(S.x-px)+(S.y-py)*(S.y-py);if(d<bd){bd=d;b=S.id;}}
+  const nz=.018*(Math.sin(px*21+Math.sin(py*13)*2)+Math.sin(py*27+px*9));dd[j*N+i]=Math.sqrt(bd)+nz;own[j*N+i]=g.own[b];}
+ for(let j=0;j<N;j++)for(let i=0;i<N;i++){const p=j*N+i,d=dd[p],o=own[p],R0=.135;if(d>R0)continue;
+  const edge=(i<N-1&&own[p+1]!==o&&dd[p+1]<=R0)||(j<N-1&&own[p+N]!==o&&dd[p+N]<=R0)||(i>0&&own[p-1]!==o&&dd[p-1]<=R0)||(j>0&&own[p-N]!==o&&dd[p-N]<=R0);
+  const c0=rgb[o],f=Math.min(1,(R0-d)/.03),a=edge?.85:(.16+.14*(1-d/R0))*f;
+  im.data[p*4]=edge?Math.min(255,c0[0]+70):c0[0];im.data[p*4+1]=edge?Math.min(255,c0[1]+70):c0[1];im.data[p*4+2]=edge?Math.min(255,c0[2]+70):c0[2];im.data[p*4+3]=a*255;}
+ x.putImageData(im,0,0);terr={k,c};return c;}
+const sxy=(S)=>({x:gal.cx+S.x*gal.R,y:gal.cy+S.y*gal.R});
 function drawGalaxy(){
  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#03050b';ctx.fillRect(0,0,W,H);
  const{R,cx,cy}=gal,g=save.g;if(!gal.img)return;
- ctx.drawImage(gal.img,cx-gal.img.width/DPR/2,cy-gal.img.height/DPR/2,gal.img.width/DPR,gal.img.height/DPR);
- const cand=gal.sel>=0?contractsFor(gal.sel).map(c=>c.client):[];
- for(const S of SECT){const o=g.own[S.id],E=EMP[o];secPath(S.id,R,cx,cy);
-  ctx.fillStyle=`rgba(${E.rgb},${S.id===gal.sel?.45:.14+.05*S.val})`;ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=.6;ctx.stroke();}
- ctx.lineWidth=1.6;ctx.strokeStyle='rgba(255,255,255,.55)';
- for(const S of SECT){const o=g.own[S.id],r0=RR[S.r]*R,r1=RR[S.r+1]*R,a1=cellAng(S.c+1);
-  const nc=S.r*CELLS+(S.c+1)%CELLS;if(g.own[nc]!==o){ctx.beginPath();ctx.moveTo(cx+Math.cos(a1)*r0,cy+Math.sin(a1)*r0);ctx.lineTo(cx+Math.cos(a1)*r1,cy+Math.sin(a1)*r1);ctx.stroke();}
-  if(S.r<RINGS-1&&g.own[S.id+CELLS]!==o){ctx.beginPath();ctx.arc(cx,cy,r1,cellAng(S.c),a1);ctx.stroke();}}
- ctx.strokeStyle='rgba(255,255,255,.25)';ctx.beginPath();ctx.arc(cx,cy,RR[RINGS]*R,0,TAU);ctx.stroke();
- if(gal.sel>=0){const pl=.5+.5*Math.sin(performance.now()/250);
-  for(const n of nbrs(gal.sel))if(cand.includes(g.own[n])){secPath(n,R,cx,cy);ctx.setLineDash([4,4]);ctx.strokeStyle=`rgba(${EMP[g.own[n]].rgb},.9)`;ctx.lineWidth=1.4;ctx.stroke();ctx.setLineDash([]);}
-  secPath(gal.sel,R,cx,cy);ctx.strokeStyle=`rgba(255,255,255,${.6+.4*pl})`;ctx.lineWidth=2.4;ctx.stroke();}
- {const S=SECT[SOL],a=cellAng(S.c+.5),r=(RR[S.r]+RR[S.r+1])/2*R,x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;ctx.fillStyle='#ffe066';ctx.beginPath();ctx.arc(x,y,3.2,0,TAU);ctx.fill();
-  ctx.font='9px ui-monospace,Menlo,monospace';ctx.textAlign='left';ctx.fillText('SOL',x+6,y+3);}
- ctx.font='bold 10px ui-monospace,Menlo,monospace';ctx.textAlign='center';
- for(const e of EORD){let sx=0,sy=0,n=0;g.own.forEach((o,i)=>{if(o!==e)return;const S=SECT[i],a=cellAng(S.c+.5),r=(RR[S.r]+RR[S.r+1])/2*R;sx+=Math.cos(a)*r;sy+=Math.sin(a)*r;n++;});
-  if(!n)continue;ctx.fillStyle=EMP[e].col;ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(EMP[e].short.toUpperCase(),cx+sx/n,cy+sy/n+14);ctx.shadowBlur=0;}
+ ctx.globalAlpha=.8;ctx.drawImage(gal.img,cx-gal.img.width/DPR/2,cy-gal.img.height/DPR/2,gal.img.width/DPR,gal.img.height/DPR);ctx.globalAlpha=1;
+ ctx.imageSmoothingEnabled=true;ctx.drawImage(terrImg(),cx-R*1.15,cy-R*1.15,R*2.3,R*2.3);
+ const sel=gal.sel,cs=sel>=0?contractsFor(sel):[],cand=cs.map(c=>c.client),pl=.5+.5*Math.sin(performance.now()/250);
+ // hyperlanes
+ ctx.lineWidth=.7;for(const S of SECT)for(const n of S.nb)if(n>S.id){const a=sxy(S),b=sxy(SECT[n]),same=g.own[S.id]===g.own[n];
+  ctx.strokeStyle=same?'rgba(200,220,255,.13)':'rgba(255,255,255,.28)';ctx.setLineDash(same?[]:[2,3]);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+ ctx.setLineDash([]);
+ if(sel>=0){const a=sxy(SECT[sel]);ctx.lineWidth=1.6;for(const n of SECT[sel].nb){const b=sxy(SECT[n]);ctx.strokeStyle=cand.includes(g.own[n])?`rgba(${EMP[g.own[n]].rgb},.9)`:'rgba(255,255,255,.35)';ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
+ // stars
+ for(const S of SECT){const p=sxy(S),E=EMP[g.own[S.id]],r=S.cap?3.6:S.val===3?2.4:S.val===2?2:1.6;
+  ctx.fillStyle=`rgba(${E.rgb},.35)`;ctx.beginPath();ctx.arc(p.x,p.y,r*2.4,0,TAU);ctx.fill();
+  ctx.fillStyle=S.cap?'#fff6d8':'#eef4ff';ctx.beginPath();ctx.arc(p.x,p.y,r,0,TAU);ctx.fill();
+  if(S.cap){ctx.strokeStyle=E.col;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(p.x,p.y,r+3.5,0,TAU);ctx.stroke();}
+  else if(STYPE[S.type].perk){ctx.strokeStyle='rgba(255,224,102,.7)';ctx.lineWidth=.8;ctx.beginPath();ctx.arc(p.x,p.y,r+2.2,0,TAU);ctx.stroke();}}
+ if(sel>=0){const p=sxy(SECT[sel]);ctx.strokeStyle=`rgba(255,255,255,${.6+.4*pl})`;ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,9,0,TAU);ctx.stroke();}
+ // names: capitals always, plus the selected system and its neighbours
+ ctx.font='11px ui-monospace,Menlo,monospace';ctx.textAlign='center';ctx.shadowColor='#000';ctx.shadowBlur=4;
+ const lab=new Set(SECT.filter(S=>S.cap).map(S=>S.id));if(sel>=0){lab.add(sel);SECT[sel].nb.forEach(n=>lab.add(n));}
+ for(const id of lab){const S=SECT[id],p=sxy(S),on=id===sel;ctx.fillStyle=on?'#fff':S.cap?'#fff6d8':'rgba(220,230,255,.8)';ctx.font=(on||S.cap?'bold ':'')+'11px ui-monospace,Menlo,monospace';ctx.fillText(S.name.toUpperCase(),p.x,p.y-(S.cap?10:8));}
+ ctx.font='bold 10px ui-monospace,Menlo,monospace';
+ for(const S of SECT)if(S.cap){const o=g.own[S.id],p=sxy(S);ctx.fillStyle=EMP[o].col;ctx.fillText(EMP[o].short.toUpperCase()+(o!==S.cap?' (TAKEN)':''),p.x,p.y+19);}
+ ctx.shadowBlur=0;
 }
-function galTap(e){const dx=e.clientX-gal.cx,dy=e.clientY-gal.cy,d=Math.hypot(dx,dy)/gal.R;
- let r=-1;for(let i=0;i<RINGS;i++)if(d>=RR[i]&&d<RR[i+1])r=i;if(r<0){gal.sel=-1;galPanels();return;}
- let a=Math.atan2(dy,dx)-GROT;a=((a%TAU)+TAU)%TAU;gal.sel=r*CELLS+Math.floor(a/(TAU/CELLS));galPanels();}
+function galTap(e){let best=-1,bd=26;for(const S of SECT){const p=sxy(S),d=Math.hypot(e.clientX-p.x,e.clientY-p.y);if(d<bd){bd=d;best=S.id;}}
+ gal.sel=best;galPanels();}
 $('#gal').addEventListener('click',e=>{const b=e.target.closest('[data-gact]');if(!b)return;const a=b.dataset.gact;
  if(a==='yard'){yardTab='ship';yard();}
  else if(a==='stand')standings();
@@ -1764,28 +1844,29 @@ function openBrief(c){if(brief.c!==c){brief.c=c;const ok=save.fleet.map((f,i)=>i
 function briefScreen(){const c=brief.c,M=MT[c.type],S=SECT[c.sid],E=EMP[c.client],F=EMP[c.foe];brief.pick=brief.pick.filter(i=>save.fleet[i]&&opOK(save.fleet[i]));
  const fv=fleetValue(brief.pick),[tl,tc]=threat(c.ev,c.st,fv),needL=M.lander&&!brief.pick.some(i=>save.fleet[i].lo.hull==='lander');
  let h=`<div class="hdr"><h2>${M.name.toUpperCase()}</h2>${cr(save.credits)}</div><div class="tag">${S.name.toUpperCase()} · FOR THE <span style="color:${E.col}">${E.short.toUpperCase()}</span> · AGAINST THE <span style="color:${F.col}">${F.short.toUpperCase()}</span></div>
- <p style="font-size:11.5px;line-height:1.5;opacity:.88">${M.d}</p>
+ <p style="font-size:13.5px;line-height:1.5;opacity:.88">${M.d}</p>
  <div class="row"><div class="t"><b style="color:${F.col}">OPPOSITION</b><span class="stars">${'★'.repeat(c.st)}${'☆'.repeat(4-c.st)}</span></div>
  ${c.fleet.map(f=>`<p><b>${HULLS[f.lo.hull].name}</b> ${ROLE[HULLS[f.lo.hull].role].toLowerCase()}, ${AIS[f.pers].label.toLowerCase()} captain · ${loSummary(f.lo)}</p>`).join('')}
  ${M.st==='base'&&!M.def?'<p><b>Starbase</b> with beams, torpedoes and a missile battery, and heavy shields</p>':''}${M.st==='planet'&&!M.def?'<p><b>Three defence batteries</b> in orbit, each with a beam and a torpedo tube</p>':''}${M.st==='convoy'?'<p><b>Three freighters</b>, unarmed, making for the far edge of the map</p>':''}${M.st==='escort'?'<p style="color:#7dffb0">On your side: three unarmed freighters. They fly themselves to the far edge.</p>':''}
  ${M.def?`<p style="color:#7dffb0">On your side: ${M.st==='base'?'the starbase':'three defence batteries'}, fighting on their own.</p>`:''}</div>
- <p style="font-size:11px">Pay ${cr(c.reward)}${c.type==='convoy'?' if all three freighters die, a third of it per kill':''} · against this squadron: <span class="thr" style="color:${tc};border:1px solid ${tc}">${tl}</span></p>
+ <p style="font-size:13px">Pay ${cr(c.reward)}${c.type==='convoy'?' if all three freighters die, a third of it per kill':''} · against this squadron: <span class="thr" style="color:${tc};border:1px solid ${tc}">${tl}</span></p>
  <div class="tag" style="margin-bottom:2px">CHOOSE UP TO ${MAXDEPLOY} SHIPS · DAMAGE CARRIES OVER</div>`;
  save.fleet.forEach((f,i)=>{const on=brief.pick.includes(i),X=HULLS[f.lo.hull];
-  h+=`<div class="row ${on?'cur':''}"><div class="t"><b>${f.n.toUpperCase()}</b><span style="font-size:10px;opacity:.6">${X.name.toUpperCase()} · ${ROLE[X.role].toUpperCase()}</span></div>
+  h+=`<div class="row ${on?'cur':''}"><div class="t"><b>${f.n.toUpperCase()}</b><span style="font-size:12px;opacity:.6">${X.name.toUpperCase()} · ${ROLE[X.role].toUpperCase()}</span></div>
   <div style="display:flex;gap:8px;align-items:center"><img src="${shipPic('line',f.lo.hull,'95,227,255',f.lo.mounts.filter(m=>m.t))}" style="width:96px;opacity:${f.wreck?.3:1}">
   <p style="margin:0">${f.wreck?'<b style="color:#ff6b5a">Wrecked</b>':`Hull <b style="color:${f.dmg>.5?'#ff6b5a':f.dmg>.005?'#ffd166':'#7dffb0'}">${Math.round(100-f.dmg*100)}%</b>`} · ${loSummary(f.lo)}</p></div>
   ${f.wreck?`<button class="btn alt sm" data-act="bsalvage" data-arg="${i}" ${salvageCost(f)>save.credits?'disabled':''}>SALVAGE · ${salvageCost(f).toLocaleString()} cr</button>`:`<button class="btn sm ${on?'':'alt'}" data-act="bpick" data-arg="${i}">${on?'✓ DEPLOYED':'DEPLOY'}</button>`}
   ${!f.wreck&&f.dmg>.005?`<button class="btn alt sm" data-act="brepair" data-arg="${i}" ${repairCost(f)>save.credits?'disabled':''}>REPAIR · ${repairCost(f).toLocaleString()} cr</button>`:''}</div>`;});
- h+=`${needL?'<p style="color:#ff9a6b;font-size:11px">This mission needs a Lander in the squadron. Landers are sold in the shipyard.</p>':''}
+ h+=`${needL?'<p style="color:#ff9a6b;font-size:13px">This mission needs a Lander in the squadron. Landers are sold in the shipyard.</p>':''}
  <button class="btn gold" data-act="launch" ${!brief.pick.length||needL?'disabled':''}>LAUNCH</button> <button class="btn alt" data-act="hub">BACK</button>`;
  const st=$('#scrBox').scrollTop,same=$('#scrBox').dataset.k==='brief';show(h);$('#scrBox').dataset.k='brief';if(same)$('#scrBox').scrollTop=st;}
 function standings(){const g=save.g,pat=patronage(),dsc=discount();
  const st=r=>r>=50?['ALLIED','#7dffb0']:r>=25?['FRIENDLY','#5fe3ff']:r>-40?['NEUTRAL','#cfe9f2']:r>-60?['HOSTILE · REFUSES WORK','#ff9a6b']:['HUNTING YOU','#ff5a4a'];
  const ul=e=>{const o=[];for(const cat in UNLOCK)for(const k in UNLOCK[cat])for(const[x,r]of UNLOCK[cat][k])if(x===e){const nm=cat==='hull'?HULLS[k].name:cat==='mod'?MODS[k].name:cat==='tv'?TV[k].name+' torpedoes':WD[k].name+'s';o.push(`<span style="opacity:${repOf(e)>=r?1:.45}">${nm} (${r})</span>`);}return o.join(', ');};
  show(`<div class="hdr"><h2>STANDINGS</h2>${cr(save.credits)}</div><div class="tag">${g.n} CONTRACTS · ${save.wins}W ${save.losses}L · PATRONAGE ${pat} CR PER WIN · SHIPYARD DISCOUNT ${dsc}%</div>
- ${EORD.map(e=>{const E=EMP[e],r=repOf(e),[sl,sc]=st(r);return`<div class="row"><div class="t"><b style="color:${E.col}">${E.name.toUpperCase()}</b><span style="color:${sc};font-size:10px">${sl}</span></div>
-  <p>${alive(e)?Math.round(shareOf(e)*100)+'% of the galaxy':'<b>Destroyed</b>'} · reputation ${r>0?'+':''}${r}</p><p>${E.bio}</p><p style="font-size:10px">Unlocks: ${ul(e)}</p></div>`;}).join('')}
+ <p style="font-size:13px;opacity:.85">Friendly-held special systems: <b>${perkCount('shipyard')}</b> shipyards (ships 3% cheaper each), <b>${perkCount('trade')}</b> trade hubs (patronage +10% each), <b>${perkCount('forge')}</b> forge worlds (repairs 10% cheaper each, up to 40%). Gold-ringed stars on the map are special systems.</p>
+ ${EORD.map(e=>{const E=EMP[e],r=repOf(e),[sl,sc]=st(r);return`<div class="row"><div class="t"><b style="color:${E.col}">${E.name.toUpperCase()}</b><span style="color:${sc};font-size:12px">${sl}</span></div>
+  <p>${alive(e)?Math.round(shareOf(e)*100)+'% of the galaxy':'<b>Destroyed</b>'} · reputation ${r>0?'+':''}${r}</p><p>${E.bio}</p><p style="font-size:12px">Unlocks: ${ul(e)}</p></div>`;}).join('')}
  <ul><li>Working for an empire raises your standing with them and lowers it with the empire you hit. Below −40 they refuse to hire you. Below −60 they send their best after you.</li>
  <li>Every win pays patronage from each empire at +25 or better, scaled by their size. An empire at +40 or better gives you a shipyard discount based on its size.</li>
  <li>The galaxy fights on between your missions. Any empire above 40% faces a coalition: it loses ground faster, and contracts against it pay more.</li>
@@ -1799,25 +1880,25 @@ function yard(){
  <div class="chips" style="margin-bottom:6px">${save.fleet.map((x,i)=>`<button class="btn sm ${i===save.sel?'':'alt'}" data-act="selship" data-arg="${i}">${x.n.toUpperCase()}<span style="opacity:.7"> · ${HULLS[x.lo.hull].name.toUpperCase()}${x.wreck?' · WRECK':x.dmg>.005?' · '+Math.round(100-x.dmg*100)+'%':''}</span></button>`).join('')}</div>
  <div class="tabs">${tabs.map(t=>`<button class="${t===yardTab?'on':''}" data-act="tab" data-arg="${t}">${t==='ship'?f.n.toUpperCase():t==='buy'?'BUY SHIPS':t.toUpperCase()}</button>`).join('')}</div>`;
  const wrecked=f.wreck&&['systems','weapons','modules'].includes(yardTab);
- if(wrecked)h+=`<p style="font-size:11px;color:#ff9a6b">${f.n} is a wreck. Salvage it before refitting.</p>`;
+ if(wrecked)h+=`<p style="font-size:13px;color:#ff9a6b">${f.n} is a wreck. Salvage it before refitting.</p>`;
  if(yardTab==='ship'){
-  h+=`<div class="row cur"><div class="t"><b>${f.n.toUpperCase()}</b><span style="font-size:10px;opacity:.6">${H.name.toUpperCase()} · ${ROLE[H.role].toUpperCase()}</span></div>
+  h+=`<div class="row cur"><div class="t"><b>${f.n.toUpperCase()}</b><span style="font-size:12px;opacity:.6">${H.name.toUpperCase()} · ${ROLE[H.role].toUpperCase()}</span></div>
   <img src="${shipPic('line',lo.hull,'95,227,255',lo.mounts.filter(m=>m.t))}" style="width:170px;display:block;margin:2px 0;opacity:${f.wreck?.3:1}"><p>${H.desc}</p><p>${loSummary(lo)}</p>
   <div class="kv"><span>Hull <b>${f.wreck?0:Math.round(100-f.dmg*100)}%</b></span><span>Value <b>${loValue(lo).toLocaleString()}</b></span><span>Sensors <b>${Math.round((H.sens||1)*100)}%</b></span></div>
   ${f.wreck?`<button class="btn gold sm" data-act="salvage" data-arg="${save.sel}" ${salvageCost(f)>save.credits?'disabled':''}>SALVAGE AND REBUILD · ${salvageCost(f).toLocaleString()} cr</button>`:f.dmg>.005?`<button class="btn gold sm" data-act="repair" data-arg="${save.sel}" ${repairCost(f)>save.credits?'disabled':''}>REPAIR · ${repairCost(f).toLocaleString()} cr</button>`:'<p style="color:var(--cy)">Fully repaired</p>'}
   <button class="btn alt sm" data-act="sellship" ${save.fleet.length<2?'disabled':''}>${f.wreck?'SCRAP':'SELL'} · +${sellVal(f).toLocaleString()} cr</button></div>
-  <p style="font-size:11px;opacity:.7">You can keep up to ${MAXFLEET} ships and send up to ${MAXDEPLOY} on each mission. Damage stays with a ship until you repair it, and a destroyed ship stays a wreck until you salvage it.</p>`;}
+  <p style="font-size:13px;opacity:.7">You can keep up to ${MAXFLEET} ships and send up to ${MAXDEPLOY} on each mission. Damage stays with a ship until you repair it, and a destroyed ship stays a wreck until you salvage it.</p>`;}
  if(yardTab==='buy'){
-  h+=`<p style="font-size:11px;opacity:.75">Every hull fills a different role. Friendly empires sell their best designs. New ships come with stock weapons. Hangar: ${save.fleet.length}/${MAXFLEET}.${discount()?' Patron discount '+discount()+'%.':''}</p>`;
+  h+=`<p style="font-size:13px;opacity:.75">Every hull fills a different role. Friendly empires sell their best designs. New ships come with stock weapons. Hangar: ${save.fleet.length}/${MAXFLEET}.${discount()?' Patron discount '+discount()+'%.':''}</p>`;
   for(const k of HORDER){const X=HULLS[k],lk=!unlocked('hull',k),p=price(X.price),full=save.fleet.length>=MAXFLEET;
-   h+=`<div class="row"><div class="t"><b>${X.name.toUpperCase()}</b><span style="font-size:10px;opacity:.6">${ROLE[X.role].toUpperCase()}</span></div><img src="${shipPic('line',k,'95,227,255')}" style="width:150px;display:block;margin:2px 0"><p>${X.desc}</p>
+   h+=`<div class="row"><div class="t"><b>${X.name.toUpperCase()}</b><span style="font-size:12px;opacity:.6">${ROLE[X.role].toUpperCase()}</span></div><img src="${shipPic('line',k,'95,227,255')}" style="width:150px;display:block;margin:2px 0"><p>${X.desc}</p>
    <div class="kv"><span>Hull <b>${X.hull}</b></span><span>Shields <b>${X.sh}</b></span><span>Speed <b>${X.speed}</b></span><span>Turn <b>${X.turn}</b></span><span>Mounts <b>${X.mounts}+2</b></span><span>Modules <b>${X.mods}</b></span><span>Beams <b>${arcTxt(X.arcs.beam)}</b></span><span>Sensors <b>${Math.round((X.sens||1)*100)}%</b></span><span>Stock <b>${X.stock.map(t=>WD[t].name).join(', ')}</b></span></div>
    ${lk?`<p style="color:#ff9a6b">${lockTxt('hull',k)}</p>`:`<button class="btn sm ${p<=save.credits&&!full?'gold':''}" data-act="buyship" data-arg="${k}" ${p>save.credits||full?'disabled':''}>${full?'HANGAR FULL':'BUY · '+p.toLocaleString()+' cr'}</button>`}</div>`;}}
  if(yardTab==='systems'&&!wrecked){for(const k in UPG){const l=lo.upg[k],c=UPC[l];
   h+=`<div class="row"><div class="t"><b>${UPG[k].name.toUpperCase()}</b><span class="lv">${'●'.repeat(l)}${'○'.repeat(4-l)}</span></div><p>${UPG[k].d}</p>
   ${l<4?`<button class="btn sm" data-act="upg" data-arg="${k}" ${c>save.credits?'disabled':''}>UPGRADE · ${c.toLocaleString()} cr</button>`:'<p style="color:var(--cy)">Maxed</p>'}</div>`;}}
  if(yardTab==='weapons'&&!wrecked){
-  h+=`<p style="font-size:11px;opacity:.75">${H.name} firing arcs: beams ${arcTxt(H.arcs.beam).toLowerCase()}, torpedoes forward ${H.arcs.torp*2}°, railguns forward ${H.arcs.rail*2}°, swarms any direction. Swapping a weapon refunds half its value.</p>`;
+  h+=`<p style="font-size:13px;opacity:.75">${H.name} firing arcs: beams ${arcTxt(H.arcs.beam).toLowerCase()}, torpedoes forward ${H.arcs.torp*2}°, railguns forward ${H.arcs.rail*2}°, swarms any direction. Swapping a weapon refunds half its value.</p>`;
   lo.mounts.forEach((m,i)=>{
    h+=`<div class="row"><div class="t"><b>MOUNT ${i+1}</b><span style="color:${m.t==='torp'?tvOf(m).col:m.t?WCOL[m.t]:'#888'}">${m.t?(m.t==='torp'?tvOf(m).name.toUpperCase()+' ':'')+WD[m.t].name.toUpperCase()+' MK '+MK[m.tier]:'EMPTY'}</span></div>
    ${m.t&&m.tier<3?`<button class="btn sm" data-act="tier" data-arg="${i}" ${TIERC[m.tier-1]>save.credits?'disabled':''}>UPGRADE TO MK ${MK[m.tier+1]} · ${TIERC[m.tier-1]} cr</button>`:''}
@@ -1826,9 +1907,9 @@ function yard(){
   if(lo.extra<2)h+=`<div class="row"><div class="t"><b>ADD HARDPOINT</b><span>${lo.extra}/2 added</span></div><p>Fit an extra weapon mount to this hull.</p><button class="btn sm" data-act="mount" ${MC[lo.extra]>save.credits?'disabled':''}>ADD MOUNT · ${MC[lo.extra]} cr</button></div>`;
  }
  if(yardTab==='modules'&&!wrecked){
-  h+=`<p style="font-size:11px;opacity:.75">Module slots used: ${lo.mods.length}/${H.mods}. Removing a module refunds half its price.</p>`;
+  h+=`<p style="font-size:13px;opacity:.75">Module slots used: ${lo.mods.length}/${H.mods}. Removing a module refunds half its price.</p>`;
   for(const k in MODS){const M=MODS[k],has=lo.mods.includes(k);
-   h+=`<div class="row ${has?'cur':''}"><div class="t"><b>${M.name.toUpperCase()}</b><span style="font-size:10px;opacity:.6">${M.active?'ACTIVE · '+(M.dur>1e6?'TOGGLED':M.dur+'S')+' · '+M.cd+'S RECHARGE':'PASSIVE'}</span></div><p>${M.d}</p>
+   h+=`<div class="row ${has?'cur':''}"><div class="t"><b>${M.name.toUpperCase()}</b><span style="font-size:12px;opacity:.6">${M.active?'ACTIVE · '+(M.dur>1e6?'TOGGLED':M.dur+'S')+' · '+M.cd+'S RECHARGE':'PASSIVE'}</span></div><p>${M.d}</p>
    ${has?`<button class="btn alt sm" data-act="sellmod" data-arg="${k}">REMOVE · +${Math.round(M.price/2)} cr</button>`:!unlocked('mod',k)?`<p style="color:#ff9a6b">${lockTxt('mod',k)}</p>`:`<button class="btn sm" data-act="buymod" data-arg="${k}" ${M.price>save.credits||lo.mods.length>=H.mods?'disabled':''}>${lo.mods.length>=H.mods?'NO FREE SLOT':'INSTALL · '+M.price+' cr'}</button>`}</div>`;}}
  h+=`<button class="btn alt" data-act="hub">BACK TO GALAXY</button>`;
  const st=$('#scrBox').scrollTop,same=$('#scrBox').dataset.k==='yard';show(h);$('#scrBox').dataset.k='yard';if(same)$('#scrBox').scrollTop=st;
@@ -1847,20 +1928,20 @@ function act(a,arg){
   case'privacy':privacyScreen();break;
   case'about':aboutScreen();break;
   case'slotsave':try{localStorage.setItem(slotKey(arg),JSON.stringify({t:Date.now(),v:VERSION,data:save}));msg('SAVED TO SLOT '+arg,'#7dffb0');}catch(e){msg('COULD NOT SAVE','#ff6b5a');}savesScreen();break;
-  case'slotload':show(`<h2>LOAD SLOT ${arg}?</h2><p style="font-size:12px;opacity:.8">This replaces your current campaign. Save it to another slot first if you want to keep it.</p><button class="btn" data-act="slotload2" data-arg="${arg}">LOAD</button><button class="btn alt" data-act="saves">CANCEL</button>`);break;
+  case'slotload':show(`<h2>LOAD SLOT ${arg}?</h2><p style="font-size:14px;opacity:.8">This replaces your current campaign. Save it to another slot first if you want to keep it.</p><button class="btn" data-act="slotload2" data-arg="${arg}">LOAD</button><button class="btn alt" data-act="saves">CANCEL</button>`);break;
   case'slotload2':{const d=readSlot(arg),ok=d&&sanitize(d.data);if(!ok){msg('THAT SAVE COULD NOT BE READ','#ff6b5a');savesScreen();break;}save=ok;persist();gal.sel=-1;titleBack='hub';msg('LOADED SLOT '+arg,'#7dffb0');hub();break;}
   case'slotdel':try{localStorage.removeItem(slotKey(arg));}catch(e){}savesScreen();break;
   case'export':{const cb=$('#codebox');cb.value=btoa(unescape(encodeURIComponent(JSON.stringify(save))));cb.select&&cb.select();break;}
   case'copycode':{const v=$('#codebox').value;if(!v)break;try{navigator.clipboard.writeText(v).then(()=>msg('CODE COPIED','#7dffb0'),()=>msg('SELECT THE CODE AND COPY IT','#ffd166'));}catch(e){msg('SELECT THE CODE AND COPY IT','#ffd166');}break;}
   case'import':{let d=null;try{d=sanitize(JSON.parse(decodeURIComponent(escape(atob($('#codebox').value.trim())))));}catch(e){}
    if(!d){msg('THAT CODE ISN\'T A VALID SAVE','#ff6b5a');break;}save=d;persist();gal.sel=-1;titleBack='hub';msg('CAMPAIGN LOADED','#7dffb0');hub();break;}
-  case'wipe':show(`<h2>DELETE EVERYTHING?</h2><p style="font-size:12px;opacity:.8">This erases your campaign, all save slots and your options from this device. It cannot be undone.</p><button class="btn" data-act="wipe2">DELETE</button><button class="btn alt" data-act="options">CANCEL</button>`);break;
+  case'wipe':show(`<h2>DELETE EVERYTHING?</h2><p style="font-size:14px;opacity:.8">This erases your campaign, all save slots and your options from this device. It cannot be undone.</p><button class="btn" data-act="wipe2">DELETE</button><button class="btn alt" data-act="options">CANCEL</button>`);break;
   case'wipe2':try{localStorage.removeItem(KEY);for(let i=1;i<=SLOTS;i++)localStorage.removeItem(slotKey(i));localStorage.removeItem(OPT_KEY);}catch(e){}
    OPT={sound:true,vol:.7,shake:true,turn:6,fast:false,hints:true};applyOpt();try{localStorage.removeItem(OPT_KEY);}catch(e){}save=defSave();title();break;
     case'yard':yardTab='ship';yard();$('#scrBox').scrollTop=0;break;
   case'selship':save.sel=+arg;if(yardTab==='buy')yardTab='ship';yard();break;
   case'buyship':{if(!unlocked('hull',arg)||save.fleet.length>=MAXFLEET)return;const p=price(HULLS[arg].price);if(p>save.credits)return;save.credits-=p;save.fleet.push(newShipRec(arg));save.sel=save.fleet.length-1;persist();msg('NEW SHIP: '+curShip().n.toUpperCase()+' · '+HULLS[arg].name.toUpperCase(),'#ffe066');yardTab='ship';yard();$('#scrBox').scrollTop=0;break;}
-  case'sellship':{if(save.fleet.length<2)return;show(`<h2>${cf.wreck?'SCRAP':'SELL'} ${cf.n.toUpperCase()}?</h2><p style="font-size:12px;opacity:.8">You get ${sellVal(cf).toLocaleString()} cr for the ${HULLS[lo.hull].name} and everything fitted to it.</p><button class="btn" data-act="sellship2">${cf.wreck?'SCRAP':'SELL'}</button><button class="btn alt" data-act="yard">CANCEL</button>`);break;}
+  case'sellship':{if(save.fleet.length<2)return;show(`<h2>${cf.wreck?'SCRAP':'SELL'} ${cf.n.toUpperCase()}?</h2><p style="font-size:14px;opacity:.8">You get ${sellVal(cf).toLocaleString()} cr for the ${HULLS[lo.hull].name} and everything fitted to it.</p><button class="btn" data-act="sellship2">${cf.wreck?'SCRAP':'SELL'}</button><button class="btn alt" data-act="yard">CANCEL</button>`);break;}
   case'sellship2':{if(save.fleet.length<2)return;save.credits+=sellVal(cf);save.fleet.splice(save.sel,1);save.sel=0;persist();yardTab='ship';yard();break;}
   case'repair':case'brepair':{const f=save.fleet[+arg],c=f?repairCost(f):0;if(!f||f.wreck||c>save.credits)return;save.credits-=c;f.dmg=0;persist();a==='repair'?yard():briefScreen();break;}
   case'salvage':case'bsalvage':{const f=save.fleet[+arg],c=f?salvageCost(f):0;if(!f||!f.wreck||c>save.credits)return;save.credits-=c;f.wreck=0;f.dmg=0;persist();msg(f.n.toUpperCase()+' REBUILT','#7dffb0');a==='salvage'?yard():briefScreen();break;}
@@ -1883,7 +1964,7 @@ function act(a,arg){
   case'opt:turn4':case'opt:turn6':case'opt:turn8':OPT.turn=+a.slice(8);applyOpt();optionsScreen();break;
   case'opt:fast0':case'opt:fast1':OPT.fast=a==='opt:fast1';applyOpt();optionsScreen();break;
   case'opt:hints':OPT.hints=!OPT.hints;applyOpt();optionsScreen();break;
-  case'reset':show(`<h2>RESET CAMPAIGN?</h2><p style="font-size:12px;opacity:.8">This wipes your credits, ship, reputation and the galaxy.</p><button class="btn" data-act="reset2">YES, RESET</button><button class="btn alt" data-act="hub">CANCEL</button>`);break;
+  case'reset':show(`<h2>RESET CAMPAIGN?</h2><p style="font-size:14px;opacity:.8">This wipes your credits, ship, reputation and the galaxy.</p><button class="btn" data-act="reset2">YES, RESET</button><button class="btn alt" data-act="hub">CANCEL</button>`);break;
   case'reset2':newGame();break;
  }
 }
