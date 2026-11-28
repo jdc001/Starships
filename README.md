@@ -1,6 +1,6 @@
 # Starships (working title)
 
-Version 0.9.2
+Version 0.9.3
 
 A squadron-scale starship combat game for iPhone and iPad, played in simultaneous turns.
 
@@ -12,10 +12,10 @@ On iPhone, open the link in Safari and choose Share > Add to Home Screen to play
 
 You take up to three ships on each mission. Each turn you give every ship a course and one action (or hand it to an AUTO captain), then tap ENGAGE. Every ship on both sides carries out its orders together for six seconds. The enemy chooses in secret.
 
-- **Course:** tap or drag in space, or pick a tactical order (Strafe, Orbit, Lance, Evade, About, Stop). The dotted line shows exactly where you will go.
+- **Course:** tap or drag in space (+ WAYPOINT adds up to five stops; tap the last one to brake to a stop there facing the target), or pick a tactical order (Strafe, Orbit, Lance, Evade, About, Stop). The dotted line shows exactly where you will go.
 - **Action:** Hold (bank weapon charge), Fire (release it when your guns bear), Scan (reveal the board, and yourself), Flank (top speed, no firing). A cloak adds Cloak, Strike (fire then cloak) and Ambush (decloak and fire). A tractor beam adds Tractor.
 - **Map:** pinch to zoom in or out, or tap MAP to see the whole battlefield.
-- **Squadron:** tap a ship or its button in the fleet bar to select it; tap an enemy to make it that ship's target. Guns that can't bear on the target fire at anything else in reach. Your ships share sensors.
+- **Squadron:** tap a ship or its button in the fleet bar to select it. Tap an enemy, or use ◀ ▶ on the target card, to set its target; FOCUS keeps its guns on that target, FREE lets them fire at anything in reach. Your ships share sensors.
 - **Jump, mines, drones:** Jump opens an aperture and brings the ship out anywhere you tap, but takes its weapons offline for two turns. Aft mines drop on top of any action every three turns. The Drone Swarm module launches four point-defence drones for three turns that can shoot down torpedoes.
 - **Railguns:** the longest-ranged weapon. Slugs fly straight, so fast, jinking ships can dodge them.
 - **Torpedoes:** Fusion (yellow, balanced), Antimatter (red, heavy but slow and short-ranged), Gravitational (blue, light but knocks the target off course and toward planets). Each mount upgrades Mk I to III.

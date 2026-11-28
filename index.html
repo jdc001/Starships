@@ -29,6 +29,9 @@ canvas{position:fixed;inset:0;display:block}
 .pills{display:flex;gap:3px;margin-top:4px}
 .pills span{flex:1;font-size:8px;text-align:center;border-radius:3px;padding:1px 0;color:#04060c;font-weight:700}
 #enemyCard{border-color:rgba(255,179,71,.3)}
+.tctl{display:flex;gap:4px;margin-top:5px}.tctl button{font:inherit;flex:1;font-size:11px;letter-spacing:.08em;color:#cfe9f2;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:4px 0}
+.tctl #focusBtn{flex:2}.tctl #focusBtn.on{border-color:#ffe066;color:#ffe066}
+.ib.on{border-color:#5fe3ff;color:#5fe3ff;background:rgba(95,227,255,.12)}
 #trow{display:flex;justify-content:center;align-items:center;gap:6px}
 #fleetw{pointer-events:auto;display:flex;flex-direction:column;gap:3px}
 #fleet{display:flex;gap:4px;justify-content:center}
@@ -184,11 +187,12 @@ ul{padding-left:18px;margin:10px 0 0;font-size:13px;line-height:1.55;opacity:.85
  <div id="top">
   <div class="cards">
    <div class="card panel" id="pCard"><div class="nm"><span id="pName">HALBERD</span><i id="pHp">100%</i></div><div class="hb"><b id="pBar" style="background:var(--cy)"></b></div><div class="pills" id="pPills"></div></div>
-   <div class="card panel" id="enemyCard"><div class="nm"><span id="eName" style="color:var(--am)">KESH</span><i id="eHp">100%</i></div><div class="hb"><b id="eBar" style="background:var(--am)"></b></div><div class="pills" id="ePills"></div></div>
+   <div class="card panel" id="enemyCard"><div class="nm"><span id="eName" style="color:var(--am)">KESH</span><i id="eHp">100%</i></div><div class="hb"><b id="eBar" style="background:var(--am)"></b></div><div class="pills" id="ePills"></div><div class="tctl"><button id="tPrev">◀</button><button id="focusBtn" class="on">FOCUS</button><button id="tNext">▶</button></div></div>
   </div>
   <div id="trow">
    <button class="ib" id="pauseBtn">II</button>
    <div class="panel" id="sens"><span class="lbl">SENSORS</span><b id="sensV">CONTACT</b></div>
+   <button class="ib" id="crsBtn" style="display:none">+ WAYPOINT</button>
    <button class="ib" id="mapBtn">MAP</button>
    <button class="ib" id="muteBtn">SND</button>
   </div>
@@ -790,7 +794,7 @@ function mountStatus(s,m,t){
  if(!s.alive||!t||!t.alive||s.disabled||t.team===s.team)return'none';if(isOn(s,'phase')||s.jump)return'phase';if(isOn(s,'cloak'))return'cloaked';if(m.cd<1)return'charging';if(!t.vis[s.team])return'nolock';
  if(s.wpnLock>0)return'locked';const w=WD[m.t];if(dist(s,t)>mRange(m))return'range';
  if(Math.abs(wrap(angTo(s,t)-s.a))>s.H.arcs[m.t]*Math.PI/180)return'arc';
- if((m.t==='beam'||m.t==='rail')&&blocked(s,t))return'los';if(t.disabled&&mission&&mission.type==='capbase')return'none';return'ok';
+ if(blocked(s,t))return'los';if(t.disabled&&mission&&mission.type==='capbase')return'none';return'ok';
 }
 const ORD={ok:7,arc:5,range:5,los:5,nolock:4,cloaked:4,phase:4,locked:4,charging:1,none:0};
 function typeStatus(s,type,t){let st='none',pct=0,n=0;for(const m of s.mounts){if(m.t!==type)continue;n++;pct=Math.max(pct,Math.min(1,m.cd));const x=mountStatus(s,m,t);if(ORD[x]>ORD[st])st=x;}return{st,pct,n};}
@@ -798,14 +802,14 @@ const foesOf=s=>ships.filter(o=>o.alive&&o.team!==s.team);
 // each mount fires on the ship's chosen target, or failing that on the nearest enemy it can reach
 function fireType(s,type,t){let n=0,alt=null;const amb=gameTime-s.seenAt>2.5&&s.ambOk;
  for(const m of s.mounts){if(m.t!==type)continue;let tt=t;
-  if(mountStatus(s,m,t)!=='ok'){if(m.cd<1)continue;if(!alt)alt=foesOf(s).filter(o=>o!==t&&o.vis[s.team]).sort((a,b)=>dist(s,a)-dist(s,b));tt=alt.find(o=>mountStatus(s,m,o)==='ok');if(!tt)continue;}
+  if(mountStatus(s,m,t)!=='ok'){if(m.cd<1||(s.focus&&t&&t.alive))continue;if(!alt)alt=foesOf(s).filter(o=>o!==t&&o.vis[s.team]).sort((a,b)=>dist(s,a)-dist(s,b));tt=alt.find(o=>mountStatus(s,m,o)==='ok');if(!tt)continue;}
   fireMount(s,m,tt,n,amb);n++;}
  if(n){s.lit=Math.max(s.lit,1.5);if(amb&&!s.ambSaid){s.ambSaid=1;msg(s.team==='p'?uname(s)+' AMBUSH · +50% DAMAGE':'AMBUSHED BY A '+uname(s),'#ffe066');}}
  return n;}
 // steady platforms shoot straighter: fast ships hit softer, stopped ships hit harder
 function gunnery(s){if(s.fixed)return 1.1;return 1.2-.3*clamp(Math.hypot(s.vx,s.vy)/s.H.speed,0,1.2);}
 function fireMount(s,m,t,idx,amb){
- const ch=Math.max(1,Math.floor(m.cd));m.cd-=ch;const w=WD[m.t],dmg=wdmg(m)*1.2*(s.dmgMul||1)*s.H.wmul*(amb?1.5:1)*gunnery(s),err=(s.ai?(1-s.ai.skill)*.18:0)+(t.ps&&t.ps.k==='evade'?.22:0)+.35*clamp(Math.abs(t.w||0)/(turnRate(t)||1),0,1),del=idx*.1;
+ const ch=Math.max(1,Math.floor(m.cd));m.cd-=ch;const w=WD[m.t],dmg=wdmg(m)*1.2*(s.dmgMul||1)*s.H.wmul*(amb?1.5:1)*gunnery(s),err=(s.ai&&(s.team==='e'||s.auto)?(1-s.ai.skill)*.18:0)+(t.ps&&t.ps.k==='evade'?.22:0)+.35*clamp(Math.abs(t.w||0)/(turnRate(t)||1),0,1),del=idx*.1;
  if(m.t==='beam'){s.queue.push({t:del,fn:()=>{if(!s.alive||!t.alive)return;const side=(idx%2?-1:1)*(wrap(angTo(s,t)-s.a)>0?1:-1);beams.push({s,t,side,time:0,dur:w.dur*(1+.25*(ch-1)),dps:dmg*ch/(w.dur*(1+.25*(ch-1))),ch});sfx('beam',vf(s));}});}
  else if(m.t==='torp'){const V=tvOf(m),sp=w.speed*V.spd,tdm=dmg*V.dmg,tv=m.v||'fusion';for(let i=0;i<2*ch;i++)s.queue.push({t:del+i*.17,fn:()=>{if(!s.alive||!t.alive)return;const a=lead(s,t,sp,err)+(ch>1?((i%3)-1)*.06:0);const p=local(s,20,i%2?-5:5);
    kick(s,-Math.cos(a)*6,-Math.sin(a)*6,0);projs.push({kind:'torp',v:tv,owner:s,target:t,x:p.x,y:p.y,vx:Math.cos(a)*sp+s.vx*.3,vy:Math.sin(a)*sp+s.vy*.3,life:mRange(m)/sp*1.2,dmg:tdm,age:0});
@@ -897,9 +901,9 @@ function updShip(s,dt){
  if(s.fixed){s.vx=s.vy=0;s.speed=0;if(s.role==='base')s.a=wrap(s.a+dt*.04);
   if(!isOn(s,'phase')){s.pd-=dt;if(s.pd<=0){s.pd=.15;pdShot(s,s.x,s.y,s.rad+190,.42*eff(s,'wpn'));}}return;}
  // steering and motion
- const pr=patStep(s,tgtOf(s),s.ps,dt),stg=(s.ps.k==='manual'&&!s.ai)?pr.tg:avoid(s,pr.tg);
+ const pr=patStep(s,tgtOf(s),s.ps,dt),stg=(s.ps.k==='manual'&&s.team==='p'&&!s.auto)?pr.tg:avoid(s,pr.tg);
  if(s.thrAuto&&s.ps.k!=='manual')s.thr=pr.thr;
- const boost=flankOn(s);let thr=boost?1:s.thr,tg2=stg;
+ const boost=flankOn(s);let thr=boost?1:(s.ps.k==='manual'&&s.team==='p'&&!s.auto?pr.thr:s.thr),tg2=stg;
  const beach=isOn(s,'phase')?null:planets.find(pl=>dist(s,pl)<pl.r+s.rad+35);
  if(beach){const a=angTo(beach,s);tg2={x:s.x+Math.cos(a)*400,y:s.y+Math.sin(a)*400};thr=Math.cos(wrap(a-s.a))>.2?1:0;
   if(s.team==='p'&&!s.beachSaid){s.beachSaid=1;msg(uname(s)+' CLAWING AWAY FROM THE PLANET','#ffd166');}}else s.beachSaid=0;
@@ -963,7 +967,13 @@ function setPat(s,k,say){
 // one helm step of a tactical pattern: returns where to steer and how hard
 function patStep(s,t,ps,dt){
  ps.tm+=dt;
- if(ps.k==='manual'){if(s.wpDone)return{tg:null,thr:s.thr};if(dist(s,s.wp)<(s.ai?40:70)){if(!s.ai)s.wpDone=true;return{tg:null,thr:s.thr};}return{tg:s.wp,thr:s.ai?1:s.thr};}
+ const AI=s.team==='e'||!!s.auto;
+ if(ps.k==='manual'&&!AI&&s.wps&&s.wps.length){const last=s.wps.length===1,w=s.wps[0],d=dist(s,w);
+  if(!last){if(d<110)s.wps.shift();return{tg:s.wps[0],thr:s.thr};}
+  // the last waypoint: either sail through it, or brake to a stop on it and turn to face the target
+  if(s.wpStop){const v=Math.hypot(s.vx,s.vy),sd=v*v/(2*(s.accK||accel(s))*.45+1)+25;if(d<60){s.wpHold=true;return{tg:t?{x:t.x,y:t.y}:null,thr:0};}return{tg:w,thr:d<sd?0:s.thr};}
+  if(d<70){s.wps.shift();s.wpDone=true;return{tg:null,thr:s.thr};}return{tg:w,thr:s.thr};}
+ if(ps.k==='manual'){if(!AI&&(s.wpDone||s.wps))return{tg:null,thr:s.thr};if(dist(s,s.wp)<(AI?40:70)){if(!AI)s.wpDone=true;return{tg:null,thr:s.thr};}return{tg:s.wp,thr:AI?1:s.thr};}
  if(!t)return{tg:null,thr:.5};
  const d=dist(s,t),brg=wrap(angTo(s,t)-s.a),side=ps.side,tr=t.rad||20,ld=k=>({x:t.x+(t.vx||0)*k,y:t.y+(t.vy||0)*k});
  const fromC=Math.hypot(s.x,s.y);
@@ -978,7 +988,7 @@ function patStep(s,t,ps,dt){
    if((d<380&&Math.abs(brg)>1.75)||ps.tm>14){ps.ph='extend';ps.tm=0;}
    return{tg:{x:L.x+Math.cos(a)*pass,y:L.y+Math.sin(a)*pass},thr:1};}
   case'orbit':{
-   const r=s.ai?clamp(s.ai.pref,280,560):WD.beam.range*.7;
+   const r=s.ai&&(s.team==='e'||s.auto)?clamp(s.ai.pref,280,560):WD.beam.range*.7;
    const a=angTo(s,t)+side*(Math.PI/2-clamp((d-r)/r*1.6,-.9,.9));return{tg:{x:s.x+Math.cos(a)*300,y:s.y+Math.sin(a)*300},thr:.5};}
   case'evade':{let a=angTo(t,s)+Math.sin(ps.tm*1.4)*.9+side*.35;
    if(fromC>ARENA*.72)a=Math.atan2(-s.y,-s.x)+Math.sin(ps.tm*1.4)*.6;
@@ -1207,7 +1217,7 @@ function engage(){
  for(const s of ships)if(s.alive&&(s.team==='e'||s.auto))aiPlan(s);
  for(const s of ships)if(s.alive)startAct(s);
  tStart={d:teamDealt('p'),t:teamDealt('e')};
- state='exec';turnT=0;ffwd=OPT.fast?2:1;$('#hud').classList.add('exec');updFleetBar(true);
+ state='exec';turnT=0;ffwd=OPT.fast?2:1;$('#hud').classList.add('exec');addWP=false;updFleetBar(true);updCrs();
 }
 // anything still flying when the resolve window runs out: bombs go off where they are, the rest burn out
 function flushProjs(){for(const p of projs.slice()){if(p.kind==='bomb')detonate(p,1);else sparks(p.x,p.y,6,SPR.white,90,.3,6);}projs=[];beams=[];for(const s of ships)s.queue=[];}
@@ -1222,7 +1232,7 @@ function endTurn(){
  const dl=Math.round(teamDealt('p')-tStart.d),tk=Math.round(teamDealt('e')-tStart.t);
  msg(`DEALT ${dl} · TOOK ${tk}`,dl>=tk?'#7dffb0':'#ff9a6b');
  if(player&&player.ps.k==='about')updOrders();
- updFleetBar(true);
+ updFleetBar(true);updCrs();
 }
 function objTurn(){const z=landZone();
  if(z){if(landerIn()){mission.hold=(mission.hold||0)+1;msg(mission.hold>=2?'MARINES ARE IN':'MARINES LANDING · HOLD ONE MORE TURN','#ffe066');}
@@ -1286,7 +1296,7 @@ function start(c,idx){
  // your squadron
  idx.forEach((fi,k)=>{const f=save.fleet[fi],[fx,fy]=FORM[k],s=M==='escort'?buildShip('player',f.lo,o.x-260+fx*.6,-2150+fy*.6,Math.PI/2):buildShip('player',f.lo,(MD.def?-1350:-1550)+fx,py+fy,0);
   s.nm=f.n;s.fi=fi;s.hull=Math.max(1,Math.round(s.maxHull*(1-f.dmg)));s.lastPat=defPat(s);s.ps={k:s.lastPat,ph:'',tm:0,side:k===2?-1:1};
-  s.shAuto=true;s.thrAuto=true;s.act='hold';s.ai=mkAI(s,'warden',.72);ships.push(s);fleet.push(s);});
+  s.shAuto=true;s.thrAuto=true;s.act='hold';s.focus=true;s.wps=[];s.ai=mkAI(s,'warden',.72);ships.push(s);fleet.push(s);});
  // the opposition, in their empire's colours
  const E=EMP[c.foe],HO=c.foe==='terran';// Concord blue is too close to your own cyan, so their ships fight in hostile red
  const ec=HO?'#ff6b5a':E.col,er=HO?'255,107,90':E.rgb,eg=HO?'red':E.spr;ECOL=ec;ERGB=er;const eS={col:ec,rgb:er,g:eg,torp:'red',miss:eg,bomb:'red',beam:eg,bc:er};
@@ -1465,13 +1475,13 @@ function drawEnemyPlan(z){const dt=.05,n=Math.round(TURN/dt);
 // one of your ships: the full maneuver, with markers where its guns bear on the target's projected position
 function drawPlan(sh,z,main){
  const dt=.05,n=Math.round(TURN/dt),t=sh.tgt&&sh.tgt.alive?sh.tgt:null,ep=t&&t.ep?t.ep:null,AM=main?1:.5,col0=main?'95,227,255':'150,200,220';
- const o={x:sh.x,y:sh.y,vx:sh.vx,vy:sh.vy,a:sh.a,w:sh.w,H:sh.H,rad:sh.rad,mounts:sh.mounts,ai:null,wp:{x:sh.wp.x,y:sh.wp.y},wpDone:sh.wpDone,thr:sh.thr,fwd:sh.fwd,ps:Object.assign({},sh.ps)};
+ const o={x:sh.x,y:sh.y,vx:sh.vx,vy:sh.vy,a:sh.a,w:sh.w,H:sh.H,rad:sh.rad,mounts:sh.mounts,ai:null,wp:{x:sh.wp.x,y:sh.wp.y},wps:(sh.wps||[]).map(w=>({x:w.x,y:w.y})),wpStop:sh.wpStop,accK:accel(sh),wpDone:sh.wpDone,thr:sh.thr,fwd:sh.fwd,ps:Object.assign({},sh.ps)};
  if(sh.act==='fold'&&sh.foldTo){const f=sh.foldTo;ctx.strokeStyle=`rgba(201,168,255,${.6*AM})`;ctx.lineWidth=1.5/z;ctx.setLineDash([4/z,8/z]);ctx.beginPath();ctx.moveTo(sh.x,sh.y);ctx.lineTo(f.x,f.y);ctx.stroke();ctx.setLineDash([]);
   ctx.beginPath();ctx.ellipse(f.x,f.y,(22+wpPulse*14)*.6,40+wpPulse*20,sh.a,0,TAU);ctx.stroke();o.x=f.x;o.y=f.y;o.vx*=.3;o.vy*=.3;o.w=0;}
  const MP=motionP(sh),A=sh.H.arcs,bt=sh.mounts.some(m=>m.t==='beam'),tt=sh.mounts.some(m=>m.t==='torp'),rt=sh.mounts.some(m=>m.t==='rail'),tRng=Math.max(0,...sh.mounts.filter(m=>m.t==='torp').map(mRange)),rRng=Math.max(0,...sh.mounts.filter(m=>m.t==='rail').map(mRange));let crash=false;
  const gc=!ep&&t?(t.vis.p?{x:t.x,y:t.y,vx:0,vy:0,rad:t.rad}:t.ctm.p?{x:t.ctm.p.x,y:t.ctm.p.y,vx:0,vy:0,rad:t.rad}:null):null;
  for(let i=0;i<n;i++){const g=ep?ep[i]:gc;
-  const r=patStep(o,g,o.ps,dt),tg=o.ps.k==='manual'?r.tg:avoid(o,r.tg),th=sh.thrAuto&&o.ps.k!=='manual'?r.thr:sh.thr;
+  const r=patStep(o,g,o.ps,dt),tg=o.ps.k==='manual'?r.tg:avoid(o,r.tg),th=o.ps.k==='manual'||sh.thrAuto?r.thr:sh.thr;
   motion(o,tg,th,MP,dt);
   if(planets.some(p=>Math.hypot(o.x-p.x,o.y-p.y)<p.r+sh.rad*.6)){ctx.fillStyle='rgba(255,90,74,.9)';ctx.beginPath();ctx.arc(o.x,o.y,6/z,0,TAU);ctx.fill();crash=true;break;}
   let col=col0,al=.35*AM,sz=1.6;
@@ -1519,7 +1529,10 @@ function render(){
  for(const p of projs)if(p.kind==='bomb'){const pulse=.5+.5*Math.sin(p.age*8),eb=p.owner.team!=='p';
   ctx.fillStyle=`rgba(255,${eb?70:140},50,${.04+.04*pulse})`;ctx.beginPath();ctx.arc(p.x,p.y,p.R,0,TAU);ctx.fill();
   ctx.strokeStyle=`rgba(255,${eb?90:150},60,${.35+.3*pulse})`;ctx.lineWidth=1.5/z;ctx.setLineDash([10/z,8/z]);ctx.lineDashOffset=-p.age*40;ctx.stroke();ctx.setLineDash([]);}
- {const t=player.tgt,eng=player.ps.k!=='manual';if(player.alive&&!player.auto&&(eng?t&&t.alive:!player.wpDone)){const tg=eng?(t.vis.p?t:t.ctm.p||t):player.wp;ctx.strokeStyle=`rgba(${eng?'255,224,102':'95,227,255'},${.3+wpPulse*.6})`;ctx.lineWidth=1.2/z;
+ if(player.alive&&!player.auto&&player.ps.k==='manual'&&player.wps&&player.wps.length){ctx.font=`${12/z}px ui-monospace,Menlo,monospace`;ctx.textAlign='center';
+  player.wps.forEach((w,i)=>{const last=i===player.wps.length-1,r=(last?12:9)/z;ctx.strokeStyle=`rgba(95,227,255,${.75+wpPulse*.25})`;ctx.lineWidth=1.6/z;ctx.beginPath();
+   if(last&&player.wpStop){ctx.rect(w.x-r,w.y-r,2*r,2*r);}else ctx.arc(w.x,w.y,r,0,TAU);ctx.stroke();ctx.fillStyle='rgba(95,227,255,.9)';ctx.fillText(last&&player.wpStop?(i+1)+' STOP':String(i+1),w.x,w.y-r-5/z);});}
+ {const t=player.tgt,eng=player.ps.k!=='manual';if(player.alive&&!player.auto&&(eng?t&&t.alive:false)){const tg=eng?(t.vis.p?t:t.ctm.p||t):player.wp;ctx.strokeStyle=`rgba(${eng?'255,224,102':'95,227,255'},${.3+wpPulse*.6})`;ctx.lineWidth=1.2/z;
   ctx.beginPath();ctx.arc(tg.x,tg.y,(eng?t.rad+18:10)+wpPulse*14,0,TAU);ctx.stroke();}}
  drawAps();
  ctx.globalCompositeOperation='lighter';
@@ -1605,7 +1618,9 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='e
 function pause(){prevState=state;state='pause';show(`<h2>PAUSED</h2><div class="tag">${mission.name.toUpperCase()}</div><p style="font-size:13.5px;opacity:.85">${MT[mission.type].d}</p><button class="btn" data-act="resume">RESUME</button><button class="btn alt" data-act="retreat">RETREAT</button>
  <ul><li>You command up to three ships. Tap a ship (or its button in the fleet bar) to select it, then give it a course and ONE action. When every ship has orders, ENGAGE. Everyone, friend and enemy, carries out their orders together. The enemy chooses in secret.</li>
  <li>AUTO hands a ship to its own captain. Tap AUTO again, or give it any order, to take it back.</li>
- <li>Tap an enemy to make it the selected ship's target. Guns that can't bear on the target fire at anything else in reach.</li>
+ <li>Tap an enemy, or use ◀ ▶ on the target card, to choose the selected ship's target. FOCUS (the default) keeps its guns on that target only. Switch to FREE and guns that can't bear on the target fire at anything else in reach.</li>
+ <li>Tap the map to set a course. + WAYPOINT adds up to five stops. Drag a waypoint to move it, tap one to remove it, and tap the last one to choose between sailing through it and braking to a stop there, facing the target.</li>
+ <li>No weapon fires through a planet. Use them as cover.</li>
  <li>Your ships share sensors. A Longbow's railguns reach far past its own sensors if another ship can see the target.</li>
  <li>Actions: HOLD banks weapon charge. FIRE releases it whenever your guns bear. SCAN reveals the whole board, but also you. FLANK is full speed with no firing, and your engines show from far away. Ships with a cloak also get CLOAK, STRIKE (fire, then cloak halfway through the turn) and AMBUSH.</li>
  <li>Weapons store up to three charges (two for swarms, bombs and railguns). A full bank fires a much bigger volley.</li>
@@ -1618,7 +1633,7 @@ function pause(){prevState=state;state='pause';show(`<h2>PAUSED</h2><div class="
  <li>Pinch to zoom the battle map in or out, or tap MAP to see the whole battlefield at once. Tap it again to go back.</li>
  <li>Tap the bar during a turn to watch at double speed.</li></ul>`);}
 // choosing which of your ships the controls work on
-function select(s){if(!s||!s.alive)return;const ch=player!==s;player=s;enemy=s.tgt;if(ch){buildHUD();buildOrders();buildActs();}updFleetBar(true);}
+function select(s){if(!s||!s.alive)return;const ch=player!==s;player=s;enemy=s.tgt;addWP=false;if(ch){buildHUD();buildOrders();buildActs();}updFleetBar(true);updCrs();}
 function selectNext(){const n=fleet.find(s=>s.alive&&s!==player);if(n)select(n);}
 let fbK='';
 function updFleetBar(force){const el=$('#fleet');if(!el||!player)return;
@@ -1643,7 +1658,7 @@ $('#fleet').addEventListener('pointerdown',e=>{const b=e.target.closest('.fs');i
  select(s);});
 function buildOrders(){if(!player)return;const f=defPat(player);
  $('#pats').innerHTML=PORDER.map(k=>`<button class="ob${k===f?' fit':''}" data-k="${k}"><small>${PAT[k].code}</small><b>${PAT[k].lab}</b></button>`).join('');updOrders();}
-function updOrders(){if(!player)return;const k=player.ps.k==='about'?'about':player.ps.k;$$('#orders .ob').forEach(b=>b.classList.toggle('on',b.dataset.k===k));}
+function updOrders(){if(!player)return;updCrs();const k=player.ps.k==='about'?'about':player.ps.k;$$('#orders .ob').forEach(b=>b.classList.toggle('on',b.dataset.k===k));}
 $('#orders').addEventListener('pointerdown',e=>{const b=e.target.closest('.ob');if(!b||!player||!player.alive)return;e.preventDefault();if(state!=='plan'){msg('ORDERS LOCKED UNTIL NEXT TURN','#ff9a6b');return;}
  if(player.auto){player.auto=false;updFleetBar(true);}
  const k=b.dataset.k;if(k==='evade'&&player.ps.k==='evade'){setPat(player,player.lastPat||defPat(player),true);return;}
@@ -1684,7 +1699,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.9.2';
+const VERSION='0.9.3';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1743,7 +1758,8 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:13.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>More hyperlanes, including lanes across the gaps between spiral arms, so you can push from the rim toward the core and back</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Ships no longer fire any weapon through a planet</li><li>Target control: ◀ ▶ on the target card cycles targets, and FOCUS keeps the ship's guns on its chosen target only (tap for FREE fire)</li><li>Precise courses: up to five waypoints with + WAYPOINT, drag any waypoint to move it, tap one to remove it, and tap the last one to make the ship brake to a stop there and turn to face its target</li></ul>
+ <p><b>0.9.2</b></p><ul style="margin-top:0"><li>More hyperlanes, including lanes across the gaps between spiral arms, so you can push from the rim toward the core and back</li></ul>
  <p><b>0.9.1</b></p><ul style="margin-top:0"><li>A CHECK FOR UPDATE button on the title screen</li></ul>
  <p><b>0.9.0</b></p><ul style="margin-top:0"><li>A new galaxy: 96 named star systems strung along the spiral arms and linked by hyperlanes, with organic borders that grow out from six capitals instead of pie slices</li><li>Every system has a character: shipyards, trade hubs, forge worlds, fortress worlds, ocean worlds, ancient ruins, nebula havens and more, each with a population and a description, and battles there are fought over that world</li><li>Shipyards, trade hubs and forge worlds held by friendly empires make ships, patronage and repairs better for you</li></ul>
  <p><b>0.8.3</b></p><ul style="margin-top:0"><li>New mission: Escort Convoy. Your client's freighters cross the map and you keep the raiders off them</li><li>Your ships never damage each other or friendly freighters, and Concord enemies now show in hostile red so they can't be mistaken for your own ships</li></ul>
@@ -1981,25 +1997,48 @@ function act(a,arg){
 $('#scrBox').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;act(b.dataset.act,b.dataset.arg);});
 
 /* ================= INPUT / LOOP ================= */
-let dragWP=false;
+let dragWP=-1,addWP=false;
 function setWP(e,first){if(state!=='plan'||!player)return;
- const x0=(e.clientX-camO.x)/cam.z,y0=(e.clientY-camO.y)/cam.z,near=o=>Math.hypot(e.clientX-(camO.x+o.x*cam.z),e.clientY-(camO.y+o.y*cam.z))<Math.max(34,o.rad*cam.z+22);
- if(first){dragWP=false;
-  if(player.alive&&player.act==='fold'&&!player.auto){let x=x0,y=y0;const r=Math.hypot(x,y);if(r>ARENA*.95){x*=ARENA*.95/r;y*=ARENA*.95/r;}player.foldTo={x,y};wpPulse=1;return;}
+ const x0=(e.clientX-camO.x)/cam.z,y0=(e.clientY-camO.y)/cam.z,near=(o,px)=>Math.hypot(e.clientX-(camO.x+o.x*cam.z),e.clientY-(camO.y+o.y*cam.z))<Math.max(px||34,(o.rad||0)*cam.z+22);
+ const P=player;
+ if(first){dragWP=-1;
+  if(P.alive&&P.act==='fold'&&!P.auto){let x=x0,y=y0;const r=Math.hypot(x,y);if(r>ARENA*.95){x*=ARENA*.95/r;y*=ARENA*.95/r;}P.foldTo={x,y};wpPulse=1;return;}
   // tap one of your ships to select it
-  const f=fleet.find(s=>s.alive&&s!==player&&near(s));if(f){select(f);return;}
-  // tap an enemy to make it the target
+  const f=fleet.find(s=>s.alive&&s!==P&&near(s));if(f){select(f);return;}
+  // tap an enemy to make it the target; the course stays as it is
   const t=ships.find(o=>o.alive&&o.team==='e'&&o.vis.p&&!isOn(o,'cloak')&&near(o))||ships.find(o=>o.alive&&o.team==='e'&&!o.vis.p&&o.ctm.p&&near(o.ctm.p));
-  if(t&&player.alive){player.tgt=t;enemy=t;if(player.auto){player.auto=false;updFleetBar(true);}if(player.ps.k==='manual')setPat(player,player.lastPat||defPat(player),true);player.thrAuto=true;wpPulse=1;msg(uname(player)+' TARGETING '+uname(t),'#ffe066');return;}
-  if(!player.alive)return;dragWP=true;}
- if(!dragWP||!player.alive)return;
- let x=x0,y=y0;const r=Math.hypot(x,y);if(r>ARENA){x*=ARENA/r;y*=ARENA/r;}
- if(player.auto){player.auto=false;updFleetBar(true);}
- if(player.ps.k!=='manual'){setPat(player,'manual');msg(uname(player)+' · MANUAL COURSE','#5fe3ff');}player.wp.x=x;player.wp.y=y;player.wpDone=false;wpPulse=1;}
+  if(t&&P.alive){setTarget(P,t);return;}
+  if(!P.alive)return;
+  if(P.auto){P.auto=false;updFleetBar(true);}
+  // grab an existing waypoint to move it; tap the last one to switch between sailing through and stopping there
+  if(P.ps.k==='manual'&&P.wps&&P.wps.length){const k=P.wps.findIndex(w=>near(w,26));
+   if(k>=0){dragWP=k;dragMoved=false;dragStart={x:e.clientX,y:e.clientY};return;}}
+  let x=x0,y=y0;const r=Math.hypot(x,y);if(r>ARENA){x*=ARENA/r;y*=ARENA/r;}
+  if(P.ps.k!=='manual'){setPat(P,'manual');P.wps=[];msg(uname(P)+' · MANUAL COURSE · TAP + WAYPOINT TO ADD MORE','#5fe3ff');}
+  if(addWP&&P.wps.length<5){P.wps.push({x,y});addWP=false;updCrs();}else{P.wps=[{x,y}];}
+  P.wpDone=false;P.wpHold=false;dragWP=P.wps.length-1;dragMoved=true;wpPulse=1;syncWP(P);return;}
+ if(dragWP<0||!P.alive||!P.wps||!P.wps[dragWP])return;
+ if(!dragMoved&&Math.hypot(e.clientX-dragStart.x,e.clientY-dragStart.y)<8)return;dragMoved=true;
+ let x=x0,y=y0;const r=Math.hypot(x,y);if(r>ARENA){x*=ARENA/r;y*=ARENA/r;}P.wps[dragWP]={x,y};P.wpDone=false;syncWP(P);}
+let dragMoved=false,dragStart={x:0,y:0};
+function syncWP(s){if(s.wps&&s.wps.length){s.wp.x=s.wps[0].x;s.wp.y=s.wps[0].y;}updCrs();}
+// a tap on a waypoint without dragging it
+function wpTapEnd(){const P=player;if(!P||dragWP<0||dragMoved||!P.wps)return;if(dragWP===P.wps.length-1){P.wpStop=!P.wpStop;msg(P.wpStop?uname(P)+' WILL STOP AT THE LAST WAYPOINT AND FACE ITS TARGET':uname(P)+' WILL SAIL THROUGH THE LAST WAYPOINT','#5fe3ff');}
+ else{P.wps.splice(dragWP,1);msg('WAYPOINT REMOVED','#5fe3ff');syncWP(P);}wpPulse=1;}
+function setTarget(P,t){P.tgt=t;enemy=t;if(P.auto){P.auto=false;updFleetBar(true);}wpPulse=1;msg(uname(P)+' TARGETING '+uname(t)+(P.focus?' · FOCUSED FIRE':''),'#ffe066');}
+// cycle the selected ship's target through everything you know about
+function cycleTarget(d){const P=player;if(!P||!P.alive)return;const L=ships.filter(o=>o.alive&&o.team==='e'&&(o.vis.p||(o.ctm.p&&ctAge('p',o)<TURN*5))).sort((a,b)=>dist(P,a.vis.p?a:a.ctm.p)-dist(P,b.vis.p?b:b.ctm.p));
+ if(!L.length){msg('NO TARGETS IN SIGHT','#ff9a6b');return;}const i=L.indexOf(P.tgt);setTarget(P,L[(i+d+L.length)%L.length]);}
+function updCrs(){const b=$('#crsBtn');if(!b)return;const m=player&&player.alive&&!player.auto&&player.ps.k==='manual'&&state==='plan';b.style.display=m?'':'none';b.classList.toggle('on',addWP);b.textContent=addWP?'TAP MAP':'+ WAYPOINT';
+ const f=$('#focusBtn');if(f&&player){f.textContent=player.focus?'FOCUS':'FREE';f.classList.toggle('on',!!player.focus);}}
+$('#crsBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state!=='plan'||!player)return;if(!player.wps||!player.wps.length){msg('TAP THE MAP TO START A COURSE FIRST','#ff9a6b');return;}if(player.wps.length>=5){msg('FIVE WAYPOINTS AT MOST','#ff9a6b');return;}addWP=!addWP;updCrs();if(addWP)msg('TAP THE MAP TO ADD A WAYPOINT','#5fe3ff');});
+$('#tPrev').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();cycleTarget(-1);});
+$('#tNext').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();cycleTarget(1);});
+$('#focusBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!player)return;player.focus=!player.focus;updCrs();msg(player.focus?uname(player)+' FIRES ONLY ON ITS TARGET':uname(player)+' FIRES ON ANYTHING IN REACH, TARGET FIRST','#ffe066');});
 // two fingers zoom the battle map; the first finger's tap is undone so a pinch never moves your ship
 const ptrs=new Map();let pinch=null,undo=null;
-function snapOrders(){if(!player)return null;return{p:player,wp:{x:player.wp.x,y:player.wp.y},wpDone:player.wpDone,ps:Object.assign({},player.ps),tgt:player.tgt,foldTo:player.foldTo,auto:player.auto,thrAuto:player.thrAuto};}
-function restoreOrders(u){if(!u||!u.p.alive)return;const p=u.p;if(player!==p)select(p);Object.assign(p,{wp:u.wp,wpDone:u.wpDone,ps:u.ps,tgt:u.tgt,foldTo:u.foldTo,auto:u.auto,thrAuto:u.thrAuto});enemy=u.tgt;updOrders();updFleetBar(true);}
+function snapOrders(){if(!player)return null;return{p:player,wps:(player.wps||[]).map(w=>({x:w.x,y:w.y})),wpStop:player.wpStop,wp:{x:player.wp.x,y:player.wp.y},wpDone:player.wpDone,ps:Object.assign({},player.ps),tgt:player.tgt,foldTo:player.foldTo,auto:player.auto,thrAuto:player.thrAuto};}
+function restoreOrders(u){if(!u||!u.p.alive)return;const p=u.p;if(player!==p)select(p);Object.assign(p,{wps:u.wps,wpStop:u.wpStop,wp:u.wp,wpDone:u.wpDone,ps:u.ps,tgt:u.tgt,foldTo:u.foldTo,auto:u.auto,thrAuto:u.thrAuto});enemy=u.tgt;updOrders();updFleetBar(true);}
 cvs.addEventListener('pointerdown',e=>{if(state==='galaxy'){galTap(e);return;}ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(ptrs.size===2){dragging=false;if(state==='plan')restoreOrders(undo);undo=null;const[a,b]=[...ptrs.values()];pinch={d:Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)),z:zoomMul,ov:overview};return;}
  if(ptrs.size>2)return;undo=state==='plan'?snapOrders():null;dragging=true;setWP(e,true);});
@@ -2008,7 +2047,7 @@ addEventListener('pointermove',e=>{if(ptrs.has(e.pointerId))ptrs.set(e.pointerId
   if(pinch.ov){if(r>1.08){overview=false;pinch.ov=false;pinch.z=.3/r;}else return;}
   zoomMul=clamp(pinch.z*r,.15,5);updMapBtn();return;}
  if(dragging&&player&&player.ps.k==='manual')setWP(e,false);});
-function ptrUp(e){ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;dragging=false;}
+function ptrUp(e){if(dragging&&!pinch&&ptrs.size===1)wpTapEnd();ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;dragging=false;dragWP=-1;}
 addEventListener('pointerup',ptrUp);addEventListener('pointercancel',ptrUp);
 cvs.addEventListener('wheel',e=>{if(!player)return;e.preventDefault();if(overview&&e.deltaY<0){overview=false;zoomMul=.3;}else zoomMul=clamp(zoomMul*Math.exp(-e.deltaY*.0015),.15,5);updMapBtn();},{passive:false});
 // the whole battlefield at once
