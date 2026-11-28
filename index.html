@@ -143,7 +143,8 @@ canvas{position:fixed;inset:0;display:block}
 #gbot .ct{display:block;width:100%;text-align:left;font:inherit;color:#cfe9f2;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:8px 9px;margin:6px 0 0}
 #gbot .ct:disabled{opacity:.4}
 #gbot p{margin:3px 0;line-height:1.45;opacity:.85}
-#gside{display:contents}#gtop{order:0;flex:0 0 auto}#gmap{order:1;flex:0 0 auto;width:100%;aspect-ratio:1/1;max-height:60vh;pointer-events:none}#gbot{order:2;flex:1 1 0;min-height:120px}
+#gside{display:contents}#gmap{position:relative}#gzoom{position:absolute;right:4px;bottom:4px;display:flex;flex-direction:column;gap:5px;pointer-events:auto}#gzoom button{font:inherit;font-size:16px;width:40px;height:36px;color:var(--cy);background:rgba(6,12,22,.8);border:1px solid var(--line);border-radius:8px}#gzoom button[data-z='0']{font-size:10px;letter-spacing:.06em}
+#gtop{order:0;flex:0 0 auto}#gmap{order:1;flex:0 0 auto;width:100%;aspect-ratio:1/1;max-height:60vh;pointer-events:none}#gbot{order:2;flex:1 1 0;min-height:120px}
 @media (orientation:landscape){#gal{flex-direction:row;align-items:stretch}#gside{display:flex;flex-direction:column;gap:6px;width:min(400px,46vw);flex:0 0 auto}#gal .gp{width:100%;max-width:none;align-self:stretch}#gmap{flex:1 1 auto;aspect-ratio:auto;max-height:none;height:auto}#greps{grid-template-columns:repeat(2,1fr)}}
 /* screens */
 .ov{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:max(14px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom));background:rgba(2,4,10,.6);z-index:5}
@@ -237,7 +238,7 @@ ul{padding-left:18px;margin:10px 0 0;font-size:13px;line-height:1.55;opacity:.85
  <div id="gside"><div id="gtop" class="gp"><div class="gh"><b>STARSHIPS</b><span id="gcr"></span></div><div id="greps"></div>
   <div class="gb"><button class="btn sm" data-gact="yard">SHIPYARD</button><button class="btn alt sm" data-gact="stand">STANDINGS</button><button class="btn alt sm" data-gact="menu">MENU</button></div></div>
  <div id="gbot" class="gp"></div></div>
- <div id="gmap"></div>
+ <div id="gmap"><div id="gzoom"><button data-z="1">+</button><button data-z="-1">−</button><button data-z="0">FIT</button></div></div>
 </div>
 <div class="ov on" id="scr"><div class="box" id="scrBox"></div></div>
 
@@ -1729,7 +1730,7 @@ function updHUD(){
 
 /* ================= SCREENS ================= */
 /* ================= TITLE, SAVES, OPTIONS ================= */
-const VERSION='0.9.5';
+const VERSION='0.9.6';
 const SLOTS=3,slotKey=i=>'starships_slot_'+i;
 function hasGame(){try{return !!localStorage.getItem(KEY);}catch(e){return false;}}
 function readSlot(i){try{return JSON.parse(localStorage.getItem(slotKey(i)));}catch(e){return null;}}
@@ -1788,7 +1789,8 @@ function privacyScreen(){show(`<h2>PRIVACY POLICY</h2><div class="tag">STARSHIPS
  <button class="btn alt" data-act="${titleBack}">BACK</button>`);}
 function aboutScreen(){show(`<h2>ABOUT</h2><div class="tag">STARSHIPS · VERSION ${VERSION} · WORKING TITLE</div>
  <div style="font-size:13.5px;line-height:1.6;opacity:.9"><p>Turn-based starship duels across a galaxy of six rival empires. Hire out to whoever you like, build a reputation, and decide who rules the stars.</p>
- <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Repair and salvage buttons for every ship on the results screen, plus REPAIR ALL</li></ul>
+ <p><b>New in ${VERSION}</b></p><ul style="margin-top:0"><li>Zoom the galaxy map: pinch, scroll or use + and −, drag to move around. More system names appear the closer you zoom</li></ul>
+ <p><b>0.9.5</b></p><ul style="margin-top:0"><li>Repair and salvage buttons for every ship on the results screen, plus REPAIR ALL</li></ul>
  <p><b>0.9.4</b></p><ul style="margin-top:0"><li>A redesigned shipyard: every hull shows its price, stat bars and role, and locked ships show which empires sell them, in their colours, with your standing</li><li>Trade-in: hand over any ship toward a new one, see exactly what it's worth and what you'll pay, and confirm. Buying asks for confirmation too</li></ul>
  <p><b>0.9.3</b></p><ul style="margin-top:0"><li>Ships no longer fire any weapon through a planet</li><li>Target control: ◀ ▶ on the target card cycles targets, and FOCUS keeps the ship's guns on its chosen target only (tap for FREE fire)</li><li>Precise courses: up to five waypoints with + WAYPOINT, drag any waypoint to move it, tap one to remove it, and tap the last one to make the ship brake to a stop there and turn to face its target</li></ul>
  <p><b>0.9.2</b></p><ul style="margin-top:0"><li>More hyperlanes, including lanes across the gaps between spiral arms, so you can push from the rim toward the core and back</li></ul>
@@ -1810,7 +1812,7 @@ function loSummary(lo){const ws={};lo.mounts.forEach(m=>{if(m.t){const k=m.t==='
  const best=a=>a.reduce((x,y)=>y.length>x.length?y:x,'Mk I');const up=Object.entries(lo.upg).filter(([k,v])=>v).map(([k,v])=>UPG[k].name+' '+v);
  return Object.entries(ws).map(([t,a])=>`${a.length>1?a.length+'x ':''}${t.startsWith('torp:')?TV[t.slice(5)].name+' '+WD.torp.name:WD[t].name}${best(a)!=='Mk I'?' '+best(a):''}`).join(', ')+(lo.mods.length?' · '+lo.mods.map(k=>MODS[k].name).join(', '):'')+(up.length?' · '+up.join(', '):'');}
 let yardTab='ship';
-let gal={sel:-1,img:null,R:0,cx:0,cy:0,k:''};
+let gal={sel:-1,img:null,R:0,cx:0,cy:0,k:'',z:1,ox:0,oy:0};
 function hub(){if(ensureFleet())msg('THE GUILD LENDS YOU A KESTREL','#ffe066');galaxy();}
 function galaxy(){msgEl.innerHTML='';$('#scr').classList.remove('on');$('#hud').classList.remove('on');$('#gal').classList.add('on');state='galaxy';player=null;enemy=null;ships=[];galPanels();}
 function galPanels(){const g=save.g;
@@ -1835,7 +1837,7 @@ function galPanels(){const g=save.g;
  $('#gbot').innerHTML=h;gal.k='';galGeom();
 }
 function galGeom(){const m=$('#gmap').getBoundingClientRect();if(!m.width)return;gal.cx=m.left+m.width/2;gal.cy=m.top+m.height/2;gal.R=Math.max(80,Math.min(m.width,m.height)/2/1.05-4);
- const k=Math.round(gal.R)+':'+DPR;if(gal.k!==k){gal.k=k;gal.img=galImg(gal.R);}}
+ const zb=Math.min(Math.ceil(gal.z*2)/2,3200/(gal.R*2.2*DPR)),k=Math.round(gal.R)+':'+DPR+':'+zb;if(gal.k!==k){gal.k=k;gal.img=galImg(gal.R*zb);gal.imgZ=zb;}}
 function galImg(R){const s=Math.ceil(R*2.2*DPR),c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d'),cx=s/2,RR0=R*DPR,q=mulb(7);
  const cg=x.createRadialGradient(cx,cx,0,cx,cx,RR0);cg.addColorStop(0,'rgba(255,236,200,.55)');cg.addColorStop(.12,'rgba(255,210,160,.22)');cg.addColorStop(.5,'rgba(120,110,200,.08)');cg.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=cg;x.fillRect(0,0,s,s);
  for(let i=0;i<5200;i++){const arm=i%2,t=Math.pow(q(),.8),th=t*3.6*Math.PI+arm*Math.PI+GROT,r=RR0*(.06+.92*t),j=(q()-.5)*RR0*.14*(1-t*.4),a=th+(q()-.5)*.5;
@@ -1845,7 +1847,7 @@ function galImg(R){const s=Math.ceil(R*2.2*DPR),c=document.createElement('canvas
 // territory: each pixel belongs to the nearest star, fading out into open space, so borders wander with the stars
 let terr={k:'',c:null};
 function terrImg(){const g=save.g,k=g.own.join(',');if(terr.k===k)return terr.c;
- const N=340,K=1.15,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d'),im=x.createImageData(N,N),own=new Array(N*N),dd=new Float32Array(N*N);
+ const N=520,K=1.15,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d'),im=x.createImageData(N,N),own=new Array(N*N),dd=new Float32Array(N*N);
  const rgb={};for(const e of EORD)rgb[e]=EMP[e].rgb.split(',').map(Number);
  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const px=((i+.5)/N*2-1)*K,py=((j+.5)/N*2-1)*K;let b=-1,bd=9;
   for(const S of SECT){const d=(S.x-px)*(S.x-px)+(S.y-py)*(S.y-py);if(d<bd){bd=d;b=S.id;}}
@@ -1855,11 +1857,11 @@ function terrImg(){const g=save.g,k=g.own.join(',');if(terr.k===k)return terr.c;
   const c0=rgb[o],f=Math.min(1,(R0-d)/.03),a=edge?.85:(.16+.14*(1-d/R0))*f;
   im.data[p*4]=edge?Math.min(255,c0[0]+70):c0[0];im.data[p*4+1]=edge?Math.min(255,c0[1]+70):c0[1];im.data[p*4+2]=edge?Math.min(255,c0[2]+70):c0[2];im.data[p*4+3]=a*255;}
  x.putImageData(im,0,0);terr={k,c};return c;}
-const sxy=(S)=>({x:gal.cx+S.x*gal.R,y:gal.cy+S.y*gal.R});
+const sxy=(S)=>({x:gal.cx+gal.ox+S.x*gal.R*gal.z,y:gal.cy+gal.oy+S.y*gal.R*gal.z});
 function drawGalaxy(){
  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#03050b';ctx.fillRect(0,0,W,H);
- const{R,cx,cy}=gal,g=save.g;if(!gal.img)return;
- ctx.globalAlpha=.8;ctx.drawImage(gal.img,cx-gal.img.width/DPR/2,cy-gal.img.height/DPR/2,gal.img.width/DPR,gal.img.height/DPR);ctx.globalAlpha=1;
+ const g=save.g;if(!gal.img)return;const Z=gal.z,R=gal.R*Z,cx=gal.cx+gal.ox,cy=gal.cy+gal.oy,iw=gal.img.width/DPR*Z/(gal.imgZ||1);
+ ctx.globalAlpha=.8;ctx.drawImage(gal.img,cx-iw/2,cy-iw/2,iw,iw);ctx.globalAlpha=1;
  ctx.imageSmoothingEnabled=true;ctx.drawImage(terrImg(),cx-R*1.15,cy-R*1.15,R*2.3,R*2.3);
  const sel=gal.sel,cs=sel>=0?contractsFor(sel):[],cand=cs.map(c=>c.client),pl=.5+.5*Math.sin(performance.now()/250);
  // hyperlanes
@@ -1868,7 +1870,8 @@ function drawGalaxy(){
  ctx.setLineDash([]);
  if(sel>=0){const a=sxy(SECT[sel]);ctx.lineWidth=1.6;for(const n of SECT[sel].nb){const b=sxy(SECT[n]);ctx.strokeStyle=cand.includes(g.own[n])?`rgba(${EMP[g.own[n]].rgb},.9)`:'rgba(255,255,255,.35)';ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
  // stars
- for(const S of SECT){const p=sxy(S),E=EMP[g.own[S.id]],r=S.cap?3.6:S.val===3?2.4:S.val===2?2:1.6;
+ const zs=Math.min(1.8,.8+.25*Z);
+ for(const S of SECT){const p=sxy(S),E=EMP[g.own[S.id]],r=(S.cap?3.6:S.val===3?2.4:S.val===2?2:1.6)*zs;
   ctx.fillStyle=`rgba(${E.rgb},.35)`;ctx.beginPath();ctx.arc(p.x,p.y,r*2.4,0,TAU);ctx.fill();
   ctx.fillStyle=S.cap?'#fff6d8':'#eef4ff';ctx.beginPath();ctx.arc(p.x,p.y,r,0,TAU);ctx.fill();
   if(S.cap){ctx.strokeStyle=E.col;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(p.x,p.y,r+3.5,0,TAU);ctx.stroke();}
@@ -1876,12 +1879,29 @@ function drawGalaxy(){
  if(sel>=0){const p=sxy(SECT[sel]);ctx.strokeStyle=`rgba(255,255,255,${.6+.4*pl})`;ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,9,0,TAU);ctx.stroke();}
  // names: capitals always, plus the selected system and its neighbours
  ctx.font='11px ui-monospace,Menlo,monospace';ctx.textAlign='center';ctx.shadowColor='#000';ctx.shadowBlur=4;
- const lab=new Set(SECT.filter(S=>S.cap).map(S=>S.id));if(sel>=0){lab.add(sel);SECT[sel].nb.forEach(n=>lab.add(n));}
+ // the closer you zoom, the more names appear
+ const lab=new Set(SECT.filter(S=>S.cap||(Z>=1.5&&S.val>=2)||Z>=2.2).map(S=>S.id));if(sel>=0){lab.add(sel);SECT[sel].nb.forEach(n=>lab.add(n));}
  for(const id of lab){const S=SECT[id],p=sxy(S),on=id===sel;ctx.fillStyle=on?'#fff':S.cap?'#fff6d8':'rgba(220,230,255,.8)';ctx.font=(on||S.cap?'bold ':'')+'11px ui-monospace,Menlo,monospace';ctx.fillText(S.name.toUpperCase(),p.x,p.y-(S.cap?10:8));}
  ctx.font='bold 10px ui-monospace,Menlo,monospace';
  for(const S of SECT)if(S.cap){const o=g.own[S.id],p=sxy(S);ctx.fillStyle=EMP[o].col;ctx.fillText(EMP[o].short.toUpperCase()+(o!==S.cap?' (TAKEN)':''),p.x,p.y+19);}
  ctx.shadowBlur=0;
 }
+// pinch or scroll to zoom the galaxy, drag to pan, tap a star to select it
+const gptr=new Map();let gdrag=null,gpinch=null;
+function galZoom(nz,mx,my){nz=clamp(nz,1,5);const u=(mx-gal.cx-gal.ox)/(gal.R*gal.z),v=(my-gal.cy-gal.oy)/(gal.R*gal.z);gal.z=nz;gal.ox=mx-gal.cx-u*gal.R*nz;gal.oy=my-gal.cy-v*gal.R*nz;galClamp();}
+function galClamp(){const L=gal.R*(gal.z-1)+gal.R*.3;if(gal.z<=1.001){gal.ox=gal.oy=0;}gal.ox=clamp(gal.ox,-L,L);gal.oy=clamp(gal.oy,-L,L);}
+function galDown(e){gptr.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(gptr.size===2){const[a,b]=[...gptr.values()];gpinch={d:Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)),z:gal.z};gdrag=null;return;}
+ gdrag={x:e.clientX,y:e.clientY,ox:gal.ox,oy:gal.oy,moved:false};}
+function galMove(e){if(!gptr.has(e.pointerId))return;gptr.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(gpinch&&gptr.size>=2){const[a,b]=[...gptr.values()];galZoom(gpinch.z*Math.hypot(a.x-b.x,a.y-b.y)/gpinch.d,(a.x+b.x)/2,(a.y+b.y)/2);return;}
+ if(gdrag){const dx=e.clientX-gdrag.x,dy=e.clientY-gdrag.y;if(!gdrag.moved&&Math.hypot(dx,dy)<8)return;gdrag.moved=true;gal.ox=gdrag.ox+dx;gal.oy=gdrag.oy+dy;galClamp();}}
+function galUp(e){if(!gptr.has(e.pointerId))return;gptr.delete(e.pointerId);if(gptr.size<2)gpinch=null;
+ if(gdrag&&!gdrag.moved&&gptr.size===0)galTap(e);if(gptr.size===0)gdrag=null;}
+addEventListener('pointermove',e=>{if(state==='galaxy')galMove(e);});addEventListener('pointerup',e=>{if(state==='galaxy')galUp(e);});addEventListener('pointercancel',e=>{gptr.delete(e.pointerId);gpinch=null;gdrag=null;});
+cvs.addEventListener('wheel',e=>{if(state!=='galaxy')return;e.preventDefault();galZoom(gal.z*Math.exp(-e.deltaY*.0015),e.clientX,e.clientY);},{passive:false});
+document.addEventListener('pointerdown',e=>{const b=e.target.closest('#gzoom button');if(!b)return;e.preventDefault();e.stopPropagation();const d=+b.dataset.z;
+ if(d===0){gal.z=1;gal.ox=gal.oy=0;}else galZoom(gal.z*(d>0?1.6:1/1.6),gal.cx,gal.cy);});
 function galTap(e){let best=-1,bd=26;for(const S of SECT){const p=sxy(S),d=Math.hypot(e.clientX-p.x,e.clientY-p.y);if(d<bd){bd=d;best=S.id;}}
  gal.sel=best;galPanels();}
 $('#gal').addEventListener('click',e=>{const b=e.target.closest('[data-gact]');if(!b)return;const a=b.dataset.gact;
@@ -2093,7 +2113,7 @@ $('#focusBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropa
 const ptrs=new Map();let pinch=null,undo=null;
 function snapOrders(){if(!player)return null;return{p:player,wps:(player.wps||[]).map(w=>({x:w.x,y:w.y})),wpStop:player.wpStop,wp:{x:player.wp.x,y:player.wp.y},wpDone:player.wpDone,ps:Object.assign({},player.ps),tgt:player.tgt,foldTo:player.foldTo,auto:player.auto,thrAuto:player.thrAuto};}
 function restoreOrders(u){if(!u||!u.p.alive)return;const p=u.p;if(player!==p)select(p);Object.assign(p,{wps:u.wps,wpStop:u.wpStop,wp:u.wp,wpDone:u.wpDone,ps:u.ps,tgt:u.tgt,foldTo:u.foldTo,auto:u.auto,thrAuto:u.thrAuto});enemy=u.tgt;updOrders();updFleetBar(true);}
-cvs.addEventListener('pointerdown',e=>{if(state==='galaxy'){galTap(e);return;}ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+cvs.addEventListener('pointerdown',e=>{if(state==='galaxy'){galDown(e);return;}ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(ptrs.size===2){dragging=false;if(state==='plan')restoreOrders(undo);undo=null;const[a,b]=[...ptrs.values()];pinch={d:Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)),z:zoomMul,ov:overview};return;}
  if(ptrs.size>2)return;undo=state==='plan'?snapOrders():null;dragging=true;setWP(e,true);});
 addEventListener('pointermove',e=>{if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
